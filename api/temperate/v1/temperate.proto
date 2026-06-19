@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package temperate.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "temperate/api/temperate/v1;v1";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.temperate.v1";
+option java_outer_classname = "TemperateProto";
+
+
+service TemperateService {
+    rpc Health(google.protobuf.Empty) returns (GetMessageResponse) {
+        option (google.api.http) = {
+            get: "/health"
+        };
+    }
+}
+
+message GetMessageResponse {
+    string message = 1;
+}

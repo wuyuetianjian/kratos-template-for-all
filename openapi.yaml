@@ -1,0 +1,29 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: TemperateService API
+    version: 0.0.1
+paths:
+    /health:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Health
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.GetMessageResponse'
+components:
+    schemas:
+        temperate.v1.GetMessageResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+tags:
+    - name: TemperateService
