@@ -33,6 +33,18 @@ func (r *authRepo) BootstrapAdmin(ctx context.Context, passwordHash string) (*bi
 	if err != nil {
 		return nil, err
 	}
+	for _, action := range []struct {
+		name        string
+		description string
+	}{
+		{biz.PermissionActionRead, "Read module"},
+		{biz.PermissionActionWrite, "Write module"},
+		{biz.PermissionActionGrant, "Grant module permissions"},
+	} {
+		if _, err := r.ensurePermission(ctx, module, action.name, "", action.description, true); err != nil {
+			return nil, err
+		}
+	}
 	role, err := r.ensureRole(ctx, "Admin", "System administrator", true)
 	if err != nil {
 		return nil, err

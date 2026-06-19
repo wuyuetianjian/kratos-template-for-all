@@ -54,6 +54,17 @@ Permissions are modeled as `module + action`.
 The concrete module and action values are database data. API handlers and
 middleware only evaluate stored permissions.
 
+Module-level permission actions are system constants returned to the frontend
+by `GET /v1/permissions/actions`:
+
+- `read`: 可看模块
+- `write`: 可编辑模块
+- `grant`: 可分配此模块的读写
+
+Modules and concrete permission records are still stored in the database. The
+frontend uses these constants as selectable action options when creating module
+permissions.
+
 ## Role Inheritance
 
 Custom roles can inherit permissions from other roles. Effective permissions
@@ -107,6 +118,7 @@ Authenticated endpoints:
 - `PUT /v1/roles/{role_id}/inheritances`
 - `POST /v1/permissions`
 - `GET /v1/permissions`
+- `GET /v1/permissions/actions`
 - `PATCH /v1/permissions/{id}`
 - `DELETE /v1/permissions/{id}`
 

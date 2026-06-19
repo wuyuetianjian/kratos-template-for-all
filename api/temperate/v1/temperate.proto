@@ -145,6 +145,12 @@ service TemperateService {
         };
     }
 
+    rpc ListPermissionActions(google.protobuf.Empty) returns (ListPermissionActionsReply) {
+        option (google.api.http) = {
+            get: "/v1/permissions/actions"
+        };
+    }
+
     rpc UpdatePermission(UpdatePermissionRequest) returns (Permission) {
         option (google.api.http) = {
             patch: "/v1/permissions/{id}"
@@ -155,6 +161,46 @@ service TemperateService {
     rpc DeletePermission(DeletePermissionRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             delete: "/v1/permissions/{id}"
+        };
+    }
+
+    // SSO provider configuration (public list for login page)
+    rpc ListSSOProvidersPublic(google.protobuf.Empty) returns (ListSSOProvidersPublicReply) {
+        option (google.api.http) = {
+            get: "/v1/sso/providers/public"
+        };
+    }
+
+    // SSO provider management (admin)
+    rpc ListSSOProviders(ListSSOProvidersRequest) returns (ListSSOProvidersReply) {
+        option (google.api.http) = {
+            get: "/v1/sso/providers"
+        };
+    }
+
+    rpc GetSSOProvider(GetSSOProviderRequest) returns (SSOProvider) {
+        option (google.api.http) = {
+            get: "/v1/sso/providers/{id}"
+        };
+    }
+
+    rpc CreateSSOProvider(CreateSSOProviderRequest) returns (SSOProvider) {
+        option (google.api.http) = {
+            post: "/v1/sso/providers"
+            body: "*"
+        };
+    }
+
+    rpc UpdateSSOProvider(UpdateSSOProviderRequest) returns (SSOProvider) {
+        option (google.api.http) = {
+            patch: "/v1/sso/providers/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteSSOProvider(DeleteSSOProviderRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/sso/providers/{id}"
         };
     }
 }
@@ -314,6 +360,16 @@ message ListPermissionsReply {
     int32 total = 2;
 }
 
+message PermissionAction {
+    string action = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message ListPermissionActionsReply {
+    repeated PermissionAction actions = 1;
+}
+
 message UpdatePermissionRequest {
     int64 id = 1 [(google.api.field_behavior) = REQUIRED];
     string operation = 2;
@@ -321,5 +377,64 @@ message UpdatePermissionRequest {
 }
 
 message DeletePermissionRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// ── SSO provider messages ──────────────────────────────────────────────────
+
+message SSOProvider {
+    int64 id = 1;
+    string name = 2;
+    string type = 3;
+    bool enabled = 4;
+    string icon = 5;
+    int32 sort_order = 6;
+    map<string, string> config = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+}
+
+message SSOProviderBrief {
+    int64 id = 1;
+    string name = 2;
+    string type = 3;
+    string icon = 4;
+}
+
+message ListSSOProvidersPublicReply {
+    repeated SSOProviderBrief providers = 1;
+}
+
+message ListSSOProvidersRequest {
+    bool include_disabled = 1;
+}
+
+message ListSSOProvidersReply {
+    repeated SSOProvider providers = 1;
+}
+
+message GetSSOProviderRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateSSOProviderRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+    string type = 2 [(google.api.field_behavior) = REQUIRED];
+    bool enabled = 3;
+    string icon = 4;
+    int32 sort_order = 5;
+    map<string, string> config = 6;
+}
+
+message UpdateSSOProviderRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    string name = 2;
+    bool enabled = 3;
+    string icon = 4;
+    int32 sort_order = 5;
+    map<string, string> config = 6;
+}
+
+message DeleteSSOProviderRequest {
     int64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }

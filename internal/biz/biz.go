@@ -20,6 +20,7 @@ type UseCase struct {
 	confServer           *conf.Server
 	confData             *conf.Data
 	authRepo             AuthRepo
+	ssoRepo              SSOProviderRepo
 	initialAdminPassword string
 }
 
@@ -30,6 +31,7 @@ func NewUseCase(
 	conf *conf.Server,
 	confData *conf.Data,
 	authRepo AuthRepo,
+	ssoRepo SSOProviderRepo,
 ) (*UseCase, error) {
 	if logger == nil {
 		logger = log.Default()
@@ -40,6 +42,7 @@ func NewUseCase(
 		confServer: conf,
 		confData:   confData,
 		authRepo:   authRepo,
+		ssoRepo:    ssoRepo,
 	}
 	if err := uc.BootstrapAdmin(context.Background()); err != nil {
 		return nil, err

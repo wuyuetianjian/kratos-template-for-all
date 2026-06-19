@@ -43,7 +43,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confRegistry *conf.Re
 	}
 	cron := data.NewCron()
 	authRepo := data.NewAuthRepo(dataData)
-	useCase, err := biz.NewUseCase(logger, cron, confServer, confData, authRepo)
+	ssoProviderRepo := data.NewSSOProviderRepo(dataData)
+	useCase, err := biz.NewUseCase(logger, cron, confServer, confData, authRepo, ssoProviderRepo)
 	if err != nil {
 		cleanup3()
 		cleanup2()

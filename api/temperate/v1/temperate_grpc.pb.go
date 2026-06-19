@@ -20,28 +20,35 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TemperateService_Health_FullMethodName                = "/temperate.v1.TemperateService/Health"
-	TemperateService_Login_FullMethodName                 = "/temperate.v1.TemperateService/Login"
-	TemperateService_GetInitialPassword_FullMethodName    = "/temperate.v1.TemperateService/GetInitialPassword"
-	TemperateService_ChangePassword_FullMethodName        = "/temperate.v1.TemperateService/ChangePassword"
-	TemperateService_GetCurrentUser_FullMethodName        = "/temperate.v1.TemperateService/GetCurrentUser"
-	TemperateService_CreateUser_FullMethodName            = "/temperate.v1.TemperateService/CreateUser"
-	TemperateService_ListUsers_FullMethodName             = "/temperate.v1.TemperateService/ListUsers"
-	TemperateService_GetUser_FullMethodName               = "/temperate.v1.TemperateService/GetUser"
-	TemperateService_UpdateUser_FullMethodName            = "/temperate.v1.TemperateService/UpdateUser"
-	TemperateService_DeleteUser_FullMethodName            = "/temperate.v1.TemperateService/DeleteUser"
-	TemperateService_AssignUserRoles_FullMethodName       = "/temperate.v1.TemperateService/AssignUserRoles"
-	TemperateService_CreateRole_FullMethodName            = "/temperate.v1.TemperateService/CreateRole"
-	TemperateService_ListRoles_FullMethodName             = "/temperate.v1.TemperateService/ListRoles"
-	TemperateService_GetRole_FullMethodName               = "/temperate.v1.TemperateService/GetRole"
-	TemperateService_UpdateRole_FullMethodName            = "/temperate.v1.TemperateService/UpdateRole"
-	TemperateService_DeleteRole_FullMethodName            = "/temperate.v1.TemperateService/DeleteRole"
-	TemperateService_AssignRolePermissions_FullMethodName = "/temperate.v1.TemperateService/AssignRolePermissions"
-	TemperateService_SetRoleInheritances_FullMethodName   = "/temperate.v1.TemperateService/SetRoleInheritances"
-	TemperateService_CreatePermission_FullMethodName      = "/temperate.v1.TemperateService/CreatePermission"
-	TemperateService_ListPermissions_FullMethodName       = "/temperate.v1.TemperateService/ListPermissions"
-	TemperateService_UpdatePermission_FullMethodName      = "/temperate.v1.TemperateService/UpdatePermission"
-	TemperateService_DeletePermission_FullMethodName      = "/temperate.v1.TemperateService/DeletePermission"
+	TemperateService_Health_FullMethodName                 = "/temperate.v1.TemperateService/Health"
+	TemperateService_Login_FullMethodName                  = "/temperate.v1.TemperateService/Login"
+	TemperateService_GetInitialPassword_FullMethodName     = "/temperate.v1.TemperateService/GetInitialPassword"
+	TemperateService_ChangePassword_FullMethodName         = "/temperate.v1.TemperateService/ChangePassword"
+	TemperateService_GetCurrentUser_FullMethodName         = "/temperate.v1.TemperateService/GetCurrentUser"
+	TemperateService_CreateUser_FullMethodName             = "/temperate.v1.TemperateService/CreateUser"
+	TemperateService_ListUsers_FullMethodName              = "/temperate.v1.TemperateService/ListUsers"
+	TemperateService_GetUser_FullMethodName                = "/temperate.v1.TemperateService/GetUser"
+	TemperateService_UpdateUser_FullMethodName             = "/temperate.v1.TemperateService/UpdateUser"
+	TemperateService_DeleteUser_FullMethodName             = "/temperate.v1.TemperateService/DeleteUser"
+	TemperateService_AssignUserRoles_FullMethodName        = "/temperate.v1.TemperateService/AssignUserRoles"
+	TemperateService_CreateRole_FullMethodName             = "/temperate.v1.TemperateService/CreateRole"
+	TemperateService_ListRoles_FullMethodName              = "/temperate.v1.TemperateService/ListRoles"
+	TemperateService_GetRole_FullMethodName                = "/temperate.v1.TemperateService/GetRole"
+	TemperateService_UpdateRole_FullMethodName             = "/temperate.v1.TemperateService/UpdateRole"
+	TemperateService_DeleteRole_FullMethodName             = "/temperate.v1.TemperateService/DeleteRole"
+	TemperateService_AssignRolePermissions_FullMethodName  = "/temperate.v1.TemperateService/AssignRolePermissions"
+	TemperateService_SetRoleInheritances_FullMethodName    = "/temperate.v1.TemperateService/SetRoleInheritances"
+	TemperateService_CreatePermission_FullMethodName       = "/temperate.v1.TemperateService/CreatePermission"
+	TemperateService_ListPermissions_FullMethodName        = "/temperate.v1.TemperateService/ListPermissions"
+	TemperateService_ListPermissionActions_FullMethodName  = "/temperate.v1.TemperateService/ListPermissionActions"
+	TemperateService_UpdatePermission_FullMethodName       = "/temperate.v1.TemperateService/UpdatePermission"
+	TemperateService_DeletePermission_FullMethodName       = "/temperate.v1.TemperateService/DeletePermission"
+	TemperateService_ListSSOProvidersPublic_FullMethodName = "/temperate.v1.TemperateService/ListSSOProvidersPublic"
+	TemperateService_ListSSOProviders_FullMethodName       = "/temperate.v1.TemperateService/ListSSOProviders"
+	TemperateService_GetSSOProvider_FullMethodName         = "/temperate.v1.TemperateService/GetSSOProvider"
+	TemperateService_CreateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/CreateSSOProvider"
+	TemperateService_UpdateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/UpdateSSOProvider"
+	TemperateService_DeleteSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/DeleteSSOProvider"
 )
 
 // TemperateServiceClient is the client API for TemperateService service.
@@ -68,8 +75,17 @@ type TemperateServiceClient interface {
 	SetRoleInheritances(ctx context.Context, in *SetRoleInheritancesRequest, opts ...grpc.CallOption) (*Role, error)
 	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
 	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
+	ListPermissionActions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListPermissionActionsReply, error)
 	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
 	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// SSO provider configuration (public list for login page)
+	ListSSOProvidersPublic(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSSOProvidersPublicReply, error)
+	// SSO provider management (admin)
+	ListSSOProviders(ctx context.Context, in *ListSSOProvidersRequest, opts ...grpc.CallOption) (*ListSSOProvidersReply, error)
+	GetSSOProvider(ctx context.Context, in *GetSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error)
+	CreateSSOProvider(ctx context.Context, in *CreateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error)
+	UpdateSSOProvider(ctx context.Context, in *UpdateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error)
+	DeleteSSOProvider(ctx context.Context, in *DeleteSSOProviderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type temperateServiceClient struct {
@@ -280,6 +296,16 @@ func (c *temperateServiceClient) ListPermissions(ctx context.Context, in *ListPe
 	return out, nil
 }
 
+func (c *temperateServiceClient) ListPermissionActions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListPermissionActionsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPermissionActionsReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListPermissionActions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *temperateServiceClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Permission)
@@ -294,6 +320,66 @@ func (c *temperateServiceClient) DeletePermission(ctx context.Context, in *Delet
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, TemperateService_DeletePermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListSSOProvidersPublic(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSSOProvidersPublicReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSSOProvidersPublicReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListSSOProvidersPublic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListSSOProviders(ctx context.Context, in *ListSSOProvidersRequest, opts ...grpc.CallOption) (*ListSSOProvidersReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSSOProvidersReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListSSOProviders_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetSSOProvider(ctx context.Context, in *GetSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SSOProvider)
+	err := c.cc.Invoke(ctx, TemperateService_GetSSOProvider_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) CreateSSOProvider(ctx context.Context, in *CreateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SSOProvider)
+	err := c.cc.Invoke(ctx, TemperateService_CreateSSOProvider_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdateSSOProvider(ctx context.Context, in *UpdateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SSOProvider)
+	err := c.cc.Invoke(ctx, TemperateService_UpdateSSOProvider_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) DeleteSSOProvider(ctx context.Context, in *DeleteSSOProviderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_DeleteSSOProvider_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -324,8 +410,17 @@ type TemperateServiceServer interface {
 	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
 	CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
+	ListPermissionActions(context.Context, *emptypb.Empty) (*ListPermissionActionsReply, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
 	DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error)
+	// SSO provider configuration (public list for login page)
+	ListSSOProvidersPublic(context.Context, *emptypb.Empty) (*ListSSOProvidersPublicReply, error)
+	// SSO provider management (admin)
+	ListSSOProviders(context.Context, *ListSSOProvidersRequest) (*ListSSOProvidersReply, error)
+	GetSSOProvider(context.Context, *GetSSOProviderRequest) (*SSOProvider, error)
+	CreateSSOProvider(context.Context, *CreateSSOProviderRequest) (*SSOProvider, error)
+	UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error)
+	DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTemperateServiceServer()
 }
 
@@ -396,11 +491,32 @@ func (UnimplementedTemperateServiceServer) CreatePermission(context.Context, *Cr
 func (UnimplementedTemperateServiceServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPermissions not implemented")
 }
+func (UnimplementedTemperateServiceServer) ListPermissionActions(context.Context, *emptypb.Empty) (*ListPermissionActionsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPermissionActions not implemented")
+}
 func (UnimplementedTemperateServiceServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdatePermission not implemented")
 }
 func (UnimplementedTemperateServiceServer) DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePermission not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListSSOProvidersPublic(context.Context, *emptypb.Empty) (*ListSSOProvidersPublicReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSSOProvidersPublic not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListSSOProviders(context.Context, *ListSSOProvidersRequest) (*ListSSOProvidersReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSSOProviders not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetSSOProvider(context.Context, *GetSSOProviderRequest) (*SSOProvider, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSSOProvider not implemented")
+}
+func (UnimplementedTemperateServiceServer) CreateSSOProvider(context.Context, *CreateSSOProviderRequest) (*SSOProvider, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateSSOProvider not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateSSOProvider not implemented")
+}
+func (UnimplementedTemperateServiceServer) DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteSSOProvider not implemented")
 }
 func (UnimplementedTemperateServiceServer) mustEmbedUnimplementedTemperateServiceServer() {}
 func (UnimplementedTemperateServiceServer) testEmbeddedByValue()                          {}
@@ -783,6 +899,24 @@ func _TemperateService_ListPermissions_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TemperateService_ListPermissionActions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListPermissionActions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListPermissionActions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListPermissionActions(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TemperateService_UpdatePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdatePermissionRequest)
 	if err := dec(in); err != nil {
@@ -815,6 +949,114 @@ func _TemperateService_DeletePermission_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TemperateServiceServer).DeletePermission(ctx, req.(*DeletePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListSSOProvidersPublic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListSSOProvidersPublic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListSSOProvidersPublic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListSSOProvidersPublic(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListSSOProviders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSSOProvidersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListSSOProviders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListSSOProviders_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListSSOProviders(ctx, req.(*ListSSOProvidersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetSSOProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSSOProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetSSOProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetSSOProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetSSOProvider(ctx, req.(*GetSSOProviderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_CreateSSOProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSSOProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).CreateSSOProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_CreateSSOProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).CreateSSOProvider(ctx, req.(*CreateSSOProviderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdateSSOProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSSOProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdateSSOProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdateSSOProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdateSSOProvider(ctx, req.(*UpdateSSOProviderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_DeleteSSOProvider_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteSSOProviderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).DeleteSSOProvider(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_DeleteSSOProvider_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).DeleteSSOProvider(ctx, req.(*DeleteSSOProviderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -907,12 +1149,40 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TemperateService_ListPermissions_Handler,
 		},
 		{
+			MethodName: "ListPermissionActions",
+			Handler:    _TemperateService_ListPermissionActions_Handler,
+		},
+		{
 			MethodName: "UpdatePermission",
 			Handler:    _TemperateService_UpdatePermission_Handler,
 		},
 		{
 			MethodName: "DeletePermission",
 			Handler:    _TemperateService_DeletePermission_Handler,
+		},
+		{
+			MethodName: "ListSSOProvidersPublic",
+			Handler:    _TemperateService_ListSSOProvidersPublic_Handler,
+		},
+		{
+			MethodName: "ListSSOProviders",
+			Handler:    _TemperateService_ListSSOProviders_Handler,
+		},
+		{
+			MethodName: "GetSSOProvider",
+			Handler:    _TemperateService_GetSSOProvider_Handler,
+		},
+		{
+			MethodName: "CreateSSOProvider",
+			Handler:    _TemperateService_CreateSSOProvider_Handler,
+		},
+		{
+			MethodName: "UpdateSSOProvider",
+			Handler:    _TemperateService_UpdateSSOProvider_Handler,
+		},
+		{
+			MethodName: "DeleteSSOProvider",
+			Handler:    _TemperateService_DeleteSSOProvider_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

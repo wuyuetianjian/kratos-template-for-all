@@ -17,6 +17,11 @@ const (
 	adminUsername = "admin"
 	adminRoleName = "Admin"
 
+	PermissionActionAll   = "*"
+	PermissionActionRead  = "read"
+	PermissionActionWrite = "write"
+	PermissionActionGrant = "grant"
+
 	reasonUnauthorized     = "UNAUTHORIZED"
 	reasonForbidden        = "FORBIDDEN"
 	reasonInvalidArgument  = "INVALID_ARGUMENT"
@@ -93,6 +98,12 @@ type Permission struct {
 	System      bool
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+type PermissionAction struct {
+	Action      string
+	Name        string
+	Description string
 }
 
 type CreateUser struct {
@@ -172,6 +183,26 @@ func ErrUnauthorized() error {
 
 func ErrNotFound(message string) error {
 	return errors.NotFound(reasonNotFound, message)
+}
+
+func (uc *UseCase) PermissionActions(context.Context) []PermissionAction {
+	return []PermissionAction{
+		{
+			Action:      PermissionActionRead,
+			Name:        "可看模块",
+			Description: "允许查看指定模块的数据和页面",
+		},
+		{
+			Action:      PermissionActionWrite,
+			Name:        "可编辑模块",
+			Description: "允许新增、修改、删除指定模块的数据",
+		},
+		{
+			Action:      PermissionActionGrant,
+			Name:        "可分配此模块读写",
+			Description: "允许将指定模块的读写权限分配给其他角色",
+		},
+	}
 }
 
 func (uc *UseCase) BootstrapAdmin(ctx context.Context) error {

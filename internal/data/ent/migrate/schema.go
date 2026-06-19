@@ -71,6 +71,24 @@ var (
 		Columns:    AuthRolesColumns,
 		PrimaryKey: []*schema.Column{AuthRolesColumns[0]},
 	}
+	// AuthSSOProvidersColumns holds the columns for the "auth_sso_providers" table.
+	AuthSSOProvidersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString},
+		{Name: "enabled", Type: field.TypeBool, Default: false},
+		{Name: "icon", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "sort_order", Type: field.TypeInt, Default: 0},
+		{Name: "config", Type: field.TypeJSON, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AuthSSOProvidersTable holds the schema information for the "auth_sso_providers" table.
+	AuthSSOProvidersTable = &schema.Table{
+		Name:       "auth_sso_providers",
+		Columns:    AuthSSOProvidersColumns,
+		PrimaryKey: []*schema.Column{AuthSSOProvidersColumns[0]},
+	}
 	// AuthUsersColumns holds the columns for the "auth_users" table.
 	AuthUsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -169,6 +187,7 @@ var (
 		AuthModulesTable,
 		AuthPermissionsTable,
 		AuthRolesTable,
+		AuthSSOProvidersTable,
 		AuthUsersTable,
 		AuthRolePermissionsTable,
 		AuthRoleParentsTable,
@@ -186,6 +205,9 @@ func init() {
 	}
 	AuthRolesTable.Annotation = &entsql.Annotation{
 		Table: "auth_roles",
+	}
+	AuthSSOProvidersTable.Annotation = &entsql.Annotation{
+		Table: "auth_sso_providers",
 	}
 	AuthUsersTable.Annotation = &entsql.Annotation{
 		Table: "auth_users",

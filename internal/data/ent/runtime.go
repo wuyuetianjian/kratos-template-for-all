@@ -7,6 +7,7 @@ import (
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/schema"
+	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/user"
 	"time"
 )
@@ -75,6 +76,38 @@ func init() {
 	role.DefaultUpdatedAt = roleDescUpdatedAt.Default.(func() time.Time)
 	// role.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	role.UpdateDefaultUpdatedAt = roleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	ssoproviderFields := schema.SSOProvider{}.Fields()
+	_ = ssoproviderFields
+	// ssoproviderDescName is the schema descriptor for name field.
+	ssoproviderDescName := ssoproviderFields[0].Descriptor()
+	// ssoprovider.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	ssoprovider.NameValidator = ssoproviderDescName.Validators[0].(func(string) error)
+	// ssoproviderDescType is the schema descriptor for type field.
+	ssoproviderDescType := ssoproviderFields[1].Descriptor()
+	// ssoprovider.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	ssoprovider.TypeValidator = ssoproviderDescType.Validators[0].(func(string) error)
+	// ssoproviderDescEnabled is the schema descriptor for enabled field.
+	ssoproviderDescEnabled := ssoproviderFields[2].Descriptor()
+	// ssoprovider.DefaultEnabled holds the default value on creation for the enabled field.
+	ssoprovider.DefaultEnabled = ssoproviderDescEnabled.Default.(bool)
+	// ssoproviderDescIcon is the schema descriptor for icon field.
+	ssoproviderDescIcon := ssoproviderFields[3].Descriptor()
+	// ssoprovider.DefaultIcon holds the default value on creation for the icon field.
+	ssoprovider.DefaultIcon = ssoproviderDescIcon.Default.(string)
+	// ssoproviderDescSortOrder is the schema descriptor for sort_order field.
+	ssoproviderDescSortOrder := ssoproviderFields[4].Descriptor()
+	// ssoprovider.DefaultSortOrder holds the default value on creation for the sort_order field.
+	ssoprovider.DefaultSortOrder = ssoproviderDescSortOrder.Default.(int)
+	// ssoproviderDescCreatedAt is the schema descriptor for created_at field.
+	ssoproviderDescCreatedAt := ssoproviderFields[6].Descriptor()
+	// ssoprovider.DefaultCreatedAt holds the default value on creation for the created_at field.
+	ssoprovider.DefaultCreatedAt = ssoproviderDescCreatedAt.Default.(func() time.Time)
+	// ssoproviderDescUpdatedAt is the schema descriptor for updated_at field.
+	ssoproviderDescUpdatedAt := ssoproviderFields[7].Descriptor()
+	// ssoprovider.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	ssoprovider.DefaultUpdatedAt = ssoproviderDescUpdatedAt.Default.(func() time.Time)
+	// ssoprovider.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	ssoprovider.UpdateDefaultUpdatedAt = ssoproviderDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

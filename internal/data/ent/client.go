@@ -14,6 +14,7 @@ import (
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/user"
 
 	"entgo.io/ent"
@@ -33,6 +34,8 @@ type Client struct {
 	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
+	// SSOProvider is the client for interacting with the SSOProvider builders.
+	SSOProvider *SSOProviderClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -49,6 +52,7 @@ func (c *Client) init() {
 	c.Module = NewModuleClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
+	c.SSOProvider = NewSSOProviderClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -140,12 +144,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Module:     NewModuleClient(cfg),
-		Permission: NewPermissionClient(cfg),
-		Role:       NewRoleClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		Module:      NewModuleClient(cfg),
+		Permission:  NewPermissionClient(cfg),
+		Role:        NewRoleClient(cfg),
+		SSOProvider: NewSSOProviderClient(cfg),
+		User:        NewUserClient(cfg),
 	}, nil
 }
 
@@ -163,12 +168,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Module:     NewModuleClient(cfg),
-		Permission: NewPermissionClient(cfg),
-		Role:       NewRoleClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		Module:      NewModuleClient(cfg),
+		Permission:  NewPermissionClient(cfg),
+		Role:        NewRoleClient(cfg),
+		SSOProvider: NewSSOProviderClient(cfg),
+		User:        NewUserClient(cfg),
 	}, nil
 }
 
@@ -200,6 +206,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Module.Use(hooks...)
 	c.Permission.Use(hooks...)
 	c.Role.Use(hooks...)
+	c.SSOProvider.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -209,6 +216,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Module.Intercept(interceptors...)
 	c.Permission.Intercept(interceptors...)
 	c.Role.Intercept(interceptors...)
+	c.SSOProvider.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -221,6 +229,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Permission.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
+	case *SSOProviderMutation:
+		return c.SSOProvider.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -723,6 +733,139 @@ func (c *RoleClient) mutate(ctx context.Context, m *RoleMutation) (Value, error)
 	}
 }
 
+// SSOProviderClient is a client for the SSOProvider schema.
+type SSOProviderClient struct {
+	config
+}
+
+// NewSSOProviderClient returns a client for the SSOProvider from the given config.
+func NewSSOProviderClient(c config) *SSOProviderClient {
+	return &SSOProviderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ssoprovider.Hooks(f(g(h())))`.
+func (c *SSOProviderClient) Use(hooks ...Hook) {
+	c.hooks.SSOProvider = append(c.hooks.SSOProvider, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `ssoprovider.Intercept(f(g(h())))`.
+func (c *SSOProviderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SSOProvider = append(c.inters.SSOProvider, interceptors...)
+}
+
+// Create returns a builder for creating a SSOProvider entity.
+func (c *SSOProviderClient) Create() *SSOProviderCreate {
+	mutation := newSSOProviderMutation(c.config, OpCreate)
+	return &SSOProviderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SSOProvider entities.
+func (c *SSOProviderClient) CreateBulk(builders ...*SSOProviderCreate) *SSOProviderCreateBulk {
+	return &SSOProviderCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SSOProviderClient) MapCreateBulk(slice any, setFunc func(*SSOProviderCreate, int)) *SSOProviderCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SSOProviderCreateBulk{err: fmt.Errorf("calling to SSOProviderClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SSOProviderCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SSOProviderCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SSOProvider.
+func (c *SSOProviderClient) Update() *SSOProviderUpdate {
+	mutation := newSSOProviderMutation(c.config, OpUpdate)
+	return &SSOProviderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SSOProviderClient) UpdateOne(_m *SSOProvider) *SSOProviderUpdateOne {
+	mutation := newSSOProviderMutation(c.config, OpUpdateOne, withSSOProvider(_m))
+	return &SSOProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SSOProviderClient) UpdateOneID(id int) *SSOProviderUpdateOne {
+	mutation := newSSOProviderMutation(c.config, OpUpdateOne, withSSOProviderID(id))
+	return &SSOProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SSOProvider.
+func (c *SSOProviderClient) Delete() *SSOProviderDelete {
+	mutation := newSSOProviderMutation(c.config, OpDelete)
+	return &SSOProviderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SSOProviderClient) DeleteOne(_m *SSOProvider) *SSOProviderDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SSOProviderClient) DeleteOneID(id int) *SSOProviderDeleteOne {
+	builder := c.Delete().Where(ssoprovider.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SSOProviderDeleteOne{builder}
+}
+
+// Query returns a query builder for SSOProvider.
+func (c *SSOProviderClient) Query() *SSOProviderQuery {
+	return &SSOProviderQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSSOProvider},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SSOProvider entity by its id.
+func (c *SSOProviderClient) Get(ctx context.Context, id int) (*SSOProvider, error) {
+	return c.Query().Where(ssoprovider.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SSOProviderClient) GetX(ctx context.Context, id int) *SSOProvider {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SSOProviderClient) Hooks() []Hook {
+	return c.hooks.SSOProvider
+}
+
+// Interceptors returns the client interceptors.
+func (c *SSOProviderClient) Interceptors() []Interceptor {
+	return c.inters.SSOProvider
+}
+
+func (c *SSOProviderClient) mutate(ctx context.Context, m *SSOProviderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SSOProviderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SSOProviderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SSOProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SSOProviderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SSOProvider mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -875,9 +1018,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Module, Permission, Role, User []ent.Hook
+		Module, Permission, Role, SSOProvider, User []ent.Hook
 	}
 	inters struct {
-		Module, Permission, Role, User []ent.Interceptor
+		Module, Permission, Role, SSOProvider, User []ent.Interceptor
 	}
 )

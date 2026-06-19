@@ -18,6 +18,8 @@ type Tx struct {
 	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
+	// SSOProvider is the client for interacting with the SSOProvider builders.
+	SSOProvider *SSOProviderClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -154,6 +156,7 @@ func (tx *Tx) init() {
 	tx.Module = NewModuleClient(tx.config)
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
+	tx.SSOProvider = NewSSOProviderClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

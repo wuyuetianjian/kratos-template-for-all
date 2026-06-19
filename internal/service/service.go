@@ -229,6 +229,19 @@ func (s *IncidentService) ListPermissions(ctx context.Context, req *v1.ListPermi
 	return &v1.ListPermissionsReply{Permissions: convertPermissions(permissions), Total: int32(total)}, nil
 }
 
+func (s *IncidentService) ListPermissionActions(ctx context.Context, _ *emptypb.Empty) (*v1.ListPermissionActionsReply, error) {
+	actions := s.useCase.PermissionActions(ctx)
+	result := make([]*v1.PermissionAction, 0, len(actions))
+	for _, action := range actions {
+		result = append(result, &v1.PermissionAction{
+			Action:      action.Action,
+			Name:        action.Name,
+			Description: action.Description,
+		})
+	}
+	return &v1.ListPermissionActionsReply{Actions: result}, nil
+}
+
 func (s *IncidentService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.Permission, error) {
 	permission, err := s.useCase.UpdatePermission(ctx, &biz.UpdatePermission{
 		ID:          req.GetId(),
@@ -246,6 +259,98 @@ func (s *IncidentService) DeletePermission(ctx context.Context, req *v1.DeletePe
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
+}
+
+// ── SSO providers ──────────────────────────────────────────────────────────
+
+func (s *IncidentService) ListSSOProvidersPublic(ctx context.Context, _ *emptypb.Empty) (*v1.ListSSOProvidersPublicReply, error) {
+	providers, err := s.useCase.ListSSOProviders(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+	briefs := make([]*v1.SSOProviderBrief, 0, len(providers))
+	for _, p := range providers {
+		briefs = append(briefs, &v1.SSOProviderBrief{Id: p.ID, Name: p.Name, Type: p.Type, Icon: p.Icon})
+	}
+	return &v1.ListSSOProvidersPublicReply{Providers: briefs}, nil
+}
+
+func (s *IncidentService) ListSSOProviders(ctx context.Context, req *v1.ListSSOProvidersRequest) (*v1.ListSSOProvidersReply, error) {
+	providers, err := s.useCase.ListSSOProviders(ctx, req.GetIncludeDisabled())
+	if err != nil {
+		return nil, err
+	}
+	return &v1.ListSSOProvidersReply{Providers: convertSSOProviders(providers)}, nil
+}
+
+func (s *IncidentService) GetSSOProvider(ctx context.Context, req *v1.GetSSOProviderRequest) (*v1.SSOProvider, error) {
+	p, err := s.useCase.GetSSOProvider(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return convertSSOProvider(p), nil
+}
+
+func (s *IncidentService) CreateSSOProvider(ctx context.Context, req *v1.CreateSSOProviderRequest) (*v1.SSOProvider, error) {
+	p, err := s.useCase.CreateSSOProvider(ctx, &biz.CreateSSOProvider{
+		Name:      req.GetName(),
+		Type:      req.GetType(),
+		Enabled:   req.GetEnabled(),
+		Icon:      req.GetIcon(),
+		SortOrder: req.GetSortOrder(),
+		Config:    req.GetConfig(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return convertSSOProvider(p), nil
+}
+
+func (s *IncidentService) UpdateSSOProvider(ctx context.Context, req *v1.UpdateSSOProviderRequest) (*v1.SSOProvider, error) {
+	p, err := s.useCase.UpdateSSOProvider(ctx, &biz.UpdateSSOProvider{
+		ID:        req.GetId(),
+		Name:      req.GetName(),
+		Enabled:   req.GetEnabled(),
+		Icon:      req.GetIcon(),
+		SortOrder: req.GetSortOrder(),
+		Config:    req.GetConfig(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return convertSSOProvider(p), nil
+}
+
+func (s *IncidentService) DeleteSSOProvider(ctx context.Context, req *v1.DeleteSSOProviderRequest) (*emptypb.Empty, error) {
+	if err := s.useCase.DeleteSSOProvider(ctx, req.GetId()); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func convertSSOProviders(providers []biz.SSOProvider) []*v1.SSOProvider {
+	result := make([]*v1.SSOProvider, 0, len(providers))
+	for i := range providers {
+		result = append(result, convertSSOProvider(&providers[i]))
+	}
+	return result
+}
+
+func convertSSOProvider(p *biz.SSOProvider) *v1.SSOProvider {
+	if p == nil {
+		return nil
+	}
+	return &v1.SSOProvider{
+		Id:        p.ID,
+		Name:      p.Name,
+		Type:      p.Type,
+		Enabled:   p.Enabled,
+		Icon:      p.Icon,
+		SortOrder: p.SortOrder,
+		Config:    p.Config,
+		CreatedAt: timestamppb.New(p.CreatedAt),
+		UpdatedAt: timestamppb.New(p.UpdatedAt),
+	}
 }
 
 func convertUsers(users []biz.User) []*v1.User {

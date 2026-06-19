@@ -11,6 +11,7 @@ import (
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/predicate"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/user"
 	"time"
 
@@ -27,10 +28,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeModule     = "Module"
-	TypePermission = "Permission"
-	TypeRole       = "Role"
-	TypeUser       = "User"
+	TypeModule      = "Module"
+	TypePermission  = "Permission"
+	TypeRole        = "Role"
+	TypeSSOProvider = "SSOProvider"
+	TypeUser        = "User"
 )
 
 // ModuleMutation represents an operation that mutates the Module nodes in the graph.
@@ -2300,6 +2302,787 @@ func (m *RoleMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Role edge %s", name)
+}
+
+// SSOProviderMutation represents an operation that mutates the SSOProvider nodes in the graph.
+type SSOProviderMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	_type         *string
+	enabled       *bool
+	icon          *string
+	sort_order    *int
+	addsort_order *int
+	_config       *map[string]string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*SSOProvider, error)
+	predicates    []predicate.SSOProvider
+}
+
+var _ ent.Mutation = (*SSOProviderMutation)(nil)
+
+// ssoproviderOption allows management of the mutation configuration using functional options.
+type ssoproviderOption func(*SSOProviderMutation)
+
+// newSSOProviderMutation creates new mutation for the SSOProvider entity.
+func newSSOProviderMutation(c config, op Op, opts ...ssoproviderOption) *SSOProviderMutation {
+	m := &SSOProviderMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSSOProvider,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSSOProviderID sets the ID field of the mutation.
+func withSSOProviderID(id int) ssoproviderOption {
+	return func(m *SSOProviderMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *SSOProvider
+		)
+		m.oldValue = func(ctx context.Context) (*SSOProvider, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().SSOProvider.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSSOProvider sets the old SSOProvider of the mutation.
+func withSSOProvider(node *SSOProvider) ssoproviderOption {
+	return func(m *SSOProviderMutation) {
+		m.oldValue = func(context.Context) (*SSOProvider, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SSOProviderMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SSOProviderMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SSOProviderMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SSOProviderMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().SSOProvider.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *SSOProviderMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *SSOProviderMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *SSOProviderMutation) ResetName() {
+	m.name = nil
+}
+
+// SetType sets the "type" field.
+func (m *SSOProviderMutation) SetType(s string) {
+	m._type = &s
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *SSOProviderMutation) GetType() (r string, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *SSOProviderMutation) ResetType() {
+	m._type = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *SSOProviderMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *SSOProviderMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *SSOProviderMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetIcon sets the "icon" field.
+func (m *SSOProviderMutation) SetIcon(s string) {
+	m.icon = &s
+}
+
+// Icon returns the value of the "icon" field in the mutation.
+func (m *SSOProviderMutation) Icon() (r string, exists bool) {
+	v := m.icon
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIcon returns the old "icon" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldIcon(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIcon is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIcon requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIcon: %w", err)
+	}
+	return oldValue.Icon, nil
+}
+
+// ClearIcon clears the value of the "icon" field.
+func (m *SSOProviderMutation) ClearIcon() {
+	m.icon = nil
+	m.clearedFields[ssoprovider.FieldIcon] = struct{}{}
+}
+
+// IconCleared returns if the "icon" field was cleared in this mutation.
+func (m *SSOProviderMutation) IconCleared() bool {
+	_, ok := m.clearedFields[ssoprovider.FieldIcon]
+	return ok
+}
+
+// ResetIcon resets all changes to the "icon" field.
+func (m *SSOProviderMutation) ResetIcon() {
+	m.icon = nil
+	delete(m.clearedFields, ssoprovider.FieldIcon)
+}
+
+// SetSortOrder sets the "sort_order" field.
+func (m *SSOProviderMutation) SetSortOrder(i int) {
+	m.sort_order = &i
+	m.addsort_order = nil
+}
+
+// SortOrder returns the value of the "sort_order" field in the mutation.
+func (m *SSOProviderMutation) SortOrder() (r int, exists bool) {
+	v := m.sort_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSortOrder returns the old "sort_order" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldSortOrder(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSortOrder is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSortOrder requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSortOrder: %w", err)
+	}
+	return oldValue.SortOrder, nil
+}
+
+// AddSortOrder adds i to the "sort_order" field.
+func (m *SSOProviderMutation) AddSortOrder(i int) {
+	if m.addsort_order != nil {
+		*m.addsort_order += i
+	} else {
+		m.addsort_order = &i
+	}
+}
+
+// AddedSortOrder returns the value that was added to the "sort_order" field in this mutation.
+func (m *SSOProviderMutation) AddedSortOrder() (r int, exists bool) {
+	v := m.addsort_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSortOrder resets all changes to the "sort_order" field.
+func (m *SSOProviderMutation) ResetSortOrder() {
+	m.sort_order = nil
+	m.addsort_order = nil
+}
+
+// SetConfig sets the "config" field.
+func (m *SSOProviderMutation) SetConfig(value map[string]string) {
+	m._config = &value
+}
+
+// Config returns the value of the "config" field in the mutation.
+func (m *SSOProviderMutation) Config() (r map[string]string, exists bool) {
+	v := m._config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConfig returns the old "config" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldConfig(ctx context.Context) (v map[string]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConfig: %w", err)
+	}
+	return oldValue.Config, nil
+}
+
+// ClearConfig clears the value of the "config" field.
+func (m *SSOProviderMutation) ClearConfig() {
+	m._config = nil
+	m.clearedFields[ssoprovider.FieldConfig] = struct{}{}
+}
+
+// ConfigCleared returns if the "config" field was cleared in this mutation.
+func (m *SSOProviderMutation) ConfigCleared() bool {
+	_, ok := m.clearedFields[ssoprovider.FieldConfig]
+	return ok
+}
+
+// ResetConfig resets all changes to the "config" field.
+func (m *SSOProviderMutation) ResetConfig() {
+	m._config = nil
+	delete(m.clearedFields, ssoprovider.FieldConfig)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SSOProviderMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SSOProviderMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SSOProviderMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SSOProviderMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SSOProviderMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the SSOProvider entity.
+// If the SSOProvider object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SSOProviderMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SSOProviderMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the SSOProviderMutation builder.
+func (m *SSOProviderMutation) Where(ps ...predicate.SSOProvider) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SSOProviderMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SSOProviderMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.SSOProvider, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SSOProviderMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SSOProviderMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (SSOProvider).
+func (m *SSOProviderMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SSOProviderMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.name != nil {
+		fields = append(fields, ssoprovider.FieldName)
+	}
+	if m._type != nil {
+		fields = append(fields, ssoprovider.FieldType)
+	}
+	if m.enabled != nil {
+		fields = append(fields, ssoprovider.FieldEnabled)
+	}
+	if m.icon != nil {
+		fields = append(fields, ssoprovider.FieldIcon)
+	}
+	if m.sort_order != nil {
+		fields = append(fields, ssoprovider.FieldSortOrder)
+	}
+	if m._config != nil {
+		fields = append(fields, ssoprovider.FieldConfig)
+	}
+	if m.created_at != nil {
+		fields = append(fields, ssoprovider.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, ssoprovider.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SSOProviderMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case ssoprovider.FieldName:
+		return m.Name()
+	case ssoprovider.FieldType:
+		return m.GetType()
+	case ssoprovider.FieldEnabled:
+		return m.Enabled()
+	case ssoprovider.FieldIcon:
+		return m.Icon()
+	case ssoprovider.FieldSortOrder:
+		return m.SortOrder()
+	case ssoprovider.FieldConfig:
+		return m.Config()
+	case ssoprovider.FieldCreatedAt:
+		return m.CreatedAt()
+	case ssoprovider.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SSOProviderMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case ssoprovider.FieldName:
+		return m.OldName(ctx)
+	case ssoprovider.FieldType:
+		return m.OldType(ctx)
+	case ssoprovider.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case ssoprovider.FieldIcon:
+		return m.OldIcon(ctx)
+	case ssoprovider.FieldSortOrder:
+		return m.OldSortOrder(ctx)
+	case ssoprovider.FieldConfig:
+		return m.OldConfig(ctx)
+	case ssoprovider.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case ssoprovider.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown SSOProvider field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SSOProviderMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case ssoprovider.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case ssoprovider.FieldType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case ssoprovider.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case ssoprovider.FieldIcon:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIcon(v)
+		return nil
+	case ssoprovider.FieldSortOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSortOrder(v)
+		return nil
+	case ssoprovider.FieldConfig:
+		v, ok := value.(map[string]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConfig(v)
+		return nil
+	case ssoprovider.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case ssoprovider.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SSOProvider field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SSOProviderMutation) AddedFields() []string {
+	var fields []string
+	if m.addsort_order != nil {
+		fields = append(fields, ssoprovider.FieldSortOrder)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SSOProviderMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case ssoprovider.FieldSortOrder:
+		return m.AddedSortOrder()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SSOProviderMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case ssoprovider.FieldSortOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSortOrder(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SSOProvider numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SSOProviderMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(ssoprovider.FieldIcon) {
+		fields = append(fields, ssoprovider.FieldIcon)
+	}
+	if m.FieldCleared(ssoprovider.FieldConfig) {
+		fields = append(fields, ssoprovider.FieldConfig)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SSOProviderMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SSOProviderMutation) ClearField(name string) error {
+	switch name {
+	case ssoprovider.FieldIcon:
+		m.ClearIcon()
+		return nil
+	case ssoprovider.FieldConfig:
+		m.ClearConfig()
+		return nil
+	}
+	return fmt.Errorf("unknown SSOProvider nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SSOProviderMutation) ResetField(name string) error {
+	switch name {
+	case ssoprovider.FieldName:
+		m.ResetName()
+		return nil
+	case ssoprovider.FieldType:
+		m.ResetType()
+		return nil
+	case ssoprovider.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case ssoprovider.FieldIcon:
+		m.ResetIcon()
+		return nil
+	case ssoprovider.FieldSortOrder:
+		m.ResetSortOrder()
+		return nil
+	case ssoprovider.FieldConfig:
+		m.ResetConfig()
+		return nil
+	case ssoprovider.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case ssoprovider.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown SSOProvider field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SSOProviderMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SSOProviderMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SSOProviderMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SSOProviderMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SSOProviderMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SSOProviderMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SSOProviderMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown SSOProvider unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SSOProviderMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown SSOProvider edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

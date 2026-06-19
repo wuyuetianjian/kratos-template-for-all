@@ -115,6 +115,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.Permission'
+    /v1/permissions/actions:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ListPermissionActions
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListPermissionActionsReply'
     /v1/permissions/{id}:
         delete:
             tags:
@@ -296,6 +308,109 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/sso/providers:
+        get:
+            tags:
+                - TemperateService
+            description: SSO provider management (admin)
+            operationId: TemperateService_ListSSOProviders
+            parameters:
+                - name: includeDisabled
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListSSOProvidersReply'
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_CreateSSOProvider
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.CreateSSOProviderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.SSOProvider'
+    /v1/sso/providers/public:
+        get:
+            tags:
+                - TemperateService
+            description: SSO provider configuration (public list for login page)
+            operationId: TemperateService_ListSSOProvidersPublic
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListSSOProvidersPublicReply'
+    /v1/sso/providers/{id}:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetSSOProvider
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.SSOProvider'
+        delete:
+            tags:
+                - TemperateService
+            operationId: TemperateService_DeleteSSOProvider
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        patch:
+            tags:
+                - TemperateService
+            operationId: TemperateService_UpdateSSOProvider
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.UpdateSSOProviderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.SSOProvider'
     /v1/users:
         get:
             tags:
@@ -480,6 +595,27 @@ components:
                     type: array
                     items:
                         type: string
+        temperate.v1.CreateSSOProviderRequest:
+            required:
+                - name
+                - type
+            type: object
+            properties:
+                name:
+                    type: string
+                type:
+                    type: string
+                enabled:
+                    type: boolean
+                icon:
+                    type: string
+                sortOrder:
+                    type: integer
+                    format: int32
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
         temperate.v1.CreateUserRequest:
             required:
                 - username
@@ -512,6 +648,13 @@ components:
                     type: string
                 initialPassword:
                     type: string
+        temperate.v1.ListPermissionActionsReply:
+            type: object
+            properties:
+                actions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.PermissionAction'
         temperate.v1.ListPermissionsReply:
             type: object
             properties:
@@ -532,6 +675,20 @@ components:
                 total:
                     type: integer
                     format: int32
+        temperate.v1.ListSSOProvidersPublicReply:
+            type: object
+            properties:
+                providers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.SSOProviderBrief'
+        temperate.v1.ListSSOProvidersReply:
+            type: object
+            properties:
+                providers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.SSOProvider'
         temperate.v1.ListUsersReply:
             type: object
             properties:
@@ -584,6 +741,15 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+        temperate.v1.PermissionAction:
+            type: object
+            properties:
+                action:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
         temperate.v1.Role:
             type: object
             properties:
@@ -609,6 +775,43 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+        temperate.v1.SSOProvider:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                type:
+                    type: string
+                enabled:
+                    type: boolean
+                icon:
+                    type: string
+                sortOrder:
+                    type: integer
+                    format: int32
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        temperate.v1.SSOProviderBrief:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                type:
+                    type: string
+                icon:
+                    type: string
         temperate.v1.SetRoleInheritancesRequest:
             required:
                 - roleId
@@ -640,6 +843,26 @@ components:
                     type: string
                 description:
                     type: string
+        temperate.v1.UpdateSSOProviderRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                enabled:
+                    type: boolean
+                icon:
+                    type: string
+                sortOrder:
+                    type: integer
+                    format: int32
+                config:
+                    type: object
+                    additionalProperties:
+                        type: string
         temperate.v1.UpdateUserRequest:
             required:
                 - id

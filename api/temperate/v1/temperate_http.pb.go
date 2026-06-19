@@ -23,22 +23,29 @@ const OperationTemperateServiceAssignUserRoles = "/temperate.v1.TemperateService
 const OperationTemperateServiceChangePassword = "/temperate.v1.TemperateService/ChangePassword"
 const OperationTemperateServiceCreatePermission = "/temperate.v1.TemperateService/CreatePermission"
 const OperationTemperateServiceCreateRole = "/temperate.v1.TemperateService/CreateRole"
+const OperationTemperateServiceCreateSSOProvider = "/temperate.v1.TemperateService/CreateSSOProvider"
 const OperationTemperateServiceCreateUser = "/temperate.v1.TemperateService/CreateUser"
 const OperationTemperateServiceDeletePermission = "/temperate.v1.TemperateService/DeletePermission"
 const OperationTemperateServiceDeleteRole = "/temperate.v1.TemperateService/DeleteRole"
+const OperationTemperateServiceDeleteSSOProvider = "/temperate.v1.TemperateService/DeleteSSOProvider"
 const OperationTemperateServiceDeleteUser = "/temperate.v1.TemperateService/DeleteUser"
 const OperationTemperateServiceGetCurrentUser = "/temperate.v1.TemperateService/GetCurrentUser"
 const OperationTemperateServiceGetInitialPassword = "/temperate.v1.TemperateService/GetInitialPassword"
 const OperationTemperateServiceGetRole = "/temperate.v1.TemperateService/GetRole"
+const OperationTemperateServiceGetSSOProvider = "/temperate.v1.TemperateService/GetSSOProvider"
 const OperationTemperateServiceGetUser = "/temperate.v1.TemperateService/GetUser"
 const OperationTemperateServiceHealth = "/temperate.v1.TemperateService/Health"
+const OperationTemperateServiceListPermissionActions = "/temperate.v1.TemperateService/ListPermissionActions"
 const OperationTemperateServiceListPermissions = "/temperate.v1.TemperateService/ListPermissions"
 const OperationTemperateServiceListRoles = "/temperate.v1.TemperateService/ListRoles"
+const OperationTemperateServiceListSSOProviders = "/temperate.v1.TemperateService/ListSSOProviders"
+const OperationTemperateServiceListSSOProvidersPublic = "/temperate.v1.TemperateService/ListSSOProvidersPublic"
 const OperationTemperateServiceListUsers = "/temperate.v1.TemperateService/ListUsers"
 const OperationTemperateServiceLogin = "/temperate.v1.TemperateService/Login"
 const OperationTemperateServiceSetRoleInheritances = "/temperate.v1.TemperateService/SetRoleInheritances"
 const OperationTemperateServiceUpdatePermission = "/temperate.v1.TemperateService/UpdatePermission"
 const OperationTemperateServiceUpdateRole = "/temperate.v1.TemperateService/UpdateRole"
+const OperationTemperateServiceUpdateSSOProvider = "/temperate.v1.TemperateService/UpdateSSOProvider"
 const OperationTemperateServiceUpdateUser = "/temperate.v1.TemperateService/UpdateUser"
 
 type TemperateServiceHTTPServer interface {
@@ -47,22 +54,31 @@ type TemperateServiceHTTPServer interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error)
 	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
+	CreateSSOProvider(context.Context, *CreateSSOProviderRequest) (*SSOProvider, error)
 	CreateUser(context.Context, *CreateUserRequest) (*User, error)
 	DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error)
 	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
+	DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
 	GetCurrentUser(context.Context, *emptypb.Empty) (*User, error)
 	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
+	GetSSOProvider(context.Context, *GetSSOProviderRequest) (*SSOProvider, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
 	Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error)
+	ListPermissionActions(context.Context, *emptypb.Empty) (*ListPermissionActionsReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error)
+	// ListSSOProviders SSO provider management (admin)
+	ListSSOProviders(context.Context, *ListSSOProvidersRequest) (*ListSSOProvidersReply, error)
+	// ListSSOProvidersPublic SSO provider configuration (public list for login page)
+	ListSSOProvidersPublic(context.Context, *emptypb.Empty) (*ListSSOProvidersPublicReply, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
+	UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 }
 
@@ -88,8 +104,15 @@ func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTP
 	r.Handle("PUT", "/v1/roles/{role_id}/inheritances", _TemperateService_SetRoleInheritances0_HTTP_Handler(srv))
 	r.Handle("POST", "/v1/permissions", _TemperateService_CreatePermission0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/permissions", _TemperateService_ListPermissions0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/permissions/actions", _TemperateService_ListPermissionActions0_HTTP_Handler(srv))
 	r.Handle("PATCH", "/v1/permissions/{id}", _TemperateService_UpdatePermission0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/v1/permissions/{id}", _TemperateService_DeletePermission0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/sso/providers/public", _TemperateService_ListSSOProvidersPublic0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/sso/providers", _TemperateService_ListSSOProviders0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/sso/providers/{id}", _TemperateService_GetSSOProvider0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/sso/providers", _TemperateService_CreateSSOProvider0_HTTP_Handler(srv))
+	r.Handle("PATCH", "/v1/sso/providers/{id}", _TemperateService_UpdateSSOProvider0_HTTP_Handler(srv))
+	r.Handle("DELETE", "/v1/sso/providers/{id}", _TemperateService_DeleteSSOProvider0_HTTP_Handler(srv))
 }
 
 func _TemperateService_Health0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
@@ -499,6 +522,25 @@ func _TemperateService_ListPermissions0_HTTP_Handler(srv TemperateServiceHTTPSer
 	}
 }
 
+func _TemperateService_ListPermissionActions0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListPermissionActions)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPermissionActions(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPermissionActionsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _TemperateService_UpdatePermission0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdatePermissionRequest
@@ -543,28 +585,160 @@ func _TemperateService_DeletePermission0_HTTP_Handler(srv TemperateServiceHTTPSe
 	}
 }
 
+func _TemperateService_ListSSOProvidersPublic0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListSSOProvidersPublic)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSSOProvidersPublic(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListSSOProvidersPublicReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ListSSOProviders0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSSOProvidersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListSSOProviders)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSSOProviders(ctx, req.(*ListSSOProvidersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListSSOProvidersReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetSSOProvider0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSSOProviderRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetSSOProvider)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSSOProvider(ctx, req.(*GetSSOProviderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SSOProvider)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_CreateSSOProvider0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateSSOProviderRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceCreateSSOProvider)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateSSOProvider(ctx, req.(*CreateSSOProviderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SSOProvider)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_UpdateSSOProvider0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateSSOProviderRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceUpdateSSOProvider)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateSSOProvider(ctx, req.(*UpdateSSOProviderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SSOProvider)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_DeleteSSOProvider0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteSSOProviderRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceDeleteSSOProvider)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteSSOProvider(ctx, req.(*DeleteSSOProviderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TemperateServiceHTTPClient interface {
 	AssignRolePermissions(ctx context.Context, req *AssignRolePermissionsRequest, opts ...http.CallOption) (rsp *Role, err error)
 	AssignUserRoles(ctx context.Context, req *AssignUserRolesRequest, opts ...http.CallOption) (rsp *User, err error)
 	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	CreatePermission(ctx context.Context, req *CreatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	CreateRole(ctx context.Context, req *CreateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	CreateSSOProvider(ctx context.Context, req *CreateSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
 	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *User, err error)
 	DeletePermission(ctx context.Context, req *DeletePermissionRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteRole(ctx context.Context, req *DeleteRoleRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteSSOProvider(ctx context.Context, req *DeleteSSOProviderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetCurrentUser(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *User, err error)
 	GetInitialPassword(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *InitialPasswordReply, err error)
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	GetSSOProvider(ctx context.Context, req *GetSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *User, err error)
 	Health(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetMessageResponse, err error)
+	ListPermissionActions(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListPermissionActionsReply, err error)
 	ListPermissions(ctx context.Context, req *ListPermissionsRequest, opts ...http.CallOption) (rsp *ListPermissionsReply, err error)
 	ListRoles(ctx context.Context, req *ListRolesRequest, opts ...http.CallOption) (rsp *ListRolesReply, err error)
+	// ListSSOProviders SSO provider management (admin)
+	ListSSOProviders(ctx context.Context, req *ListSSOProvidersRequest, opts ...http.CallOption) (rsp *ListSSOProvidersReply, err error)
+	// ListSSOProvidersPublic SSO provider configuration (public list for login page)
+	ListSSOProvidersPublic(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListSSOProvidersPublicReply, err error)
 	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	SetRoleInheritances(ctx context.Context, req *SetRoleInheritancesRequest, opts ...http.CallOption) (rsp *Role, err error)
 	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	UpdateSSOProvider(ctx context.Context, req *UpdateSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *User, err error)
 }
 
@@ -661,6 +835,23 @@ func (c *TemperateServiceHTTPClientImpl) CreateRole(ctx context.Context, in *Cre
 	return &out, nil
 }
 
+func (c *TemperateServiceHTTPClientImpl) CreateSSOProvider(ctx context.Context, in *CreateSSOProviderRequest, opts ...http.CallOption) (*SSOProvider, error) {
+	var out SSOProvider
+	pattern := "/v1/sso/providers"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceCreateSSOProvider),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *TemperateServiceHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...http.CallOption) (*User, error) {
 	var out User
 	pattern := "/v1/users"
@@ -701,6 +892,22 @@ func (c *TemperateServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *Del
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationTemperateServiceDeleteRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) DeleteSSOProvider(ctx context.Context, in *DeleteSSOProviderRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/sso/providers/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceDeleteSSOProvider),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
@@ -774,6 +981,22 @@ func (c *TemperateServiceHTTPClientImpl) GetRole(ctx context.Context, in *GetRol
 	return &out, nil
 }
 
+func (c *TemperateServiceHTTPClientImpl) GetSSOProvider(ctx context.Context, in *GetSSOProviderRequest, opts ...http.CallOption) (*SSOProvider, error) {
+	var out SSOProvider
+	pattern := "/v1/sso/providers/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetSSOProvider),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *TemperateServiceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*User, error) {
 	var out User
 	pattern := "/v1/users/{id}"
@@ -806,6 +1029,22 @@ func (c *TemperateServiceHTTPClientImpl) Health(ctx context.Context, in *emptypb
 	return &out, nil
 }
 
+func (c *TemperateServiceHTTPClientImpl) ListPermissionActions(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListPermissionActionsReply, error) {
+	var out ListPermissionActionsReply
+	pattern := "/v1/permissions/actions"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListPermissionActions),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *TemperateServiceHTTPClientImpl) ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...http.CallOption) (*ListPermissionsReply, error) {
 	var out ListPermissionsReply
 	pattern := "/v1/permissions"
@@ -829,6 +1068,40 @@ func (c *TemperateServiceHTTPClientImpl) ListRoles(ctx context.Context, in *List
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationTemperateServiceListRoles),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListSSOProviders SSO provider management (admin)
+func (c *TemperateServiceHTTPClientImpl) ListSSOProviders(ctx context.Context, in *ListSSOProvidersRequest, opts ...http.CallOption) (*ListSSOProvidersReply, error) {
+	var out ListSSOProvidersReply
+	pattern := "/v1/sso/providers"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListSSOProviders),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListSSOProvidersPublic SSO provider configuration (public list for login page)
+func (c *TemperateServiceHTTPClientImpl) ListSSOProvidersPublic(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListSSOProvidersPublicReply, error) {
+	var out ListSSOProvidersPublicReply
+	pattern := "/v1/sso/providers/public"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListSSOProvidersPublic),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
@@ -913,6 +1186,23 @@ func (c *TemperateServiceHTTPClientImpl) UpdateRole(ctx context.Context, in *Upd
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationTemperateServiceUpdateRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) UpdateSSOProvider(ctx context.Context, in *UpdateSSOProviderRequest, opts ...http.CallOption) (*SSOProvider, error) {
+	var out SSOProvider
+	pattern := "/v1/sso/providers/{id}"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceUpdateSSOProvider),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
