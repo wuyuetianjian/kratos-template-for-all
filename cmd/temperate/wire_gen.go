@@ -42,10 +42,17 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confRegistry *conf.Re
 		return nil, nil, err
 	}
 	cron := data.NewCron()
-	useCase := biz.NewUseCase(logger, cron, confServer, confData)
+	authRepo := data.NewAuthRepo(dataData)
+	useCase, err := biz.NewUseCase(logger, cron, confServer, confData, authRepo)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	incidentService := service.NewIncidentService(confData, useCase, logger)
-	grpcServer := server.NewGRPCServer(confServer, confData, metrics, tracing, incidentService, logger)
-	httpServer := server.NewHTTPServer(confServer, confData, metrics, tracing, incidentService, logger)
+	grpcServer := server.NewGRPCServer(confServer, confData, metrics, tracing, useCase, incidentService, logger)
+	httpServer := server.NewHTTPServer(confServer, confData, metrics, tracing, useCase, incidentService, logger)
 	app := newApp(logger, registrar, dataData, grpcServer, httpServer)
 	return app, func() {
 		cleanup3()

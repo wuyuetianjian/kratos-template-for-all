@@ -3,6 +3,7 @@ package server
 import (
 	"log/slog"
 	v1 "temperate/api/temperate/v1"
+	"temperate/internal/biz"
 	"temperate/internal/conf"
 	"temperate/internal/service"
 
@@ -19,6 +20,7 @@ func NewGRPCServer(
 	data *conf.Data,
 	metrics *Metrics,
 	tracing *Tracing,
+	auth *biz.UseCase,
 	service *service.IncidentService,
 	logger *slog.Logger,
 ) *grpc.Server {
@@ -36,7 +38,7 @@ func NewGRPCServer(
 		middlewares = append(middlewares, ratelimit.Server())
 	}
 	if api.GetAuth() {
-		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey()))
+		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth))
 	}
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(middlewares...),

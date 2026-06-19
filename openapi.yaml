@@ -18,12 +18,665 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.GetMessageResponse'
+    /v1/auth/change-password:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ChangePassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.ChangePasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/auth/initial-password:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetInitialPassword
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.InitialPasswordReply'
+    /v1/auth/login:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.LoginReply'
+    /v1/auth/me:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetCurrentUser
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.User'
+    /v1/permissions:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ListPermissions
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListPermissionsReply'
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_CreatePermission
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.CreatePermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Permission'
+    /v1/permissions/{id}:
+        delete:
+            tags:
+                - TemperateService
+            operationId: TemperateService_DeletePermission
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        patch:
+            tags:
+                - TemperateService
+            operationId: TemperateService_UpdatePermission
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.UpdatePermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Permission'
+    /v1/roles:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ListRoles
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListRolesReply'
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_CreateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.CreateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/roles/{id}:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Role'
+        delete:
+            tags:
+                - TemperateService
+            operationId: TemperateService_DeleteRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        patch:
+            tags:
+                - TemperateService
+            operationId: TemperateService_UpdateRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.UpdateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/roles/{roleId}/inheritances:
+        put:
+            tags:
+                - TemperateService
+            operationId: TemperateService_SetRoleInheritances
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.SetRoleInheritancesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/roles/{roleId}/permissions:
+        put:
+            tags:
+                - TemperateService
+            operationId: TemperateService_AssignRolePermissions
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.AssignRolePermissionsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/users:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ListUsers
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListUsersReply'
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.User'
+    /v1/users/{id}:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.User'
+        delete:
+            tags:
+                - TemperateService
+            operationId: TemperateService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        patch:
+            tags:
+                - TemperateService
+            operationId: TemperateService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.User'
+    /v1/users/{userId}/roles:
+        put:
+            tags:
+                - TemperateService
+            operationId: TemperateService_AssignUserRoles
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.AssignUserRolesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.User'
 components:
     schemas:
+        temperate.v1.AssignRolePermissionsRequest:
+            required:
+                - roleId
+            type: object
+            properties:
+                roleId:
+                    type: string
+                permissionIds:
+                    type: array
+                    items:
+                        type: string
+        temperate.v1.AssignUserRolesRequest:
+            required:
+                - userId
+            type: object
+            properties:
+                userId:
+                    type: string
+                roleIds:
+                    type: array
+                    items:
+                        type: string
+        temperate.v1.ChangePasswordRequest:
+            required:
+                - oldPassword
+                - newPassword
+            type: object
+            properties:
+                oldPassword:
+                    type: string
+                newPassword:
+                    type: string
+        temperate.v1.CreatePermissionRequest:
+            required:
+                - module
+                - action
+            type: object
+            properties:
+                module:
+                    type: string
+                action:
+                    type: string
+                operation:
+                    type: string
+                description:
+                    type: string
+        temperate.v1.CreateRoleRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                permissionIds:
+                    type: array
+                    items:
+                        type: string
+                inheritedRoleIds:
+                    type: array
+                    items:
+                        type: string
+        temperate.v1.CreateUserRequest:
+            required:
+                - username
+                - password
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                displayName:
+                    type: string
+                disabled:
+                    type: boolean
+                roleIds:
+                    type: array
+                    items:
+                        type: string
         temperate.v1.GetMessageResponse:
             type: object
             properties:
                 message:
                     type: string
+        temperate.v1.InitialPasswordReply:
+            type: object
+            properties:
+                available:
+                    type: boolean
+                username:
+                    type: string
+                initialPassword:
+                    type: string
+        temperate.v1.ListPermissionsReply:
+            type: object
+            properties:
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Permission'
+                total:
+                    type: integer
+                    format: int32
+        temperate.v1.ListRolesReply:
+            type: object
+            properties:
+                roles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Role'
+                total:
+                    type: integer
+                    format: int32
+        temperate.v1.ListUsersReply:
+            type: object
+            properties:
+                users:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.User'
+                total:
+                    type: integer
+                    format: int32
+        temperate.v1.LoginReply:
+            type: object
+            properties:
+                token:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/temperate.v1.User'
+                mustChangePassword:
+                    type: boolean
+                initialPassword:
+                    type: string
+        temperate.v1.LoginRequest:
+            required:
+                - username
+                - password
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        temperate.v1.Permission:
+            type: object
+            properties:
+                id:
+                    type: string
+                module:
+                    type: string
+                action:
+                    type: string
+                operation:
+                    type: string
+                description:
+                    type: string
+                system:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        temperate.v1.Role:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                system:
+                    type: boolean
+                permissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Permission'
+                inheritedRoles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Role'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        temperate.v1.SetRoleInheritancesRequest:
+            required:
+                - roleId
+            type: object
+            properties:
+                roleId:
+                    type: string
+                inheritedRoleIds:
+                    type: array
+                    items:
+                        type: string
+        temperate.v1.UpdatePermissionRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                operation:
+                    type: string
+                description:
+                    type: string
+        temperate.v1.UpdateRoleRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                description:
+                    type: string
+        temperate.v1.UpdateUserRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                displayName:
+                    type: string
+                disabled:
+                    type: boolean
+                roleIds:
+                    type: array
+                    items:
+                        type: string
+        temperate.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                displayName:
+                    type: string
+                disabled:
+                    type: boolean
+                system:
+                    type: boolean
+                roles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Role'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
 tags:
     - name: TemperateService

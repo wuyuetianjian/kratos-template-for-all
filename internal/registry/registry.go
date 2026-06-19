@@ -15,7 +15,6 @@ import (
 	etcdreg "github.com/go-kratos/kratos/contrib/registry/etcd/v3"
 	kubereg "github.com/go-kratos/kratos/contrib/registry/kubernetes/v3"
 	nacosreg "github.com/go-kratos/kratos/contrib/registry/nacos/v3"
-	polarisreg "github.com/go-kratos/kratos/contrib/registry/polaris/v3"
 	zookeeperreg "github.com/go-kratos/kratos/contrib/registry/zookeeper/v3"
 	"github.com/go-kratos/kratos/v3/registry"
 	"github.com/go-zookeeper/zk"
@@ -24,8 +23,6 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	polarisapi "github.com/polarismesh/polaris-go/api"
-	polarisconfig "github.com/polarismesh/polaris-go/pkg/config"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -160,48 +157,6 @@ func voClientParam(clientConfig *constant.ClientConfig, serverConfigs []constant
 		ClientConfig:  clientConfig,
 		ServerConfigs: serverConfigs,
 	}
-}
-
-func newPolaris(c *conf.Registry) (registry.Registrar, func(), error) {
-	cfg := polarisconfig.NewDefaultConfiguration(c.GetEndpoints())
-	provider, err := polarisapi.NewProviderAPIByConfig(cfg)
-	if err != nil {
-		return nil, nil, err
-	}
-	consumer, err := polarisapi.NewConsumerAPIByConfig(cfg)
-	if err != nil {
-		provider.Destroy()
-		return nil, nil, err
-	}
-	opts := []polarisreg.Option{}
-	if c.GetNamespace() != "" {
-		opts = append(opts, polarisreg.WithNamespace(c.GetNamespace()))
-	}
-	if c.GetServiceToken() != "" {
-		opts = append(opts, polarisreg.WithServiceToken(c.GetServiceToken()))
-	}
-	if c.GetProtocol() != "" {
-		opts = append(opts, polarisreg.WithProtocol(c.GetProtocol()))
-	}
-	if c.GetWeight() > 0 {
-		opts = append(opts, polarisreg.WithWeight(int(c.GetWeight())))
-	}
-	if c.GetTtlSeconds() > 0 {
-		opts = append(opts, polarisreg.WithTTL(int(c.GetTtlSeconds())))
-	}
-	if c.GetTimeoutSeconds() > 0 {
-		opts = append(opts, polarisreg.WithTimeout(timeout(c)))
-	}
-	if c.GetRetryCount() > 0 {
-		opts = append(opts, polarisreg.WithRetryCount(int(c.GetRetryCount())))
-	}
-	if c.GetHeartbeat() {
-		opts = append(opts, polarisreg.WithHeartbeat(true))
-	}
-	return polarisreg.NewRegistry(provider, consumer, opts...), func() {
-		provider.Destroy()
-		consumer.Destroy()
-	}, nil
 }
 
 func newZookeeper(c *conf.Registry) (registry.Registrar, func(), error) {

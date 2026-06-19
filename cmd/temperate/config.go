@@ -13,7 +13,6 @@ import (
 	consulconfig "github.com/go-kratos/kratos/contrib/config/consul/v3"
 	kubeconfig "github.com/go-kratos/kratos/contrib/config/kubernetes/v3"
 	nacosconfig "github.com/go-kratos/kratos/contrib/config/nacos/v3"
-	polarisconfigsource "github.com/go-kratos/kratos/contrib/config/polaris/v3"
 	kconfig "github.com/go-kratos/kratos/v3/config"
 	"github.com/go-kratos/kratos/v3/config/env"
 	"github.com/go-kratos/kratos/v3/config/file"
@@ -22,8 +21,6 @@ import (
 	nacosconfigclient "github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	nacosconstant "github.com/nacos-group/nacos-sdk-go/common/constant"
 	nacosvo "github.com/nacos-group/nacos-sdk-go/vo"
-	polaris "github.com/polarismesh/polaris-go"
-	polarisconfig "github.com/polarismesh/polaris-go/pkg/config"
 	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"temperate/internal/conf"
@@ -141,20 +138,7 @@ func newRemoteConfigSource(c *conf.Config_Remote) (kconfig.Source, error) {
 			nacosconfig.WithGroup(c.GetGroup()),
 		), nil
 	case "polaris":
-		client, err := polaris.NewConfigAPIByConfig(polarisconfig.NewDefaultConfiguration(c.GetEndpoints()))
-		if err != nil {
-			return nil, err
-		}
-		fileName := c.GetFileName()
-		if fileName == "" {
-			fileName = c.GetPath()
-		}
-		return polarisconfigsource.New(
-			client,
-			polarisconfigsource.WithNamespace(c.GetNamespace()),
-			polarisconfigsource.WithFileGroup(c.GetFileGroup()),
-			polarisconfigsource.WithFileName(fileName),
-		)
+		return newPolarisConfigSource(c)
 	default:
 		return nil, fmt.Errorf("unsupported config driver %q", c.GetDriver())
 	}

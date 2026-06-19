@@ -20,8 +20,306 @@ service TemperateService {
             get: "/health"
         };
     }
+
+    rpc Login(LoginRequest) returns (LoginReply) {
+        option (google.api.http) = {
+            post: "/v1/auth/login"
+            body: "*"
+        };
+    }
+
+    rpc GetInitialPassword(google.protobuf.Empty) returns (InitialPasswordReply) {
+        option (google.api.http) = {
+            get: "/v1/auth/initial-password"
+        };
+    }
+
+    rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/auth/change-password"
+            body: "*"
+        };
+    }
+
+    rpc GetCurrentUser(google.protobuf.Empty) returns (User) {
+        option (google.api.http) = {
+            get: "/v1/auth/me"
+        };
+    }
+
+    rpc CreateUser(CreateUserRequest) returns (User) {
+        option (google.api.http) = {
+            post: "/v1/users"
+            body: "*"
+        };
+    }
+
+    rpc ListUsers(ListUsersRequest) returns (ListUsersReply) {
+        option (google.api.http) = {
+            get: "/v1/users"
+        };
+    }
+
+    rpc GetUser(GetUserRequest) returns (User) {
+        option (google.api.http) = {
+            get: "/v1/users/{id}"
+        };
+    }
+
+    rpc UpdateUser(UpdateUserRequest) returns (User) {
+        option (google.api.http) = {
+            patch: "/v1/users/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/users/{id}"
+        };
+    }
+
+    rpc AssignUserRoles(AssignUserRolesRequest) returns (User) {
+        option (google.api.http) = {
+            put: "/v1/users/{user_id}/roles"
+            body: "*"
+        };
+    }
+
+    rpc CreateRole(CreateRoleRequest) returns (Role) {
+        option (google.api.http) = {
+            post: "/v1/roles"
+            body: "*"
+        };
+    }
+
+    rpc ListRoles(ListRolesRequest) returns (ListRolesReply) {
+        option (google.api.http) = {
+            get: "/v1/roles"
+        };
+    }
+
+    rpc GetRole(GetRoleRequest) returns (Role) {
+        option (google.api.http) = {
+            get: "/v1/roles/{id}"
+        };
+    }
+
+    rpc UpdateRole(UpdateRoleRequest) returns (Role) {
+        option (google.api.http) = {
+            patch: "/v1/roles/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/roles/{id}"
+        };
+    }
+
+    rpc AssignRolePermissions(AssignRolePermissionsRequest) returns (Role) {
+        option (google.api.http) = {
+            put: "/v1/roles/{role_id}/permissions"
+            body: "*"
+        };
+    }
+
+    rpc SetRoleInheritances(SetRoleInheritancesRequest) returns (Role) {
+        option (google.api.http) = {
+            put: "/v1/roles/{role_id}/inheritances"
+            body: "*"
+        };
+    }
+
+    rpc CreatePermission(CreatePermissionRequest) returns (Permission) {
+        option (google.api.http) = {
+            post: "/v1/permissions"
+            body: "*"
+        };
+    }
+
+    rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsReply) {
+        option (google.api.http) = {
+            get: "/v1/permissions"
+        };
+    }
+
+    rpc UpdatePermission(UpdatePermissionRequest) returns (Permission) {
+        option (google.api.http) = {
+            patch: "/v1/permissions/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeletePermission(DeletePermissionRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/permissions/{id}"
+        };
+    }
 }
 
 message GetMessageResponse {
     string message = 1;
+}
+
+message LoginRequest {
+    string username = 1 [(google.api.field_behavior) = REQUIRED];
+    string password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message LoginReply {
+    string token = 1;
+    User user = 2;
+    bool must_change_password = 3;
+    string initial_password = 4;
+}
+
+message InitialPasswordReply {
+    bool available = 1;
+    string username = 2;
+    string initial_password = 3;
+}
+
+message ChangePasswordRequest {
+    string old_password = 1 [(google.api.field_behavior) = REQUIRED];
+    string new_password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message User {
+    int64 id = 1;
+    string username = 2;
+    string display_name = 3;
+    bool disabled = 4;
+    bool system = 5;
+    repeated Role roles = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message Role {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    bool system = 4;
+    repeated Permission permissions = 5;
+    repeated Role inherited_roles = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message Permission {
+    int64 id = 1;
+    string module = 2;
+    string action = 3;
+    string operation = 4;
+    string description = 5;
+    bool system = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message CreateUserRequest {
+    string username = 1 [(google.api.field_behavior) = REQUIRED];
+    string password = 2 [(google.api.field_behavior) = REQUIRED];
+    string display_name = 3;
+    bool disabled = 4;
+    repeated int64 role_ids = 5;
+}
+
+message ListUsersRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+}
+
+message ListUsersReply {
+    repeated User users = 1;
+    int32 total = 2;
+}
+
+message GetUserRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UpdateUserRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    string display_name = 2;
+    bool disabled = 3;
+    repeated int64 role_ids = 4;
+}
+
+message DeleteUserRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AssignUserRolesRequest {
+    int64 user_id = 1 [(google.api.field_behavior) = REQUIRED];
+    repeated int64 role_ids = 2;
+}
+
+message CreateRoleRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+    string description = 2;
+    repeated int64 permission_ids = 3;
+    repeated int64 inherited_role_ids = 4;
+}
+
+message ListRolesRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+}
+
+message ListRolesReply {
+    repeated Role roles = 1;
+    int32 total = 2;
+}
+
+message GetRoleRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UpdateRoleRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    string description = 2;
+}
+
+message DeleteRoleRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AssignRolePermissionsRequest {
+    int64 role_id = 1 [(google.api.field_behavior) = REQUIRED];
+    repeated int64 permission_ids = 2;
+}
+
+message SetRoleInheritancesRequest {
+    int64 role_id = 1 [(google.api.field_behavior) = REQUIRED];
+    repeated int64 inherited_role_ids = 2;
+}
+
+message CreatePermissionRequest {
+    string module = 1 [(google.api.field_behavior) = REQUIRED];
+    string action = 2 [(google.api.field_behavior) = REQUIRED];
+    string operation = 3;
+    string description = 4;
+}
+
+message ListPermissionsRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+}
+
+message ListPermissionsReply {
+    repeated Permission permissions = 1;
+    int32 total = 2;
+}
+
+message UpdatePermissionRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    string operation = 2;
+    string description = 3;
+}
+
+message DeletePermissionRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }

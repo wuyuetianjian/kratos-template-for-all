@@ -113,6 +113,15 @@ go test ./...
 go run ./cmd/temperate -conf ./configs
 ```
 
+Polaris config or registry support is compiled behind the `polaris` build tag
+because Polaris and etcd currently register different protobuf descriptors with
+the same `auth.proto` filename. Use this command only when the deployment needs
+Polaris:
+
+```bash
+go run -tags polaris ./cmd/temperate -conf ./configs
+```
+
 Default local ports are configured in `configs/config.yaml`:
 
 - HTTP: `0.0.0.0:8000`
@@ -252,6 +261,8 @@ config:
     file_group: temperate
     file_name: config.yaml
 ```
+
+Polaris config support requires building with `-tags polaris`.
 
 When `config.watch.enabled` is true, configured keys are watched and changes
 are logged. The template does not rebuild already-created servers, registrars,
@@ -473,6 +484,8 @@ registry:
   retry_count: 1
   heartbeat: true
 ```
+
+Polaris registry support requires building with `-tags polaris`.
 
 Discovery:
 

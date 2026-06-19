@@ -15,16 +15,26 @@ data:
     ratelimit: true
     tracing: true
     tracing_endpoint: localhost:4318
+  # database:
+  #   driver: mysql
+  #   source: root:postgres123@tcp(127.0.0.1:5432)/testdb?parseTime=True&loc=Local
+  #   read_sources:
+  #     - root:postgres123@tcp(127.0.0.1:5432)/testdb?parseTime=True&loc=Local
+  #   max_idle_conns: 10
+  #   max_open_conns: 100
+  #   conn_max_lifetime: 1h
+  #   debug: false
+  #   auto_migrate: true
   database:
-    driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+    driver: postgres
+    source: postgres://postgres:postgres123@127.0.0.1:5432/testdb?sslmode=disable
     read_sources:
-      - root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+      - postgres://postgres:postgres123@127.0.0.1:5432/testdb?sslmode=disable
     max_idle_conns: 10
     max_open_conns: 100
-    conn_max_lifetime: 1h
+    conn_max_lifetime: 3600s
     debug: false
-    auto_migrate: false
+    auto_migrate: true
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s

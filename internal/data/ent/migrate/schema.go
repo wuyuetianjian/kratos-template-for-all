@@ -3,27 +3,197 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
 
 var (
-	// TemplatesColumns holds the columns for the "templates" table.
-	TemplatesColumns = []*schema.Column{
+	// AuthModulesColumns holds the columns for the "auth_modules" table.
+	AuthModulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Default: "template"},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "system", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
-	// TemplatesTable holds the schema information for the "templates" table.
-	TemplatesTable = &schema.Table{
-		Name:       "templates",
-		Columns:    TemplatesColumns,
-		PrimaryKey: []*schema.Column{TemplatesColumns[0]},
+	// AuthModulesTable holds the schema information for the "auth_modules" table.
+	AuthModulesTable = &schema.Table{
+		Name:       "auth_modules",
+		Columns:    AuthModulesColumns,
+		PrimaryKey: []*schema.Column{AuthModulesColumns[0]},
+	}
+	// AuthPermissionsColumns holds the columns for the "auth_permissions" table.
+	AuthPermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "action", Type: field.TypeString},
+		{Name: "operation", Type: field.TypeString, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "system", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "module_permissions", Type: field.TypeInt},
+	}
+	// AuthPermissionsTable holds the schema information for the "auth_permissions" table.
+	AuthPermissionsTable = &schema.Table{
+		Name:       "auth_permissions",
+		Columns:    AuthPermissionsColumns,
+		PrimaryKey: []*schema.Column{AuthPermissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_permissions_auth_modules_permissions",
+				Columns:    []*schema.Column{AuthPermissionsColumns[7]},
+				RefColumns: []*schema.Column{AuthModulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "permission_action_module_permissions",
+				Unique:  true,
+				Columns: []*schema.Column{AuthPermissionsColumns[1], AuthPermissionsColumns[7]},
+			},
+		},
+	}
+	// AuthRolesColumns holds the columns for the "auth_roles" table.
+	AuthRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "system", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AuthRolesTable holds the schema information for the "auth_roles" table.
+	AuthRolesTable = &schema.Table{
+		Name:       "auth_roles",
+		Columns:    AuthRolesColumns,
+		PrimaryKey: []*schema.Column{AuthRolesColumns[0]},
+	}
+	// AuthUsersColumns holds the columns for the "auth_users" table.
+	AuthUsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "username", Type: field.TypeString, Unique: true},
+		{Name: "password_hash", Type: field.TypeString},
+		{Name: "display_name", Type: field.TypeString, Nullable: true},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "system", Type: field.TypeBool, Default: false},
+		{Name: "initial_password_used", Type: field.TypeBool, Default: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AuthUsersTable holds the schema information for the "auth_users" table.
+	AuthUsersTable = &schema.Table{
+		Name:       "auth_users",
+		Columns:    AuthUsersColumns,
+		PrimaryKey: []*schema.Column{AuthUsersColumns[0]},
+	}
+	// AuthRolePermissionsColumns holds the columns for the "auth_role_permissions" table.
+	AuthRolePermissionsColumns = []*schema.Column{
+		{Name: "role_id", Type: field.TypeInt},
+		{Name: "permission_id", Type: field.TypeInt},
+	}
+	// AuthRolePermissionsTable holds the schema information for the "auth_role_permissions" table.
+	AuthRolePermissionsTable = &schema.Table{
+		Name:       "auth_role_permissions",
+		Columns:    AuthRolePermissionsColumns,
+		PrimaryKey: []*schema.Column{AuthRolePermissionsColumns[0], AuthRolePermissionsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_role_permissions_role_id",
+				Columns:    []*schema.Column{AuthRolePermissionsColumns[0]},
+				RefColumns: []*schema.Column{AuthRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "auth_role_permissions_permission_id",
+				Columns:    []*schema.Column{AuthRolePermissionsColumns[1]},
+				RefColumns: []*schema.Column{AuthPermissionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// AuthRoleParentsColumns holds the columns for the "auth_role_parents" table.
+	AuthRoleParentsColumns = []*schema.Column{
+		{Name: "role_id", Type: field.TypeInt},
+		{Name: "parent_id", Type: field.TypeInt},
+	}
+	// AuthRoleParentsTable holds the schema information for the "auth_role_parents" table.
+	AuthRoleParentsTable = &schema.Table{
+		Name:       "auth_role_parents",
+		Columns:    AuthRoleParentsColumns,
+		PrimaryKey: []*schema.Column{AuthRoleParentsColumns[0], AuthRoleParentsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_role_parents_role_id",
+				Columns:    []*schema.Column{AuthRoleParentsColumns[0]},
+				RefColumns: []*schema.Column{AuthRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "auth_role_parents_parent_id",
+				Columns:    []*schema.Column{AuthRoleParentsColumns[1]},
+				RefColumns: []*schema.Column{AuthRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// AuthUserRolesColumns holds the columns for the "auth_user_roles" table.
+	AuthUserRolesColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "role_id", Type: field.TypeInt},
+	}
+	// AuthUserRolesTable holds the schema information for the "auth_user_roles" table.
+	AuthUserRolesTable = &schema.Table{
+		Name:       "auth_user_roles",
+		Columns:    AuthUserRolesColumns,
+		PrimaryKey: []*schema.Column{AuthUserRolesColumns[0], AuthUserRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_user_roles_user_id",
+				Columns:    []*schema.Column{AuthUserRolesColumns[0]},
+				RefColumns: []*schema.Column{AuthUsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "auth_user_roles_role_id",
+				Columns:    []*schema.Column{AuthUserRolesColumns[1]},
+				RefColumns: []*schema.Column{AuthRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		TemplatesTable,
+		AuthModulesTable,
+		AuthPermissionsTable,
+		AuthRolesTable,
+		AuthUsersTable,
+		AuthRolePermissionsTable,
+		AuthRoleParentsTable,
+		AuthUserRolesTable,
 	}
 )
 
 func init() {
+	AuthModulesTable.Annotation = &entsql.Annotation{
+		Table: "auth_modules",
+	}
+	AuthPermissionsTable.ForeignKeys[0].RefTable = AuthModulesTable
+	AuthPermissionsTable.Annotation = &entsql.Annotation{
+		Table: "auth_permissions",
+	}
+	AuthRolesTable.Annotation = &entsql.Annotation{
+		Table: "auth_roles",
+	}
+	AuthUsersTable.Annotation = &entsql.Annotation{
+		Table: "auth_users",
+	}
+	AuthRolePermissionsTable.ForeignKeys[0].RefTable = AuthRolesTable
+	AuthRolePermissionsTable.ForeignKeys[1].RefTable = AuthPermissionsTable
+	AuthRoleParentsTable.ForeignKeys[0].RefTable = AuthRolesTable
+	AuthRoleParentsTable.ForeignKeys[1].RefTable = AuthRolesTable
+	AuthUserRolesTable.ForeignKeys[0].RefTable = AuthUsersTable
+	AuthUserRolesTable.ForeignKeys[1].RefTable = AuthRolesTable
 }

@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	v1 "temperate/api/temperate/v1"
+	"temperate/internal/biz"
 
 	"github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/middleware"
@@ -27,14 +29,21 @@ var (
 	errWrongContext           = errors.Unauthorized(authReason, "Wrong context for middleware")
 	errUnsupportedSigningConf = errors.Unauthorized(authReason, "Unsupported JWT signing method")
 	errMissingJWTKey          = errors.Unauthorized(authReason, "JWT key is missing")
+	errMissingUserID          = errors.Unauthorized(authReason, "Token user_id is missing")
 )
 
 var authAllowlist = newAuthAllowlist(
 	[]string{
 		v1.OperationTemperateServiceHealth,
+		v1.OperationTemperateServiceLogin,
+		v1.OperationTemperateServiceGetInitialPassword,
 	},
 	nil,
 )
+
+type authorizer interface {
+	Authorize(context.Context, int64, string) (*biz.AuthContext, error)
+}
 
 type authOperationAllowlist struct {
 	operations map[string]struct{}
@@ -64,15 +73,15 @@ func (a authOperationAllowlist) Contains(operation string) bool {
 	return false
 }
 
-func selectedAuthMiddleware(signingMethod, key string) middleware.Middleware {
-	return selector.Server(authMiddleware(signingMethod, key)).
+func selectedAuthMiddleware(signingMethod, key string, auth authorizer) middleware.Middleware {
+	return selector.Server(authMiddleware(signingMethod, key, auth)).
 		Match(func(_ context.Context, operation string) bool {
 			return !authAllowlist.Contains(operation)
 		}).
 		Build()
 }
 
-func authMiddleware(signingMethod, key string) middleware.Middleware {
+func authMiddleware(signingMethod, key string, auth authorizer) middleware.Middleware {
 	method, ok := jwtSigningMethod(signingMethod)
 	if !ok {
 		return func(middleware.Handler) middleware.Handler {
@@ -118,9 +127,42 @@ func authMiddleware(signingMethod, key string) middleware.Middleware {
 			if token.Method != method {
 				return nil, errUnsupportedSigning
 			}
+			userID, err := userIDFromClaims(token.Claims)
+			if err != nil {
+				return nil, err
+			}
+			authContext, err := auth.Authorize(ctx, userID, header.Operation())
+			if err != nil {
+				return nil, err
+			}
 
-			return handler(ctx, req)
+			return handler(biz.WithAuthContext(ctx, authContext), req)
 		}
+	}
+}
+
+func userIDFromClaims(claims jwt.Claims) (int64, error) {
+	mapClaims, ok := claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errTokenInvalid
+	}
+	value, ok := mapClaims["user_id"]
+	if !ok {
+		return 0, errMissingUserID
+	}
+	switch typed := value.(type) {
+	case float64:
+		return int64(typed), nil
+	case int64:
+		return typed, nil
+	case string:
+		var id int64
+		if _, err := fmt.Sscan(typed, &id); err != nil {
+			return 0, errMissingUserID
+		}
+		return id, nil
+	default:
+		return 0, errMissingUserID
 	}
 }
 

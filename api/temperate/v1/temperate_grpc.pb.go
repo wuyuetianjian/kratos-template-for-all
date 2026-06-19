@@ -20,7 +20,28 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TemperateService_Health_FullMethodName = "/temperate.v1.TemperateService/Health"
+	TemperateService_Health_FullMethodName                = "/temperate.v1.TemperateService/Health"
+	TemperateService_Login_FullMethodName                 = "/temperate.v1.TemperateService/Login"
+	TemperateService_GetInitialPassword_FullMethodName    = "/temperate.v1.TemperateService/GetInitialPassword"
+	TemperateService_ChangePassword_FullMethodName        = "/temperate.v1.TemperateService/ChangePassword"
+	TemperateService_GetCurrentUser_FullMethodName        = "/temperate.v1.TemperateService/GetCurrentUser"
+	TemperateService_CreateUser_FullMethodName            = "/temperate.v1.TemperateService/CreateUser"
+	TemperateService_ListUsers_FullMethodName             = "/temperate.v1.TemperateService/ListUsers"
+	TemperateService_GetUser_FullMethodName               = "/temperate.v1.TemperateService/GetUser"
+	TemperateService_UpdateUser_FullMethodName            = "/temperate.v1.TemperateService/UpdateUser"
+	TemperateService_DeleteUser_FullMethodName            = "/temperate.v1.TemperateService/DeleteUser"
+	TemperateService_AssignUserRoles_FullMethodName       = "/temperate.v1.TemperateService/AssignUserRoles"
+	TemperateService_CreateRole_FullMethodName            = "/temperate.v1.TemperateService/CreateRole"
+	TemperateService_ListRoles_FullMethodName             = "/temperate.v1.TemperateService/ListRoles"
+	TemperateService_GetRole_FullMethodName               = "/temperate.v1.TemperateService/GetRole"
+	TemperateService_UpdateRole_FullMethodName            = "/temperate.v1.TemperateService/UpdateRole"
+	TemperateService_DeleteRole_FullMethodName            = "/temperate.v1.TemperateService/DeleteRole"
+	TemperateService_AssignRolePermissions_FullMethodName = "/temperate.v1.TemperateService/AssignRolePermissions"
+	TemperateService_SetRoleInheritances_FullMethodName   = "/temperate.v1.TemperateService/SetRoleInheritances"
+	TemperateService_CreatePermission_FullMethodName      = "/temperate.v1.TemperateService/CreatePermission"
+	TemperateService_ListPermissions_FullMethodName       = "/temperate.v1.TemperateService/ListPermissions"
+	TemperateService_UpdatePermission_FullMethodName      = "/temperate.v1.TemperateService/UpdatePermission"
+	TemperateService_DeletePermission_FullMethodName      = "/temperate.v1.TemperateService/DeletePermission"
 )
 
 // TemperateServiceClient is the client API for TemperateService service.
@@ -28,6 +49,27 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TemperateServiceClient interface {
 	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMessageResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	GetInitialPassword(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InitialPasswordReply, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetCurrentUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
+	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersReply, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error)
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssignUserRoles(ctx context.Context, in *AssignUserRolesRequest, opts ...grpc.CallOption) (*User, error)
+	CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*Role, error)
+	ListRoles(ctx context.Context, in *ListRolesRequest, opts ...grpc.CallOption) (*ListRolesReply, error)
+	GetRole(ctx context.Context, in *GetRoleRequest, opts ...grpc.CallOption) (*Role, error)
+	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*Role, error)
+	DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssignRolePermissions(ctx context.Context, in *AssignRolePermissionsRequest, opts ...grpc.CallOption) (*Role, error)
+	SetRoleInheritances(ctx context.Context, in *SetRoleInheritancesRequest, opts ...grpc.CallOption) (*Role, error)
+	CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
+	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error)
+	UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error)
+	DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type temperateServiceClient struct {
@@ -48,11 +90,242 @@ func (c *temperateServiceClient) Health(ctx context.Context, in *emptypb.Empty, 
 	return out, nil
 }
 
+func (c *temperateServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, TemperateService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetInitialPassword(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InitialPasswordReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InitialPasswordReply)
+	err := c.cc.Invoke(ctx, TemperateService_GetInitialPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_ChangePassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetCurrentUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, TemperateService_GetCurrentUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, TemperateService_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListUsersReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, TemperateService_GetUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, TemperateService_UpdateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) AssignUserRoles(ctx context.Context, in *AssignUserRolesRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, TemperateService_AssignUserRoles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*Role, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Role)
+	err := c.cc.Invoke(ctx, TemperateService_CreateRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListRoles(ctx context.Context, in *ListRolesRequest, opts ...grpc.CallOption) (*ListRolesReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRolesReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListRoles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetRole(ctx context.Context, in *GetRoleRequest, opts ...grpc.CallOption) (*Role, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Role)
+	err := c.cc.Invoke(ctx, TemperateService_GetRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*Role, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Role)
+	err := c.cc.Invoke(ctx, TemperateService_UpdateRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_DeleteRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) AssignRolePermissions(ctx context.Context, in *AssignRolePermissionsRequest, opts ...grpc.CallOption) (*Role, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Role)
+	err := c.cc.Invoke(ctx, TemperateService_AssignRolePermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) SetRoleInheritances(ctx context.Context, in *SetRoleInheritancesRequest, opts ...grpc.CallOption) (*Role, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Role)
+	err := c.cc.Invoke(ctx, TemperateService_SetRoleInheritances_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...grpc.CallOption) (*Permission, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Permission)
+	err := c.cc.Invoke(ctx, TemperateService_CreatePermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPermissionsReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...grpc.CallOption) (*Permission, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Permission)
+	err := c.cc.Invoke(ctx, TemperateService_UpdatePermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_DeletePermission_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TemperateServiceServer is the server API for TemperateService service.
 // All implementations must embed UnimplementedTemperateServiceServer
 // for forward compatibility.
 type TemperateServiceServer interface {
 	Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
+	GetCurrentUser(context.Context, *emptypb.Empty) (*User, error)
+	CreateUser(context.Context, *CreateUserRequest) (*User, error)
+	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
+	GetUser(context.Context, *GetUserRequest) (*User, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
+	AssignUserRoles(context.Context, *AssignUserRolesRequest) (*User, error)
+	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
+	ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error)
+	GetRole(context.Context, *GetRoleRequest) (*Role, error)
+	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
+	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
+	AssignRolePermissions(context.Context, *AssignRolePermissionsRequest) (*Role, error)
+	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
+	CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error)
+	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
+	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
+	DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTemperateServiceServer()
 }
 
@@ -65,6 +338,69 @@ type UnimplementedTemperateServiceServer struct{}
 
 func (UnimplementedTemperateServiceServer) Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedTemperateServiceServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetInitialPassword not implemented")
+}
+func (UnimplementedTemperateServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetCurrentUser(context.Context, *emptypb.Empty) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCurrentUser not implemented")
+}
+func (UnimplementedTemperateServiceServer) CreateUser(context.Context, *CreateUserRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetUser(context.Context, *GetUserRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedTemperateServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedTemperateServiceServer) AssignUserRoles(context.Context, *AssignUserRolesRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignUserRoles not implemented")
+}
+func (UnimplementedTemperateServiceServer) CreateRole(context.Context, *CreateRoleRequest) (*Role, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateRole not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRoles not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetRole(context.Context, *GetRoleRequest) (*Role, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetRole not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRole not implemented")
+}
+func (UnimplementedTemperateServiceServer) DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (UnimplementedTemperateServiceServer) AssignRolePermissions(context.Context, *AssignRolePermissionsRequest) (*Role, error) {
+	return nil, status.Error(codes.Unimplemented, "method AssignRolePermissions not implemented")
+}
+func (UnimplementedTemperateServiceServer) SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetRoleInheritances not implemented")
+}
+func (UnimplementedTemperateServiceServer) CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePermission not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPermissions not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePermission not implemented")
+}
+func (UnimplementedTemperateServiceServer) DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePermission not implemented")
 }
 func (UnimplementedTemperateServiceServer) mustEmbedUnimplementedTemperateServiceServer() {}
 func (UnimplementedTemperateServiceServer) testEmbeddedByValue()                          {}
@@ -105,6 +441,384 @@ func _TemperateService_Health_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TemperateService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_Login_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetInitialPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetInitialPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetInitialPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetInitialPassword(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ChangePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetCurrentUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetCurrentUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetCurrentUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetCurrentUser(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).CreateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_CreateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListUsers(ctx, req.(*ListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_AssignUserRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignUserRolesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).AssignUserRoles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_AssignUserRoles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).AssignUserRoles(ctx, req.(*AssignUserRolesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).CreateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_CreateRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).CreateRole(ctx, req.(*CreateRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRolesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListRoles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListRoles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListRoles(ctx, req.(*ListRolesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetRole(ctx, req.(*GetRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdateRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdateRole(ctx, req.(*UpdateRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_DeleteRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).DeleteRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_DeleteRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).DeleteRole(ctx, req.(*DeleteRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_AssignRolePermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssignRolePermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).AssignRolePermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_AssignRolePermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).AssignRolePermissions(ctx, req.(*AssignRolePermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_SetRoleInheritances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRoleInheritancesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).SetRoleInheritances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_SetRoleInheritances_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).SetRoleInheritances(ctx, req.(*SetRoleInheritancesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_CreatePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).CreatePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_CreatePermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).CreatePermission(ctx, req.(*CreatePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListPermissions(ctx, req.(*ListPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdatePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdatePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdatePermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdatePermission(ctx, req.(*UpdatePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_DeletePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).DeletePermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_DeletePermission_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).DeletePermission(ctx, req.(*DeletePermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TemperateService_ServiceDesc is the grpc.ServiceDesc for TemperateService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,6 +829,90 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _TemperateService_Health_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _TemperateService_Login_Handler,
+		},
+		{
+			MethodName: "GetInitialPassword",
+			Handler:    _TemperateService_GetInitialPassword_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _TemperateService_ChangePassword_Handler,
+		},
+		{
+			MethodName: "GetCurrentUser",
+			Handler:    _TemperateService_GetCurrentUser_Handler,
+		},
+		{
+			MethodName: "CreateUser",
+			Handler:    _TemperateService_CreateUser_Handler,
+		},
+		{
+			MethodName: "ListUsers",
+			Handler:    _TemperateService_ListUsers_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _TemperateService_GetUser_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _TemperateService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _TemperateService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "AssignUserRoles",
+			Handler:    _TemperateService_AssignUserRoles_Handler,
+		},
+		{
+			MethodName: "CreateRole",
+			Handler:    _TemperateService_CreateRole_Handler,
+		},
+		{
+			MethodName: "ListRoles",
+			Handler:    _TemperateService_ListRoles_Handler,
+		},
+		{
+			MethodName: "GetRole",
+			Handler:    _TemperateService_GetRole_Handler,
+		},
+		{
+			MethodName: "UpdateRole",
+			Handler:    _TemperateService_UpdateRole_Handler,
+		},
+		{
+			MethodName: "DeleteRole",
+			Handler:    _TemperateService_DeleteRole_Handler,
+		},
+		{
+			MethodName: "AssignRolePermissions",
+			Handler:    _TemperateService_AssignRolePermissions_Handler,
+		},
+		{
+			MethodName: "SetRoleInheritances",
+			Handler:    _TemperateService_SetRoleInheritances_Handler,
+		},
+		{
+			MethodName: "CreatePermission",
+			Handler:    _TemperateService_CreatePermission_Handler,
+		},
+		{
+			MethodName: "ListPermissions",
+			Handler:    _TemperateService_ListPermissions_Handler,
+		},
+		{
+			MethodName: "UpdatePermission",
+			Handler:    _TemperateService_UpdatePermission_Handler,
+		},
+		{
+			MethodName: "DeletePermission",
+			Handler:    _TemperateService_DeletePermission_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

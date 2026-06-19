@@ -18,15 +18,78 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationTemperateServiceAssignRolePermissions = "/temperate.v1.TemperateService/AssignRolePermissions"
+const OperationTemperateServiceAssignUserRoles = "/temperate.v1.TemperateService/AssignUserRoles"
+const OperationTemperateServiceChangePassword = "/temperate.v1.TemperateService/ChangePassword"
+const OperationTemperateServiceCreatePermission = "/temperate.v1.TemperateService/CreatePermission"
+const OperationTemperateServiceCreateRole = "/temperate.v1.TemperateService/CreateRole"
+const OperationTemperateServiceCreateUser = "/temperate.v1.TemperateService/CreateUser"
+const OperationTemperateServiceDeletePermission = "/temperate.v1.TemperateService/DeletePermission"
+const OperationTemperateServiceDeleteRole = "/temperate.v1.TemperateService/DeleteRole"
+const OperationTemperateServiceDeleteUser = "/temperate.v1.TemperateService/DeleteUser"
+const OperationTemperateServiceGetCurrentUser = "/temperate.v1.TemperateService/GetCurrentUser"
+const OperationTemperateServiceGetInitialPassword = "/temperate.v1.TemperateService/GetInitialPassword"
+const OperationTemperateServiceGetRole = "/temperate.v1.TemperateService/GetRole"
+const OperationTemperateServiceGetUser = "/temperate.v1.TemperateService/GetUser"
 const OperationTemperateServiceHealth = "/temperate.v1.TemperateService/Health"
+const OperationTemperateServiceListPermissions = "/temperate.v1.TemperateService/ListPermissions"
+const OperationTemperateServiceListRoles = "/temperate.v1.TemperateService/ListRoles"
+const OperationTemperateServiceListUsers = "/temperate.v1.TemperateService/ListUsers"
+const OperationTemperateServiceLogin = "/temperate.v1.TemperateService/Login"
+const OperationTemperateServiceSetRoleInheritances = "/temperate.v1.TemperateService/SetRoleInheritances"
+const OperationTemperateServiceUpdatePermission = "/temperate.v1.TemperateService/UpdatePermission"
+const OperationTemperateServiceUpdateRole = "/temperate.v1.TemperateService/UpdateRole"
+const OperationTemperateServiceUpdateUser = "/temperate.v1.TemperateService/UpdateUser"
 
 type TemperateServiceHTTPServer interface {
+	AssignRolePermissions(context.Context, *AssignRolePermissionsRequest) (*Role, error)
+	AssignUserRoles(context.Context, *AssignUserRolesRequest) (*User, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
+	CreatePermission(context.Context, *CreatePermissionRequest) (*Permission, error)
+	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
+	CreateUser(context.Context, *CreateUserRequest) (*User, error)
+	DeletePermission(context.Context, *DeletePermissionRequest) (*emptypb.Empty, error)
+	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
+	DeleteUser(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
+	GetCurrentUser(context.Context, *emptypb.Empty) (*User, error)
+	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
+	GetRole(context.Context, *GetRoleRequest) (*Role, error)
+	GetUser(context.Context, *GetUserRequest) (*User, error)
 	Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error)
+	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
+	ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error)
+	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
+	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
+	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
+	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 }
 
 func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("GET", "/health", _TemperateService_Health0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/login", _TemperateService_Login0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/auth/initial-password", _TemperateService_GetInitialPassword0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/change-password", _TemperateService_ChangePassword0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/auth/me", _TemperateService_GetCurrentUser0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/users", _TemperateService_CreateUser0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/users", _TemperateService_ListUsers0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/users/{id}", _TemperateService_GetUser0_HTTP_Handler(srv))
+	r.Handle("PATCH", "/v1/users/{id}", _TemperateService_UpdateUser0_HTTP_Handler(srv))
+	r.Handle("DELETE", "/v1/users/{id}", _TemperateService_DeleteUser0_HTTP_Handler(srv))
+	r.Handle("PUT", "/v1/users/{user_id}/roles", _TemperateService_AssignUserRoles0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/roles", _TemperateService_CreateRole0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/roles", _TemperateService_ListRoles0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/roles/{id}", _TemperateService_GetRole0_HTTP_Handler(srv))
+	r.Handle("PATCH", "/v1/roles/{id}", _TemperateService_UpdateRole0_HTTP_Handler(srv))
+	r.Handle("DELETE", "/v1/roles/{id}", _TemperateService_DeleteRole0_HTTP_Handler(srv))
+	r.Handle("PUT", "/v1/roles/{role_id}/permissions", _TemperateService_AssignRolePermissions0_HTTP_Handler(srv))
+	r.Handle("PUT", "/v1/roles/{role_id}/inheritances", _TemperateService_SetRoleInheritances0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/permissions", _TemperateService_CreatePermission0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/permissions", _TemperateService_ListPermissions0_HTTP_Handler(srv))
+	r.Handle("PATCH", "/v1/permissions/{id}", _TemperateService_UpdatePermission0_HTTP_Handler(srv))
+	r.Handle("DELETE", "/v1/permissions/{id}", _TemperateService_DeletePermission0_HTTP_Handler(srv))
 }
 
 func _TemperateService_Health0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
@@ -48,8 +111,461 @@ func _TemperateService_Health0_HTTP_Handler(srv TemperateServiceHTTPServer) func
 	}
 }
 
+func _TemperateService_Login0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Login(ctx, req.(*LoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetInitialPassword0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetInitialPassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetInitialPassword(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*InitialPasswordReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ChangePassword0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ChangePasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceChangePassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ChangePassword(ctx, req.(*ChangePasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetCurrentUser0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetCurrentUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCurrentUser(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_CreateUser0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateUserRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceCreateUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateUser(ctx, req.(*CreateUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ListUsers0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUsersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListUsers)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUsers(ctx, req.(*ListUsersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUsersReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetUser0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetUser(ctx, req.(*GetUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_UpdateUser0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceUpdateUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUser(ctx, req.(*UpdateUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_DeleteUser0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceDeleteUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteUser(ctx, req.(*DeleteUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_AssignUserRoles0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AssignUserRolesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceAssignUserRoles)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AssignUserRoles(ctx, req.(*AssignUserRolesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_CreateRole0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateRoleRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceCreateRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateRole(ctx, req.(*CreateRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Role)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ListRoles0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListRolesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListRoles)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListRoles(ctx, req.(*ListRolesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListRolesReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetRole0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRoleRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRole(ctx, req.(*GetRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Role)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_UpdateRole0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateRoleRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceUpdateRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateRole(ctx, req.(*UpdateRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Role)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_DeleteRole0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteRoleRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceDeleteRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteRole(ctx, req.(*DeleteRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_AssignRolePermissions0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AssignRolePermissionsRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceAssignRolePermissions)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AssignRolePermissions(ctx, req.(*AssignRolePermissionsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Role)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_SetRoleInheritances0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SetRoleInheritancesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceSetRoleInheritances)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetRoleInheritances(ctx, req.(*SetRoleInheritancesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Role)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_CreatePermission0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreatePermissionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceCreatePermission)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreatePermission(ctx, req.(*CreatePermissionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Permission)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ListPermissions0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPermissionsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListPermissions)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPermissions(ctx, req.(*ListPermissionsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPermissionsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_UpdatePermission0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdatePermissionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceUpdatePermission)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdatePermission(ctx, req.(*UpdatePermissionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Permission)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_DeletePermission0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeletePermissionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceDeletePermission)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeletePermission(ctx, req.(*DeletePermissionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TemperateServiceHTTPClient interface {
+	AssignRolePermissions(ctx context.Context, req *AssignRolePermissionsRequest, opts ...http.CallOption) (rsp *Role, err error)
+	AssignUserRoles(ctx context.Context, req *AssignUserRolesRequest, opts ...http.CallOption) (rsp *User, err error)
+	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	CreatePermission(ctx context.Context, req *CreatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
+	CreateRole(ctx context.Context, req *CreateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *User, err error)
+	DeletePermission(ctx context.Context, req *DeletePermissionRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteRole(ctx context.Context, req *DeleteRoleRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetCurrentUser(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *User, err error)
+	GetInitialPassword(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *InitialPasswordReply, err error)
+	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *User, err error)
 	Health(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetMessageResponse, err error)
+	ListPermissions(ctx context.Context, req *ListPermissionsRequest, opts ...http.CallOption) (rsp *ListPermissionsReply, err error)
+	ListRoles(ctx context.Context, req *ListRolesRequest, opts ...http.CallOption) (rsp *ListRolesReply, err error)
+	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersReply, err error)
+	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
+	SetRoleInheritances(ctx context.Context, req *SetRoleInheritancesRequest, opts ...http.CallOption) (rsp *Role, err error)
+	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
+	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *User, err error)
 }
 
 type TemperateServiceHTTPClientImpl struct {
@@ -58,6 +574,220 @@ type TemperateServiceHTTPClientImpl struct {
 
 func NewTemperateServiceHTTPClient(client *http.Client) TemperateServiceHTTPClient {
 	return &TemperateServiceHTTPClientImpl{client}
+}
+
+func (c *TemperateServiceHTTPClientImpl) AssignRolePermissions(ctx context.Context, in *AssignRolePermissionsRequest, opts ...http.CallOption) (*Role, error) {
+	var out Role
+	pattern := "/v1/roles/{role_id}/permissions"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceAssignRolePermissions),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) AssignUserRoles(ctx context.Context, in *AssignUserRolesRequest, opts ...http.CallOption) (*User, error) {
+	var out User
+	pattern := "/v1/users/{user_id}/roles"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceAssignUserRoles),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/auth/change-password"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceChangePassword),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) CreatePermission(ctx context.Context, in *CreatePermissionRequest, opts ...http.CallOption) (*Permission, error) {
+	var out Permission
+	pattern := "/v1/permissions"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceCreatePermission),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...http.CallOption) (*Role, error) {
+	var out Role
+	pattern := "/v1/roles"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceCreateRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...http.CallOption) (*User, error) {
+	var out User
+	pattern := "/v1/users"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceCreateUser),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) DeletePermission(ctx context.Context, in *DeletePermissionRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/permissions/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceDeletePermission),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/roles/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceDeleteRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/users/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceDeleteUser),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) GetCurrentUser(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*User, error) {
+	var out User
+	pattern := "/v1/auth/me"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetCurrentUser),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) GetInitialPassword(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*InitialPasswordReply, error) {
+	var out InitialPasswordReply
+	pattern := "/v1/auth/initial-password"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetInitialPassword),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequest, opts ...http.CallOption) (*Role, error) {
+	var out Role
+	pattern := "/v1/roles/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*User, error) {
+	var out User
+	pattern := "/v1/users/{id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetUser),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *TemperateServiceHTTPClientImpl) Health(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetMessageResponse, error) {
@@ -70,6 +800,139 @@ func (c *TemperateServiceHTTPClientImpl) Health(ctx context.Context, in *emptypb
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...http.CallOption) (*ListPermissionsReply, error) {
+	var out ListPermissionsReply
+	pattern := "/v1/permissions"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListPermissions),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ListRoles(ctx context.Context, in *ListRolesRequest, opts ...http.CallOption) (*ListRolesReply, error) {
+	var out ListRolesReply
+	pattern := "/v1/roles"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListRoles),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...http.CallOption) (*ListUsersReply, error) {
+	var out ListUsersReply
+	pattern := "/v1/users"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListUsers),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
+	var out LoginReply
+	pattern := "/v1/auth/login"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceLogin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) SetRoleInheritances(ctx context.Context, in *SetRoleInheritancesRequest, opts ...http.CallOption) (*Role, error) {
+	var out Role
+	pattern := "/v1/roles/{role_id}/inheritances"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceSetRoleInheritances),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...http.CallOption) (*Permission, error) {
+	var out Permission
+	pattern := "/v1/permissions/{id}"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceUpdatePermission),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...http.CallOption) (*Role, error) {
+	var out Role
+	pattern := "/v1/roles/{id}"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceUpdateRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...http.CallOption) (*User, error) {
+	var out User
+	pattern := "/v1/users/{id}"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceUpdateUser),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

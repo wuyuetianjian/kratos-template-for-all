@@ -12,7 +12,7 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -69,15 +69,1772 @@ func (x *GetMessageResponse) GetMessage() string {
 	return ""
 }
 
+type LoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginRequest) Reset() {
+	*x = LoginRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginRequest) ProtoMessage() {}
+
+func (x *LoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
+func (*LoginRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *LoginRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *LoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginReply struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Token              string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	User               *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	MustChangePassword bool                   `protobuf:"varint,3,opt,name=must_change_password,json=mustChangePassword,proto3" json:"must_change_password,omitempty"`
+	InitialPassword    string                 `protobuf:"bytes,4,opt,name=initial_password,json=initialPassword,proto3" json:"initial_password,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *LoginReply) Reset() {
+	*x = LoginReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginReply) ProtoMessage() {}
+
+func (x *LoginReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginReply.ProtoReflect.Descriptor instead.
+func (*LoginReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LoginReply) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *LoginReply) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *LoginReply) GetMustChangePassword() bool {
+	if x != nil {
+		return x.MustChangePassword
+	}
+	return false
+}
+
+func (x *LoginReply) GetInitialPassword() string {
+	if x != nil {
+		return x.InitialPassword
+	}
+	return ""
+}
+
+type InitialPasswordReply struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Available       bool                   `protobuf:"varint,1,opt,name=available,proto3" json:"available,omitempty"`
+	Username        string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	InitialPassword string                 `protobuf:"bytes,3,opt,name=initial_password,json=initialPassword,proto3" json:"initial_password,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *InitialPasswordReply) Reset() {
+	*x = InitialPasswordReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InitialPasswordReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitialPasswordReply) ProtoMessage() {}
+
+func (x *InitialPasswordReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitialPasswordReply.ProtoReflect.Descriptor instead.
+func (*InitialPasswordReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *InitialPasswordReply) GetAvailable() bool {
+	if x != nil {
+		return x.Available
+	}
+	return false
+}
+
+func (x *InitialPasswordReply) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *InitialPasswordReply) GetInitialPassword() string {
+	if x != nil {
+		return x.InitialPassword
+	}
+	return ""
+}
+
+type ChangePasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OldPassword   string                 `protobuf:"bytes,1,opt,name=old_password,json=oldPassword,proto3" json:"old_password,omitempty"`
+	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangePasswordRequest) Reset() {
+	*x = ChangePasswordRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangePasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangePasswordRequest) ProtoMessage() {}
+
+func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
+func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ChangePasswordRequest) GetOldPassword() string {
+	if x != nil {
+		return x.OldPassword
+	}
+	return ""
+}
+
+func (x *ChangePasswordRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
+type User struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Disabled      bool                   `protobuf:"varint,4,opt,name=disabled,proto3" json:"disabled,omitempty"`
+	System        bool                   `protobuf:"varint,5,opt,name=system,proto3" json:"system,omitempty"`
+	Roles         []*Role                `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *User) Reset() {
+	*x = User{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *User) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*User) ProtoMessage() {}
+
+func (x *User) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use User.ProtoReflect.Descriptor instead.
+func (*User) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *User) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *User) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *User) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *User) GetDisabled() bool {
+	if x != nil {
+		return x.Disabled
+	}
+	return false
+}
+
+func (x *User) GetSystem() bool {
+	if x != nil {
+		return x.System
+	}
+	return false
+}
+
+func (x *User) GetRoles() []*Role {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *User) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type Role struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	System         bool                   `protobuf:"varint,4,opt,name=system,proto3" json:"system,omitempty"`
+	Permissions    []*Permission          `protobuf:"bytes,5,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	InheritedRoles []*Role                `protobuf:"bytes,6,rep,name=inherited_roles,json=inheritedRoles,proto3" json:"inherited_roles,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt      *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Role) Reset() {
+	*x = Role{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Role) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Role) ProtoMessage() {}
+
+func (x *Role) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Role.ProtoReflect.Descriptor instead.
+func (*Role) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Role) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Role) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Role) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Role) GetSystem() bool {
+	if x != nil {
+		return x.System
+	}
+	return false
+}
+
+func (x *Role) GetPermissions() []*Permission {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+func (x *Role) GetInheritedRoles() []*Role {
+	if x != nil {
+		return x.InheritedRoles
+	}
+	return nil
+}
+
+func (x *Role) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Role) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type Permission struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Module        string                 `protobuf:"bytes,2,opt,name=module,proto3" json:"module,omitempty"`
+	Action        string                 `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"`
+	Operation     string                 `protobuf:"bytes,4,opt,name=operation,proto3" json:"operation,omitempty"`
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
+	System        bool                   `protobuf:"varint,6,opt,name=system,proto3" json:"system,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Permission) Reset() {
+	*x = Permission{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Permission) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Permission) ProtoMessage() {}
+
+func (x *Permission) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Permission.ProtoReflect.Descriptor instead.
+func (*Permission) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Permission) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Permission) GetModule() string {
+	if x != nil {
+		return x.Module
+	}
+	return ""
+}
+
+func (x *Permission) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *Permission) GetOperation() string {
+	if x != nil {
+		return x.Operation
+	}
+	return ""
+}
+
+func (x *Permission) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Permission) GetSystem() bool {
+	if x != nil {
+		return x.System
+	}
+	return false
+}
+
+func (x *Permission) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Permission) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type CreateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Disabled      bool                   `protobuf:"varint,4,opt,name=disabled,proto3" json:"disabled,omitempty"`
+	RoleIds       []int64                `protobuf:"varint,5,rep,packed,name=role_ids,json=roleIds,proto3" json:"role_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateUserRequest) Reset() {
+	*x = CreateUserRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateUserRequest) ProtoMessage() {}
+
+func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
+func (*CreateUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CreateUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetDisabled() bool {
+	if x != nil {
+		return x.Disabled
+	}
+	return false
+}
+
+func (x *CreateUserRequest) GetRoleIds() []int64 {
+	if x != nil {
+		return x.RoleIds
+	}
+	return nil
+}
+
+type ListUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     int32                  `protobuf:"varint,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersRequest) ProtoMessage() {}
+
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListUsersRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListUsersRequest) GetPageToken() int32 {
+	if x != nil {
+		return x.PageToken
+	}
+	return 0
+}
+
+type ListUsersReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Users         []*User                `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersReply) Reset() {
+	*x = ListUsersReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersReply) ProtoMessage() {}
+
+func (x *ListUsersReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersReply.ProtoReflect.Descriptor instead.
+func (*ListUsersReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListUsersReply) GetUsers() []*User {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+func (x *ListUsersReply) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserRequest) Reset() {
+	*x = GetUserRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserRequest) ProtoMessage() {}
+
+func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
+func (*GetUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetUserRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Disabled      bool                   `protobuf:"varint,3,opt,name=disabled,proto3" json:"disabled,omitempty"`
+	RoleIds       []int64                `protobuf:"varint,4,rep,packed,name=role_ids,json=roleIds,proto3" json:"role_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *UpdateUserRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateUserRequest) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetDisabled() bool {
+	if x != nil {
+		return x.Disabled
+	}
+	return false
+}
+
+func (x *UpdateUserRequest) GetRoleIds() []int64 {
+	if x != nil {
+		return x.RoleIds
+	}
+	return nil
+}
+
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteUserRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type AssignUserRolesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	RoleIds       []int64                `protobuf:"varint,2,rep,packed,name=role_ids,json=roleIds,proto3" json:"role_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignUserRolesRequest) Reset() {
+	*x = AssignUserRolesRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignUserRolesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignUserRolesRequest) ProtoMessage() {}
+
+func (x *AssignUserRolesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignUserRolesRequest.ProtoReflect.Descriptor instead.
+func (*AssignUserRolesRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *AssignUserRolesRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AssignUserRolesRequest) GetRoleIds() []int64 {
+	if x != nil {
+		return x.RoleIds
+	}
+	return nil
+}
+
+type CreateRoleRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Name             string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description      string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	PermissionIds    []int64                `protobuf:"varint,3,rep,packed,name=permission_ids,json=permissionIds,proto3" json:"permission_ids,omitempty"`
+	InheritedRoleIds []int64                `protobuf:"varint,4,rep,packed,name=inherited_role_ids,json=inheritedRoleIds,proto3" json:"inherited_role_ids,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CreateRoleRequest) Reset() {
+	*x = CreateRoleRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateRoleRequest) ProtoMessage() {}
+
+func (x *CreateRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateRoleRequest.ProtoReflect.Descriptor instead.
+func (*CreateRoleRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CreateRoleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateRoleRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateRoleRequest) GetPermissionIds() []int64 {
+	if x != nil {
+		return x.PermissionIds
+	}
+	return nil
+}
+
+func (x *CreateRoleRequest) GetInheritedRoleIds() []int64 {
+	if x != nil {
+		return x.InheritedRoleIds
+	}
+	return nil
+}
+
+type ListRolesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     int32                  `protobuf:"varint,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRolesRequest) Reset() {
+	*x = ListRolesRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRolesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRolesRequest) ProtoMessage() {}
+
+func (x *ListRolesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRolesRequest.ProtoReflect.Descriptor instead.
+func (*ListRolesRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListRolesRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListRolesRequest) GetPageToken() int32 {
+	if x != nil {
+		return x.PageToken
+	}
+	return 0
+}
+
+type ListRolesReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Roles         []*Role                `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRolesReply) Reset() {
+	*x = ListRolesReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRolesReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRolesReply) ProtoMessage() {}
+
+func (x *ListRolesReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRolesReply.ProtoReflect.Descriptor instead.
+func (*ListRolesReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListRolesReply) GetRoles() []*Role {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *ListRolesReply) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRoleRequest) Reset() {
+	*x = GetRoleRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRoleRequest) ProtoMessage() {}
+
+func (x *GetRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRoleRequest.ProtoReflect.Descriptor instead.
+func (*GetRoleRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetRoleRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type UpdateRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRoleRequest) Reset() {
+	*x = UpdateRoleRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRoleRequest) ProtoMessage() {}
+
+func (x *UpdateRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRoleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRoleRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateRoleRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateRoleRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type DeleteRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRoleRequest) Reset() {
+	*x = DeleteRoleRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRoleRequest) ProtoMessage() {}
+
+func (x *DeleteRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRoleRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRoleRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *DeleteRoleRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type AssignRolePermissionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoleId        int64                  `protobuf:"varint,1,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	PermissionIds []int64                `protobuf:"varint,2,rep,packed,name=permission_ids,json=permissionIds,proto3" json:"permission_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignRolePermissionsRequest) Reset() {
+	*x = AssignRolePermissionsRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignRolePermissionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignRolePermissionsRequest) ProtoMessage() {}
+
+func (x *AssignRolePermissionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignRolePermissionsRequest.ProtoReflect.Descriptor instead.
+func (*AssignRolePermissionsRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *AssignRolePermissionsRequest) GetRoleId() int64 {
+	if x != nil {
+		return x.RoleId
+	}
+	return 0
+}
+
+func (x *AssignRolePermissionsRequest) GetPermissionIds() []int64 {
+	if x != nil {
+		return x.PermissionIds
+	}
+	return nil
+}
+
+type SetRoleInheritancesRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	RoleId           int64                  `protobuf:"varint,1,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	InheritedRoleIds []int64                `protobuf:"varint,2,rep,packed,name=inherited_role_ids,json=inheritedRoleIds,proto3" json:"inherited_role_ids,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SetRoleInheritancesRequest) Reset() {
+	*x = SetRoleInheritancesRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetRoleInheritancesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetRoleInheritancesRequest) ProtoMessage() {}
+
+func (x *SetRoleInheritancesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetRoleInheritancesRequest.ProtoReflect.Descriptor instead.
+func (*SetRoleInheritancesRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *SetRoleInheritancesRequest) GetRoleId() int64 {
+	if x != nil {
+		return x.RoleId
+	}
+	return 0
+}
+
+func (x *SetRoleInheritancesRequest) GetInheritedRoleIds() []int64 {
+	if x != nil {
+		return x.InheritedRoleIds
+	}
+	return nil
+}
+
+type CreatePermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Module        string                 `protobuf:"bytes,1,opt,name=module,proto3" json:"module,omitempty"`
+	Action        string                 `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
+	Operation     string                 `protobuf:"bytes,3,opt,name=operation,proto3" json:"operation,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePermissionRequest) Reset() {
+	*x = CreatePermissionRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePermissionRequest) ProtoMessage() {}
+
+func (x *CreatePermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePermissionRequest.ProtoReflect.Descriptor instead.
+func (*CreatePermissionRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *CreatePermissionRequest) GetModule() string {
+	if x != nil {
+		return x.Module
+	}
+	return ""
+}
+
+func (x *CreatePermissionRequest) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *CreatePermissionRequest) GetOperation() string {
+	if x != nil {
+		return x.Operation
+	}
+	return ""
+}
+
+func (x *CreatePermissionRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type ListPermissionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     int32                  `protobuf:"varint,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPermissionsRequest) Reset() {
+	*x = ListPermissionsRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPermissionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPermissionsRequest) ProtoMessage() {}
+
+func (x *ListPermissionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPermissionsRequest.ProtoReflect.Descriptor instead.
+func (*ListPermissionsRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ListPermissionsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListPermissionsRequest) GetPageToken() int32 {
+	if x != nil {
+		return x.PageToken
+	}
+	return 0
+}
+
+type ListPermissionsReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Permissions   []*Permission          `protobuf:"bytes,1,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPermissionsReply) Reset() {
+	*x = ListPermissionsReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPermissionsReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPermissionsReply) ProtoMessage() {}
+
+func (x *ListPermissionsReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPermissionsReply.ProtoReflect.Descriptor instead.
+func (*ListPermissionsReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ListPermissionsReply) GetPermissions() []*Permission {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+func (x *ListPermissionsReply) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type UpdatePermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Operation     string                 `protobuf:"bytes,2,opt,name=operation,proto3" json:"operation,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePermissionRequest) Reset() {
+	*x = UpdatePermissionRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePermissionRequest) ProtoMessage() {}
+
+func (x *UpdatePermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePermissionRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePermissionRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UpdatePermissionRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdatePermissionRequest) GetOperation() string {
+	if x != nil {
+		return x.Operation
+	}
+	return ""
+}
+
+func (x *UpdatePermissionRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type DeletePermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeletePermissionRequest) Reset() {
+	*x = DeletePermissionRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeletePermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePermissionRequest) ProtoMessage() {}
+
+func (x *DeletePermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePermissionRequest.ProtoReflect.Descriptor instead.
+func (*DeletePermissionRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *DeletePermissionRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 var File_api_temperate_v1_temperate_proto protoreflect.FileDescriptor
 
 const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\n" +
 	" api/temperate/v1/temperate.proto\x12\ftemperate.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\".\n" +
 	"\x12GetMessageResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2g\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"P\n" +
+	"\fLoginRequest\x12\x1f\n" +
+	"\busername\x18\x01 \x01(\tB\x03\xe0A\x02R\busername\x12\x1f\n" +
+	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\"\xa7\x01\n" +
+	"\n" +
+	"LoginReply\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12&\n" +
+	"\x04user\x18\x02 \x01(\v2\x12.temperate.v1.UserR\x04user\x120\n" +
+	"\x14must_change_password\x18\x03 \x01(\bR\x12mustChangePassword\x12)\n" +
+	"\x10initial_password\x18\x04 \x01(\tR\x0finitialPassword\"{\n" +
+	"\x14InitialPasswordReply\x12\x1c\n" +
+	"\tavailable\x18\x01 \x01(\bR\tavailable\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12)\n" +
+	"\x10initial_password\x18\x03 \x01(\tR\x0finitialPassword\"g\n" +
+	"\x15ChangePasswordRequest\x12&\n" +
+	"\fold_password\x18\x01 \x01(\tB\x03\xe0A\x02R\voldPassword\x12&\n" +
+	"\fnew_password\x18\x02 \x01(\tB\x03\xe0A\x02R\vnewPassword\"\xa9\x02\n" +
+	"\x04User\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12\x1a\n" +
+	"\bdisabled\x18\x04 \x01(\bR\bdisabled\x12\x16\n" +
+	"\x06system\x18\x05 \x01(\bR\x06system\x12(\n" +
+	"\x05roles\x18\x06 \x03(\v2\x12.temperate.v1.RoleR\x05roles\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xd3\x02\n" +
+	"\x04Role\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06system\x18\x04 \x01(\bR\x06system\x12:\n" +
+	"\vpermissions\x18\x05 \x03(\v2\x18.temperate.v1.PermissionR\vpermissions\x12;\n" +
+	"\x0finherited_roles\x18\x06 \x03(\v2\x12.temperate.v1.RoleR\x0einheritedRoles\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x9a\x02\n" +
+	"\n" +
+	"Permission\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06module\x18\x02 \x01(\tR\x06module\x12\x16\n" +
+	"\x06action\x18\x03 \x01(\tR\x06action\x12\x1c\n" +
+	"\toperation\x18\x04 \x01(\tR\toperation\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06system\x18\x06 \x01(\bR\x06system\x129\n" +
+	"\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xaf\x01\n" +
+	"\x11CreateUserRequest\x12\x1f\n" +
+	"\busername\x18\x01 \x01(\tB\x03\xe0A\x02R\busername\x12\x1f\n" +
+	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12\x1a\n" +
+	"\bdisabled\x18\x04 \x01(\bR\bdisabled\x12\x19\n" +
+	"\brole_ids\x18\x05 \x03(\x03R\aroleIds\"N\n" +
+	"\x10ListUsersRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\x05R\tpageToken\"P\n" +
+	"\x0eListUsersReply\x12(\n" +
+	"\x05users\x18\x01 \x03(\v2\x12.temperate.v1.UserR\x05users\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"%\n" +
+	"\x0eGetUserRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"\x82\x01\n" +
+	"\x11UpdateUserRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1a\n" +
+	"\bdisabled\x18\x03 \x01(\bR\bdisabled\x12\x19\n" +
+	"\brole_ids\x18\x04 \x03(\x03R\aroleIds\"(\n" +
+	"\x11DeleteUserRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"Q\n" +
+	"\x16AssignUserRolesRequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x06userId\x12\x19\n" +
+	"\brole_ids\x18\x02 \x03(\x03R\aroleIds\"\xa3\x01\n" +
+	"\x11CreateRoleRequest\x12\x17\n" +
+	"\x04name\x18\x01 \x01(\tB\x03\xe0A\x02R\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12%\n" +
+	"\x0epermission_ids\x18\x03 \x03(\x03R\rpermissionIds\x12,\n" +
+	"\x12inherited_role_ids\x18\x04 \x03(\x03R\x10inheritedRoleIds\"N\n" +
+	"\x10ListRolesRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\x05R\tpageToken\"P\n" +
+	"\x0eListRolesReply\x12(\n" +
+	"\x05roles\x18\x01 \x03(\v2\x12.temperate.v1.RoleR\x05roles\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"%\n" +
+	"\x0eGetRoleRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"J\n" +
+	"\x11UpdateRoleRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"(\n" +
+	"\x11DeleteRoleRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"c\n" +
+	"\x1cAssignRolePermissionsRequest\x12\x1c\n" +
+	"\arole_id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x06roleId\x12%\n" +
+	"\x0epermission_ids\x18\x02 \x03(\x03R\rpermissionIds\"h\n" +
+	"\x1aSetRoleInheritancesRequest\x12\x1c\n" +
+	"\arole_id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x06roleId\x12,\n" +
+	"\x12inherited_role_ids\x18\x02 \x03(\x03R\x10inheritedRoleIds\"\x93\x01\n" +
+	"\x17CreatePermissionRequest\x12\x1b\n" +
+	"\x06module\x18\x01 \x01(\tB\x03\xe0A\x02R\x06module\x12\x1b\n" +
+	"\x06action\x18\x02 \x01(\tB\x03\xe0A\x02R\x06action\x12\x1c\n" +
+	"\toperation\x18\x03 \x01(\tR\toperation\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\"T\n" +
+	"\x16ListPermissionsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\x05R\tpageToken\"h\n" +
+	"\x14ListPermissionsReply\x12:\n" +
+	"\vpermissions\x18\x01 \x03(\v2\x18.temperate.v1.PermissionR\vpermissions\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"n\n" +
+	"\x17UpdatePermissionRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\x12\x1c\n" +
+	"\toperation\x18\x02 \x01(\tR\toperation\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\".\n" +
+	"\x17DeletePermissionRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id2\xd9\x11\n" +
 	"\x10TemperateService\x12S\n" +
-	"\x06Health\x12\x16.google.protobuf.Empty\x1a .temperate.v1.GetMessageResponse\"\x0f\x82\xd3\xe4\x93\x02\t\x12\a/healthBP\n" +
+	"\x06Health\x12\x16.google.protobuf.Empty\x1a .temperate.v1.GetMessageResponse\"\x0f\x82\xd3\xe4\x93\x02\t\x12\a/health\x12X\n" +
+	"\x05Login\x12\x1a.temperate.v1.LoginRequest\x1a\x18.temperate.v1.LoginReply\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12s\n" +
+	"\x12GetInitialPassword\x12\x16.google.protobuf.Empty\x1a\".temperate.v1.InitialPasswordReply\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/auth/initial-password\x12r\n" +
+	"\x0eChangePassword\x12#.temperate.v1.ChangePasswordRequest\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/v1/auth/change-password\x12Q\n" +
+	"\x0eGetCurrentUser\x12\x16.google.protobuf.Empty\x1a\x12.temperate.v1.User\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/v1/auth/me\x12W\n" +
+	"\n" +
+	"CreateUser\x12\x1f.temperate.v1.CreateUserRequest\x1a\x12.temperate.v1.User\"\x14\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/users\x12\\\n" +
+	"\tListUsers\x12\x1e.temperate.v1.ListUsersRequest\x1a\x1c.temperate.v1.ListUsersReply\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/v1/users\x12S\n" +
+	"\aGetUser\x12\x1c.temperate.v1.GetUserRequest\x1a\x12.temperate.v1.User\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/users/{id}\x12\\\n" +
+	"\n" +
+	"UpdateUser\x12\x1f.temperate.v1.UpdateUserRequest\x1a\x12.temperate.v1.User\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*2\x0e/v1/users/{id}\x12]\n" +
+	"\n" +
+	"DeleteUser\x12\x1f.temperate.v1.DeleteUserRequest\x1a\x16.google.protobuf.Empty\"\x16\x82\xd3\xe4\x93\x02\x10*\x0e/v1/users/{id}\x12q\n" +
+	"\x0fAssignUserRoles\x12$.temperate.v1.AssignUserRolesRequest\x1a\x12.temperate.v1.User\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/v1/users/{user_id}/roles\x12W\n" +
+	"\n" +
+	"CreateRole\x12\x1f.temperate.v1.CreateRoleRequest\x1a\x12.temperate.v1.Role\"\x14\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/roles\x12\\\n" +
+	"\tListRoles\x12\x1e.temperate.v1.ListRolesRequest\x1a\x1c.temperate.v1.ListRolesReply\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/v1/roles\x12S\n" +
+	"\aGetRole\x12\x1c.temperate.v1.GetRoleRequest\x1a\x12.temperate.v1.Role\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/roles/{id}\x12\\\n" +
+	"\n" +
+	"UpdateRole\x12\x1f.temperate.v1.UpdateRoleRequest\x1a\x12.temperate.v1.Role\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*2\x0e/v1/roles/{id}\x12]\n" +
+	"\n" +
+	"DeleteRole\x12\x1f.temperate.v1.DeleteRoleRequest\x1a\x16.google.protobuf.Empty\"\x16\x82\xd3\xe4\x93\x02\x10*\x0e/v1/roles/{id}\x12\x83\x01\n" +
+	"\x15AssignRolePermissions\x12*.temperate.v1.AssignRolePermissionsRequest\x1a\x12.temperate.v1.Role\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/roles/{role_id}/permissions\x12\x80\x01\n" +
+	"\x13SetRoleInheritances\x12(.temperate.v1.SetRoleInheritancesRequest\x1a\x12.temperate.v1.Role\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /v1/roles/{role_id}/inheritances\x12o\n" +
+	"\x10CreatePermission\x12%.temperate.v1.CreatePermissionRequest\x1a\x18.temperate.v1.Permission\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/permissions\x12t\n" +
+	"\x0fListPermissions\x12$.temperate.v1.ListPermissionsRequest\x1a\".temperate.v1.ListPermissionsReply\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/permissions\x12t\n" +
+	"\x10UpdatePermission\x12%.temperate.v1.UpdatePermissionRequest\x1a\x18.temperate.v1.Permission\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*2\x14/v1/permissions/{id}\x12o\n" +
+	"\x10DeletePermission\x12%.temperate.v1.DeletePermissionRequest\x1a\x16.google.protobuf.Empty\"\x1c\x82\xd3\xe4\x93\x02\x16*\x14/v1/permissions/{id}BP\n" +
 	"\x1dio.grpc.examples.temperate.v1B\x0eTemperateProtoP\x01Z\x1dtemperate/api/temperate/v1;v1b\x06proto3"
 
 var (
@@ -92,19 +1849,102 @@ func file_api_temperate_v1_temperate_proto_rawDescGZIP() []byte {
 	return file_api_temperate_v1_temperate_proto_rawDescData
 }
 
-var file_api_temperate_v1_temperate_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_api_temperate_v1_temperate_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_api_temperate_v1_temperate_proto_goTypes = []any{
-	(*GetMessageResponse)(nil), // 0: temperate.v1.GetMessageResponse
-	(*emptypb.Empty)(nil),      // 1: google.protobuf.Empty
+	(*GetMessageResponse)(nil),           // 0: temperate.v1.GetMessageResponse
+	(*LoginRequest)(nil),                 // 1: temperate.v1.LoginRequest
+	(*LoginReply)(nil),                   // 2: temperate.v1.LoginReply
+	(*InitialPasswordReply)(nil),         // 3: temperate.v1.InitialPasswordReply
+	(*ChangePasswordRequest)(nil),        // 4: temperate.v1.ChangePasswordRequest
+	(*User)(nil),                         // 5: temperate.v1.User
+	(*Role)(nil),                         // 6: temperate.v1.Role
+	(*Permission)(nil),                   // 7: temperate.v1.Permission
+	(*CreateUserRequest)(nil),            // 8: temperate.v1.CreateUserRequest
+	(*ListUsersRequest)(nil),             // 9: temperate.v1.ListUsersRequest
+	(*ListUsersReply)(nil),               // 10: temperate.v1.ListUsersReply
+	(*GetUserRequest)(nil),               // 11: temperate.v1.GetUserRequest
+	(*UpdateUserRequest)(nil),            // 12: temperate.v1.UpdateUserRequest
+	(*DeleteUserRequest)(nil),            // 13: temperate.v1.DeleteUserRequest
+	(*AssignUserRolesRequest)(nil),       // 14: temperate.v1.AssignUserRolesRequest
+	(*CreateRoleRequest)(nil),            // 15: temperate.v1.CreateRoleRequest
+	(*ListRolesRequest)(nil),             // 16: temperate.v1.ListRolesRequest
+	(*ListRolesReply)(nil),               // 17: temperate.v1.ListRolesReply
+	(*GetRoleRequest)(nil),               // 18: temperate.v1.GetRoleRequest
+	(*UpdateRoleRequest)(nil),            // 19: temperate.v1.UpdateRoleRequest
+	(*DeleteRoleRequest)(nil),            // 20: temperate.v1.DeleteRoleRequest
+	(*AssignRolePermissionsRequest)(nil), // 21: temperate.v1.AssignRolePermissionsRequest
+	(*SetRoleInheritancesRequest)(nil),   // 22: temperate.v1.SetRoleInheritancesRequest
+	(*CreatePermissionRequest)(nil),      // 23: temperate.v1.CreatePermissionRequest
+	(*ListPermissionsRequest)(nil),       // 24: temperate.v1.ListPermissionsRequest
+	(*ListPermissionsReply)(nil),         // 25: temperate.v1.ListPermissionsReply
+	(*UpdatePermissionRequest)(nil),      // 26: temperate.v1.UpdatePermissionRequest
+	(*DeletePermissionRequest)(nil),      // 27: temperate.v1.DeletePermissionRequest
+	(*timestamppb.Timestamp)(nil),        // 28: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                // 29: google.protobuf.Empty
 }
 var file_api_temperate_v1_temperate_proto_depIdxs = []int32{
-	1, // 0: temperate.v1.TemperateService.Health:input_type -> google.protobuf.Empty
-	0, // 1: temperate.v1.TemperateService.Health:output_type -> temperate.v1.GetMessageResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5,  // 0: temperate.v1.LoginReply.user:type_name -> temperate.v1.User
+	6,  // 1: temperate.v1.User.roles:type_name -> temperate.v1.Role
+	28, // 2: temperate.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	28, // 3: temperate.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	7,  // 4: temperate.v1.Role.permissions:type_name -> temperate.v1.Permission
+	6,  // 5: temperate.v1.Role.inherited_roles:type_name -> temperate.v1.Role
+	28, // 6: temperate.v1.Role.created_at:type_name -> google.protobuf.Timestamp
+	28, // 7: temperate.v1.Role.updated_at:type_name -> google.protobuf.Timestamp
+	28, // 8: temperate.v1.Permission.created_at:type_name -> google.protobuf.Timestamp
+	28, // 9: temperate.v1.Permission.updated_at:type_name -> google.protobuf.Timestamp
+	5,  // 10: temperate.v1.ListUsersReply.users:type_name -> temperate.v1.User
+	6,  // 11: temperate.v1.ListRolesReply.roles:type_name -> temperate.v1.Role
+	7,  // 12: temperate.v1.ListPermissionsReply.permissions:type_name -> temperate.v1.Permission
+	29, // 13: temperate.v1.TemperateService.Health:input_type -> google.protobuf.Empty
+	1,  // 14: temperate.v1.TemperateService.Login:input_type -> temperate.v1.LoginRequest
+	29, // 15: temperate.v1.TemperateService.GetInitialPassword:input_type -> google.protobuf.Empty
+	4,  // 16: temperate.v1.TemperateService.ChangePassword:input_type -> temperate.v1.ChangePasswordRequest
+	29, // 17: temperate.v1.TemperateService.GetCurrentUser:input_type -> google.protobuf.Empty
+	8,  // 18: temperate.v1.TemperateService.CreateUser:input_type -> temperate.v1.CreateUserRequest
+	9,  // 19: temperate.v1.TemperateService.ListUsers:input_type -> temperate.v1.ListUsersRequest
+	11, // 20: temperate.v1.TemperateService.GetUser:input_type -> temperate.v1.GetUserRequest
+	12, // 21: temperate.v1.TemperateService.UpdateUser:input_type -> temperate.v1.UpdateUserRequest
+	13, // 22: temperate.v1.TemperateService.DeleteUser:input_type -> temperate.v1.DeleteUserRequest
+	14, // 23: temperate.v1.TemperateService.AssignUserRoles:input_type -> temperate.v1.AssignUserRolesRequest
+	15, // 24: temperate.v1.TemperateService.CreateRole:input_type -> temperate.v1.CreateRoleRequest
+	16, // 25: temperate.v1.TemperateService.ListRoles:input_type -> temperate.v1.ListRolesRequest
+	18, // 26: temperate.v1.TemperateService.GetRole:input_type -> temperate.v1.GetRoleRequest
+	19, // 27: temperate.v1.TemperateService.UpdateRole:input_type -> temperate.v1.UpdateRoleRequest
+	20, // 28: temperate.v1.TemperateService.DeleteRole:input_type -> temperate.v1.DeleteRoleRequest
+	21, // 29: temperate.v1.TemperateService.AssignRolePermissions:input_type -> temperate.v1.AssignRolePermissionsRequest
+	22, // 30: temperate.v1.TemperateService.SetRoleInheritances:input_type -> temperate.v1.SetRoleInheritancesRequest
+	23, // 31: temperate.v1.TemperateService.CreatePermission:input_type -> temperate.v1.CreatePermissionRequest
+	24, // 32: temperate.v1.TemperateService.ListPermissions:input_type -> temperate.v1.ListPermissionsRequest
+	26, // 33: temperate.v1.TemperateService.UpdatePermission:input_type -> temperate.v1.UpdatePermissionRequest
+	27, // 34: temperate.v1.TemperateService.DeletePermission:input_type -> temperate.v1.DeletePermissionRequest
+	0,  // 35: temperate.v1.TemperateService.Health:output_type -> temperate.v1.GetMessageResponse
+	2,  // 36: temperate.v1.TemperateService.Login:output_type -> temperate.v1.LoginReply
+	3,  // 37: temperate.v1.TemperateService.GetInitialPassword:output_type -> temperate.v1.InitialPasswordReply
+	29, // 38: temperate.v1.TemperateService.ChangePassword:output_type -> google.protobuf.Empty
+	5,  // 39: temperate.v1.TemperateService.GetCurrentUser:output_type -> temperate.v1.User
+	5,  // 40: temperate.v1.TemperateService.CreateUser:output_type -> temperate.v1.User
+	10, // 41: temperate.v1.TemperateService.ListUsers:output_type -> temperate.v1.ListUsersReply
+	5,  // 42: temperate.v1.TemperateService.GetUser:output_type -> temperate.v1.User
+	5,  // 43: temperate.v1.TemperateService.UpdateUser:output_type -> temperate.v1.User
+	29, // 44: temperate.v1.TemperateService.DeleteUser:output_type -> google.protobuf.Empty
+	5,  // 45: temperate.v1.TemperateService.AssignUserRoles:output_type -> temperate.v1.User
+	6,  // 46: temperate.v1.TemperateService.CreateRole:output_type -> temperate.v1.Role
+	17, // 47: temperate.v1.TemperateService.ListRoles:output_type -> temperate.v1.ListRolesReply
+	6,  // 48: temperate.v1.TemperateService.GetRole:output_type -> temperate.v1.Role
+	6,  // 49: temperate.v1.TemperateService.UpdateRole:output_type -> temperate.v1.Role
+	29, // 50: temperate.v1.TemperateService.DeleteRole:output_type -> google.protobuf.Empty
+	6,  // 51: temperate.v1.TemperateService.AssignRolePermissions:output_type -> temperate.v1.Role
+	6,  // 52: temperate.v1.TemperateService.SetRoleInheritances:output_type -> temperate.v1.Role
+	7,  // 53: temperate.v1.TemperateService.CreatePermission:output_type -> temperate.v1.Permission
+	25, // 54: temperate.v1.TemperateService.ListPermissions:output_type -> temperate.v1.ListPermissionsReply
+	7,  // 55: temperate.v1.TemperateService.UpdatePermission:output_type -> temperate.v1.Permission
+	29, // 56: temperate.v1.TemperateService.DeletePermission:output_type -> google.protobuf.Empty
+	35, // [35:57] is the sub-list for method output_type
+	13, // [13:35] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_api_temperate_v1_temperate_proto_init() }
@@ -118,7 +1958,7 @@ func file_api_temperate_v1_temperate_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_temperate_v1_temperate_proto_rawDesc), len(file_api_temperate_v1_temperate_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

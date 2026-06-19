@@ -10,15 +10,15 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-kratos/kratos/v3/log"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/wire"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/robfig/cron/v3"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewCron)
+var ProviderSet = wire.NewSet(NewData, NewCron, NewAuthRepo)
 
 // Data .
 type Data struct {

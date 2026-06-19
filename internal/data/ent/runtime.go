@@ -3,18 +3,104 @@
 package ent
 
 import (
+	"temperate/internal/data/ent/module"
+	"temperate/internal/data/ent/permission"
+	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/schema"
-	"temperate/internal/data/ent/template"
+	"temperate/internal/data/ent/user"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	templateFields := schema.Template{}.Fields()
-	_ = templateFields
-	// templateDescName is the schema descriptor for name field.
-	templateDescName := templateFields[0].Descriptor()
-	// template.DefaultName holds the default value on creation for the name field.
-	template.DefaultName = templateDescName.Default.(string)
+	moduleFields := schema.Module{}.Fields()
+	_ = moduleFields
+	// moduleDescName is the schema descriptor for name field.
+	moduleDescName := moduleFields[0].Descriptor()
+	// module.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	module.NameValidator = moduleDescName.Validators[0].(func(string) error)
+	// moduleDescSystem is the schema descriptor for system field.
+	moduleDescSystem := moduleFields[2].Descriptor()
+	// module.DefaultSystem holds the default value on creation for the system field.
+	module.DefaultSystem = moduleDescSystem.Default.(bool)
+	// moduleDescCreatedAt is the schema descriptor for created_at field.
+	moduleDescCreatedAt := moduleFields[3].Descriptor()
+	// module.DefaultCreatedAt holds the default value on creation for the created_at field.
+	module.DefaultCreatedAt = moduleDescCreatedAt.Default.(func() time.Time)
+	// moduleDescUpdatedAt is the schema descriptor for updated_at field.
+	moduleDescUpdatedAt := moduleFields[4].Descriptor()
+	// module.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	module.DefaultUpdatedAt = moduleDescUpdatedAt.Default.(func() time.Time)
+	// module.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	module.UpdateDefaultUpdatedAt = moduleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	permissionFields := schema.Permission{}.Fields()
+	_ = permissionFields
+	// permissionDescAction is the schema descriptor for action field.
+	permissionDescAction := permissionFields[0].Descriptor()
+	// permission.ActionValidator is a validator for the "action" field. It is called by the builders before save.
+	permission.ActionValidator = permissionDescAction.Validators[0].(func(string) error)
+	// permissionDescSystem is the schema descriptor for system field.
+	permissionDescSystem := permissionFields[3].Descriptor()
+	// permission.DefaultSystem holds the default value on creation for the system field.
+	permission.DefaultSystem = permissionDescSystem.Default.(bool)
+	// permissionDescCreatedAt is the schema descriptor for created_at field.
+	permissionDescCreatedAt := permissionFields[4].Descriptor()
+	// permission.DefaultCreatedAt holds the default value on creation for the created_at field.
+	permission.DefaultCreatedAt = permissionDescCreatedAt.Default.(func() time.Time)
+	// permissionDescUpdatedAt is the schema descriptor for updated_at field.
+	permissionDescUpdatedAt := permissionFields[5].Descriptor()
+	// permission.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	permission.DefaultUpdatedAt = permissionDescUpdatedAt.Default.(func() time.Time)
+	// permission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	permission.UpdateDefaultUpdatedAt = permissionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	roleFields := schema.Role{}.Fields()
+	_ = roleFields
+	// roleDescName is the schema descriptor for name field.
+	roleDescName := roleFields[0].Descriptor()
+	// role.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	role.NameValidator = roleDescName.Validators[0].(func(string) error)
+	// roleDescSystem is the schema descriptor for system field.
+	roleDescSystem := roleFields[2].Descriptor()
+	// role.DefaultSystem holds the default value on creation for the system field.
+	role.DefaultSystem = roleDescSystem.Default.(bool)
+	// roleDescCreatedAt is the schema descriptor for created_at field.
+	roleDescCreatedAt := roleFields[3].Descriptor()
+	// role.DefaultCreatedAt holds the default value on creation for the created_at field.
+	role.DefaultCreatedAt = roleDescCreatedAt.Default.(func() time.Time)
+	// roleDescUpdatedAt is the schema descriptor for updated_at field.
+	roleDescUpdatedAt := roleFields[4].Descriptor()
+	// role.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	role.DefaultUpdatedAt = roleDescUpdatedAt.Default.(func() time.Time)
+	// role.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	role.UpdateDefaultUpdatedAt = roleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescUsername is the schema descriptor for username field.
+	userDescUsername := userFields[0].Descriptor()
+	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
+	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
+	// userDescDisabled is the schema descriptor for disabled field.
+	userDescDisabled := userFields[3].Descriptor()
+	// user.DefaultDisabled holds the default value on creation for the disabled field.
+	user.DefaultDisabled = userDescDisabled.Default.(bool)
+	// userDescSystem is the schema descriptor for system field.
+	userDescSystem := userFields[4].Descriptor()
+	// user.DefaultSystem holds the default value on creation for the system field.
+	user.DefaultSystem = userDescSystem.Default.(bool)
+	// userDescInitialPasswordUsed is the schema descriptor for initial_password_used field.
+	userDescInitialPasswordUsed := userFields[5].Descriptor()
+	// user.DefaultInitialPasswordUsed holds the default value on creation for the initial_password_used field.
+	user.DefaultInitialPasswordUsed = userDescInitialPasswordUsed.Default.(bool)
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[6].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[7].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"log/slog"
 	v1 "temperate/api/temperate/v1"
+	"temperate/internal/biz"
 	"temperate/internal/conf"
 	"temperate/internal/service"
 
@@ -26,6 +27,7 @@ func NewHTTPServer(
 	data *conf.Data,
 	metrics *Metrics,
 	tracing *Tracing,
+	auth *biz.UseCase,
 	service *service.IncidentService,
 	logger *slog.Logger,
 ) *http.Server {
@@ -47,7 +49,7 @@ func NewHTTPServer(
 		middlewares = append(middlewares, ratelimit.Server())
 	}
 	if api.GetAuth() {
-		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey()))
+		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth))
 	}
 	middlewares = append(middlewares,
 		validate.Validator(func(req any) error {
