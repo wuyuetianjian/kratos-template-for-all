@@ -78,5 +78,6 @@ func NewHTTPServer(
 		srv.Handle(metrics.Path(), metrics.Handler())
 	}
 	v1.RegisterTemperateServiceHTTPServer(srv, service)
+	srv.HandleFunc("/v1/ws", newWSHandler(data, auth))
 	return srv
 }

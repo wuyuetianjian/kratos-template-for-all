@@ -28,6 +28,13 @@ service TemperateService {
         };
     }
 
+    rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/auth/logout"
+            body: "*"
+        };
+    }
+
     rpc GetInitialPassword(google.protobuf.Empty) returns (InitialPasswordReply) {
         option (google.api.http) = {
             get: "/v1/auth/initial-password"
@@ -256,6 +263,10 @@ message LoginReply {
     User user = 2;
     bool must_change_password = 3;
     string initial_password = 4;
+}
+
+message LogoutRequest {
+    string detail = 1;
 }
 
 message InitialPasswordReply {
@@ -523,6 +534,10 @@ message ListAuditLogsRequest {
     int32 page_size = 1;
     int32 page_token = 2;
     string action = 3;
+    string username = 4;
+    string resource_type = 5;
+    string start_time = 6;
+    string end_time = 7;
 }
 
 message ListAuditLogsReply {
@@ -535,9 +550,15 @@ message ListAuditLogsReply {
 message SystemSettingsReply {
     int32 audit_log_retention_days = 1;
     int32 session_log_retention_days = 2;
+    string service_name = 3;
+    string site_icon = 4;
+    string corner_icon = 5;
 }
 
 message UpdateSystemSettingsRequest {
     int32 audit_log_retention_days = 1;
     int32 session_log_retention_days = 2;
+    string service_name = 3;
+    string site_icon = 4;
+    string corner_icon = 5;
 }

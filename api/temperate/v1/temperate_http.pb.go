@@ -46,6 +46,7 @@ const OperationTemperateServiceListSSOProvidersPublic = "/temperate.v1.Temperate
 const OperationTemperateServiceListSessions = "/temperate.v1.TemperateService/ListSessions"
 const OperationTemperateServiceListUsers = "/temperate.v1.TemperateService/ListUsers"
 const OperationTemperateServiceLogin = "/temperate.v1.TemperateService/Login"
+const OperationTemperateServiceLogout = "/temperate.v1.TemperateService/Logout"
 const OperationTemperateServiceSetRoleInheritances = "/temperate.v1.TemperateService/SetRoleInheritances"
 const OperationTemperateServiceUpdatePermission = "/temperate.v1.TemperateService/UpdatePermission"
 const OperationTemperateServiceUpdateRole = "/temperate.v1.TemperateService/UpdateRole"
@@ -84,6 +85,7 @@ type TemperateServiceHTTPServer interface {
 	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsReply, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
@@ -96,6 +98,7 @@ func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTP
 	r := s.Route("/")
 	r.Handle("GET", "/health", _TemperateService_Health0_HTTP_Handler(srv))
 	r.Handle("POST", "/v1/auth/login", _TemperateService_Login0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/logout", _TemperateService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/auth/initial-password", _TemperateService_GetInitialPassword0_HTTP_Handler(srv))
 	r.Handle("POST", "/v1/auth/change-password", _TemperateService_ChangePassword0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/auth/me", _TemperateService_GetCurrentUser0_HTTP_Handler(srv))
@@ -164,6 +167,25 @@ func _TemperateService_Login0_HTTP_Handler(srv TemperateServiceHTTPServer) func(
 			return err
 		}
 		reply := out.(*LoginReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_Logout0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LogoutRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceLogout)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Logout(ctx, req.(*LogoutRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
@@ -852,6 +874,7 @@ type TemperateServiceHTTPClient interface {
 	ListSessions(ctx context.Context, req *ListSessionsRequest, opts ...http.CallOption) (rsp *ListSessionsReply, err error)
 	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
+	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	SetRoleInheritances(ctx context.Context, req *SetRoleInheritancesRequest, opts ...http.CallOption) (rsp *Role, err error)
 	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
@@ -1317,6 +1340,23 @@ func (c *TemperateServiceHTTPClientImpl) Login(ctx context.Context, in *LoginReq
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationTemperateServiceLogin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/auth/logout"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceLogout),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

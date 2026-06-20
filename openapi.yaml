@@ -38,6 +38,22 @@ paths:
                   in: query
                   schema:
                     type: string
+                - name: username
+                  in: query
+                  schema:
+                    type: string
+                - name: resourceType
+                  in: query
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  schema:
+                    type: string
+                - name: endTime
+                  in: query
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -90,6 +106,21 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.LoginReply'
+    /v1/auth/logout:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /v1/auth/me:
         get:
             tags:
@@ -856,6 +887,11 @@ components:
                     type: string
                 password:
                     type: string
+        temperate.v1.LogoutRequest:
+            type: object
+            properties:
+                detail:
+                    type: string
         temperate.v1.Permission:
             type: object
             properties:
@@ -968,6 +1004,12 @@ components:
                 sessionLogRetentionDays:
                     type: integer
                     format: int32
+                serviceName:
+                    type: string
+                siteIcon:
+                    type: string
+                cornerIcon:
+                    type: string
         temperate.v1.UpdatePermissionRequest:
             required:
                 - id
@@ -1017,6 +1059,12 @@ components:
                 sessionLogRetentionDays:
                     type: integer
                     format: int32
+                serviceName:
+                    type: string
+                siteIcon:
+                    type: string
+                cornerIcon:
+                    type: string
         temperate.v1.UpdateUserRequest:
             required:
                 - id

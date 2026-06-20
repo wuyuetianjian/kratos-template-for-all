@@ -56,6 +56,7 @@ type AuthRepo interface {
 
 	CreatePermission(context.Context, *CreatePermission) (*Permission, error)
 	ListPermissions(context.Context, Page) ([]Permission, int, error)
+	GetPermission(context.Context, int64) (*Permission, error)
 	UpdatePermission(context.Context, *UpdatePermission) (*Permission, error)
 	DeletePermission(context.Context, int64) error
 }
@@ -372,6 +373,10 @@ func (uc *UseCase) CreatePermission(ctx context.Context, in *CreatePermission) (
 
 func (uc *UseCase) ListPermissions(ctx context.Context, page Page) ([]Permission, int, error) {
 	return uc.authRepo.ListPermissions(ctx, page.normalize())
+}
+
+func (uc *UseCase) GetPermission(ctx context.Context, permissionID int64) (*Permission, error) {
+	return uc.authRepo.GetPermission(ctx, permissionID)
 }
 
 func (uc *UseCase) UpdatePermission(ctx context.Context, in *UpdatePermission) (*Permission, error) {

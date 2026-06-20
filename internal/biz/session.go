@@ -15,6 +15,7 @@ const (
 
 	settingAuditLogRetentionDays   = "audit_log_retention_days"
 	settingSessionLogRetentionDays = "session_log_retention_days"
+	DefaultServiceName             = "Temperate"
 
 	defaultAuditLogRetentionDays   = 90
 	defaultSessionLogRetentionDays = 30
@@ -46,23 +47,36 @@ type AuditLogEntry struct {
 	CreatedAt    time.Time
 }
 
+type AuditLogFilter struct {
+	Action       string
+	Username     string
+	ResourceType string
+	StartTime    time.Time
+	EndTime      time.Time
+}
+
 type SystemSettings struct {
 	AuditLogRetentionDays   int32
 	SessionLogRetentionDays int32
+	ServiceName             string
+	SiteIcon                string
+	CornerIcon              string
 }
 
 type SessionRepo interface {
 	CreateSession(ctx context.Context, session *UserSession) error
+	GetSession(ctx context.Context, sessionID int64) (*UserSession, error)
 	FindSessionByTokenHash(ctx context.Context, tokenHash string) (*UserSession, error)
 	UpdateSessionLastAccess(ctx context.Context, tokenHash string) error
 	ListSessions(ctx context.Context, page Page) ([]UserSession, int, error)
 	KickSession(ctx context.Context, sessionID int64, kickedBy string) error
+	ExpireSession(ctx context.Context, tokenHash string) error
 	DeleteSessionsBefore(ctx context.Context, before time.Time) error
 }
 
 type AuditLogRepo interface {
 	CreateAuditLog(ctx context.Context, entry *AuditLogEntry) error
-	ListAuditLogs(ctx context.Context, action string, page Page) ([]AuditLogEntry, int, error)
+	ListAuditLogs(ctx context.Context, filter AuditLogFilter, page Page) ([]AuditLogEntry, int, error)
 	DeleteAuditLogsBefore(ctx context.Context, before time.Time) error
 }
 
@@ -126,7 +140,7 @@ func (uc *UseCase) CheckSession(ctx context.Context, tokenHash string) error {
 	if err != nil {
 		return nil
 	}
-	if session.Status == SessionStatusKicked {
+	if session.Status != SessionStatusActive {
 		return ErrUnauthorized()
 	}
 	_ = uc.sessionRepo.UpdateSessionLastAccess(ctx, tokenHash)
@@ -137,12 +151,35 @@ func (uc *UseCase) ListSessions(ctx context.Context, page Page) ([]UserSession, 
 	return uc.sessionRepo.ListSessions(ctx, page.normalize())
 }
 
+func (uc *UseCase) GetSession(ctx context.Context, sessionID int64) (*UserSession, error) {
+	return uc.sessionRepo.GetSession(ctx, sessionID)
+}
+
+func (uc *UseCase) LogoutSession(ctx context.Context, rawToken string) error {
+	if rawToken == "" {
+		return nil
+	}
+	return uc.sessionRepo.ExpireSession(ctx, TokenHash(rawToken))
+}
+
+func (uc *UseCase) Hub() *SessionHub {
+	return uc.hub
+}
+
 func (uc *UseCase) KickSession(ctx context.Context, sessionID int64) error {
 	auth, ok := AuthFromContext(ctx)
 	if !ok {
 		return ErrUnauthorized()
 	}
-	return uc.sessionRepo.KickSession(ctx, sessionID, auth.Username)
+	if err := uc.sessionRepo.KickSession(ctx, sessionID, auth.Username); err != nil {
+		return err
+	}
+	uc.hub.Notify(sessionID)
+	return nil
+}
+
+func (uc *UseCase) FindSessionByToken(ctx context.Context, rawToken string) (*UserSession, error) {
+	return uc.sessionRepo.FindSessionByTokenHash(ctx, TokenHash(rawToken))
 }
 
 func (uc *UseCase) LogAuditEvent(ctx context.Context, action, resourceType, resourceName, ip, detail string) {
@@ -152,6 +189,9 @@ func (uc *UseCase) LogAuditEvent(ctx context.Context, action, resourceType, reso
 	if auth != nil {
 		userID = auth.UserID
 		username = auth.Username
+	}
+	if username == "" && (action == "login" || action == "logout") {
+		username = resourceName
 	}
 	_ = uc.auditRepo.CreateAuditLog(ctx, &AuditLogEntry{
 		UserID:       userID,
@@ -164,8 +204,8 @@ func (uc *UseCase) LogAuditEvent(ctx context.Context, action, resourceType, reso
 	})
 }
 
-func (uc *UseCase) ListAuditLogs(ctx context.Context, action string, page Page) ([]AuditLogEntry, int, error) {
-	return uc.auditRepo.ListAuditLogs(ctx, action, page.normalize())
+func (uc *UseCase) ListAuditLogs(ctx context.Context, filter AuditLogFilter, page Page) ([]AuditLogEntry, int, error) {
+	return uc.auditRepo.ListAuditLogs(ctx, filter, page.normalize())
 }
 
 func (uc *UseCase) GetSettings(ctx context.Context) (*SystemSettings, error) {

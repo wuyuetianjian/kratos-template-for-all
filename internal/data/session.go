@@ -25,6 +25,20 @@ func NewSessionRepo(data *Data) biz.SessionRepo {
 	return &sessionRepo{data: data}
 }
 
+func (r *sessionRepo) GetSession(ctx context.Context, sessionID int64) (*biz.UserSession, error) {
+	s, err := r.data.WriteEnt.UserSession.Query().
+		Where(entusersession.ID(int(sessionID))).
+		WithUser().
+		Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, errors.NotFound(bizReasonNotFound, "session not found")
+	}
+	if err != nil {
+		return nil, err
+	}
+	return toBizSession(s), nil
+}
+
 func (r *sessionRepo) CreateSession(ctx context.Context, s *biz.UserSession) error {
 	u, err := r.data.WriteEnt.User.Get(ctx, int(s.UserID))
 	if err != nil {
@@ -66,7 +80,9 @@ func (r *sessionRepo) UpdateSessionLastAccess(ctx context.Context, tokenHash str
 }
 
 func (r *sessionRepo) ListSessions(ctx context.Context, page biz.Page) ([]biz.UserSession, int, error) {
-	query := r.data.WriteEnt.UserSession.Query().WithUser()
+	query := r.data.WriteEnt.UserSession.Query().
+		Where(entusersession.StatusIn(biz.SessionStatusActive, biz.SessionStatusKicked)).
+		WithUser()
 	total, err := query.Clone().Count(ctx)
 	if err != nil {
 		return nil, 0, err
@@ -100,6 +116,14 @@ func (r *sessionRepo) KickSession(ctx context.Context, sessionID int64, kickedBy
 	return r.data.WriteEnt.UserSession.UpdateOneID(int(sessionID)).
 		SetStatus(biz.SessionStatusKicked).
 		SetKickedBy(kickedBy).
+		Exec(ctx)
+}
+
+func (r *sessionRepo) ExpireSession(ctx context.Context, tokenHash string) error {
+	return r.data.WriteEnt.UserSession.Update().
+		Where(entusersession.TokenHash(tokenHash), entusersession.Status(biz.SessionStatusActive)).
+		SetStatus(biz.SessionStatusExpired).
+		SetLastAccessAt(time.Now()).
 		Exec(ctx)
 }
 
@@ -152,10 +176,22 @@ func (r *auditLogRepo) CreateAuditLog(ctx context.Context, entry *biz.AuditLogEn
 	return err
 }
 
-func (r *auditLogRepo) ListAuditLogs(ctx context.Context, action string, page biz.Page) ([]biz.AuditLogEntry, int, error) {
+func (r *auditLogRepo) ListAuditLogs(ctx context.Context, filter biz.AuditLogFilter, page biz.Page) ([]biz.AuditLogEntry, int, error) {
 	query := r.data.ReadEnt.AuditLog.Query()
-	if action != "" {
-		query = query.Where(entauditlog.Action(action))
+	if filter.Action != "" {
+		query = query.Where(entauditlog.Action(filter.Action))
+	}
+	if filter.Username != "" {
+		query = query.Where(entauditlog.UsernameContainsFold(filter.Username))
+	}
+	if filter.ResourceType != "" {
+		query = query.Where(entauditlog.ResourceType(filter.ResourceType))
+	}
+	if !filter.StartTime.IsZero() {
+		query = query.Where(entauditlog.CreatedAtGTE(filter.StartTime))
+	}
+	if !filter.EndTime.IsZero() {
+		query = query.Where(entauditlog.CreatedAtLTE(filter.EndTime))
 	}
 	total, err := query.Clone().Count(ctx)
 	if err != nil {
@@ -207,12 +243,17 @@ func (r *settingsRepo) GetSettings(ctx context.Context) (*biz.SystemSettings, er
 	settings := &biz.SystemSettings{
 		AuditLogRetentionDays:   90,
 		SessionLogRetentionDays: 30,
+		ServiceName:             biz.DefaultServiceName,
+		SiteIcon:                biz.DefaultServiceName,
+		CornerIcon:              biz.DefaultServiceName,
 	}
 	rows, err := r.data.ReadEnt.SystemSetting.Query().All(ctx)
 	if err != nil {
 		return settings, nil
 	}
+	seen := make(map[string]bool, len(rows))
 	for _, row := range rows {
+		seen[row.Key] = true
 		switch row.Key {
 		case "audit_log_retention_days":
 			var v int32
@@ -224,16 +265,58 @@ func (r *settingsRepo) GetSettings(ctx context.Context) (*biz.SystemSettings, er
 			if _, err := countSScan(row.Value, &v); err == nil && v > 0 {
 				settings.SessionLogRetentionDays = v
 			}
+		case "service_name":
+			if row.Value != "" {
+				settings.ServiceName = row.Value
+			}
+		case "site_icon":
+			if row.Value != "" {
+				settings.SiteIcon = row.Value
+			}
+		case "corner_icon":
+			if row.Value != "" {
+				settings.CornerIcon = row.Value
+			}
 		}
 	}
+	_ = r.upsertSettings(ctx, defaultSettingPairs(settings, seen))
 	return settings, nil
 }
 
 func (r *settingsRepo) UpdateSettings(ctx context.Context, settings *biz.SystemSettings) error {
-	pairs := map[string]string{
+	if settings.ServiceName == "" {
+		settings.ServiceName = biz.DefaultServiceName
+	}
+	if settings.SiteIcon == "" {
+		settings.SiteIcon = biz.DefaultServiceName
+	}
+	if settings.CornerIcon == "" {
+		settings.CornerIcon = biz.DefaultServiceName
+	}
+	return r.upsertSettings(ctx, map[string]string{
 		"audit_log_retention_days":   intToStr(settings.AuditLogRetentionDays),
 		"session_log_retention_days": intToStr(settings.SessionLogRetentionDays),
+		"service_name":               settings.ServiceName,
+		"site_icon":                  settings.SiteIcon,
+		"corner_icon":                settings.CornerIcon,
+	})
+}
+
+func defaultSettingPairs(settings *biz.SystemSettings, seen map[string]bool) map[string]string {
+	defaults := map[string]string{
+		"audit_log_retention_days":   intToStr(settings.AuditLogRetentionDays),
+		"session_log_retention_days": intToStr(settings.SessionLogRetentionDays),
+		"service_name":               settings.ServiceName,
+		"site_icon":                  settings.SiteIcon,
+		"corner_icon":                settings.CornerIcon,
 	}
+	for key := range seen {
+		delete(defaults, key)
+	}
+	return defaults
+}
+
+func (r *settingsRepo) upsertSettings(ctx context.Context, pairs map[string]string) error {
 	for k, v := range pairs {
 		existing, err := r.data.WriteEnt.SystemSetting.Query().Where(entsystemsetting.Key(k)).Only(ctx)
 		if ent.IsNotFound(err) {

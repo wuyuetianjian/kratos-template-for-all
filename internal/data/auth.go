@@ -390,6 +390,20 @@ func (r *authRepo) ListPermissions(ctx context.Context, page biz.Page) ([]biz.Pe
 	return toBizPermissions(permissions), total, nil
 }
 
+func (r *authRepo) GetPermission(ctx context.Context, permissionID int64) (*biz.Permission, error) {
+	permission, err := r.data.ReadEnt.Permission.Query().
+		Where(entpermission.ID(int(permissionID))).
+		WithModule().
+		Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, errors.NotFound(bizReasonNotFound, "permission not found")
+	}
+	if err != nil {
+		return nil, err
+	}
+	return toBizPermission(permission), nil
+}
+
 func (r *authRepo) UpdatePermission(ctx context.Context, in *biz.UpdatePermission) (*biz.Permission, error) {
 	permission, err := r.data.WriteEnt.Permission.UpdateOneID(int(in.ID)).
 		SetOperation(in.Operation).

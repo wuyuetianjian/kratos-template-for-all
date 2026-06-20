@@ -2,15 +2,19 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net"
+	"reflect"
 	"strings"
+	"time"
 
 	v1 "temperate/api/temperate/v1"
 	"temperate/internal/biz"
 	"temperate/internal/conf"
 
+	"github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/log"
 	"github.com/go-kratos/kratos/v3/transport"
 	khttp "github.com/go-kratos/kratos/v3/transport/http"
@@ -56,13 +60,27 @@ func (s *IncidentService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.
 	browser, os := biz.ParseUserAgent(ua)
 	tokenHash := biz.TokenHash(result.Token)
 	_ = s.useCase.CreateSession(ctx, tokenHash, ip, browser, os, result.User.ID, result.User.Username)
-	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip, "")
+	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip, fmt.Sprintf("browser=%s os=%s", browser, os))
 	return &v1.LoginReply{
 		Token:              result.Token,
 		User:               convertUser(result.User),
 		MustChangePassword: result.MustChangePassword,
 		InitialPassword:    result.InitialPassword,
 	}, nil
+}
+
+func (s *IncidentService) Logout(ctx context.Context, req *v1.LogoutRequest) (*emptypb.Empty, error) {
+	token := bearerTokenFromContext(ctx)
+	_ = s.useCase.LogoutSession(ctx, token)
+	ip, _ := requestMeta(ctx)
+	detail := req.GetDetail()
+	if detail == "" {
+		if auth, ok := biz.AuthFromContext(ctx); ok {
+			detail = fmt.Sprintf("logout for %q", auth.Username)
+		}
+	}
+	s.useCase.LogAuditEvent(ctx, "logout", "session", "", ip, detail)
+	return &emptypb.Empty{}, nil
 }
 
 func (s *IncidentService) GetInitialPassword(ctx context.Context, _ *emptypb.Empty) (*v1.InitialPasswordReply, error) {
@@ -133,6 +151,7 @@ func (s *IncidentService) GetUser(ctx context.Context, req *v1.GetUserRequest) (
 }
 
 func (s *IncidentService) UpdateUser(ctx context.Context, req *v1.UpdateUserRequest) (*v1.User, error) {
+	before, _ := s.useCase.CurrentUser(ctx, req.GetId())
 	user, err := s.useCase.UpdateUser(ctx, &biz.UpdateUser{
 		ID:          req.GetId(),
 		DisplayName: req.GetDisplayName(),
@@ -143,24 +162,32 @@ func (s *IncidentService) UpdateUser(ctx context.Context, req *v1.UpdateUserRequ
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "update", "user", user.Username, ip, "")
+	s.useCase.LogAuditEvent(ctx, "update", "user", userLabel(user), ip, auditDiffDetail("更新用户 "+userLabel(user), userAuditMap(before), userAuditMap(user)))
 	return convertUser(user), nil
 }
 
 func (s *IncidentService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*emptypb.Empty, error) {
+	user, _ := s.useCase.CurrentUser(ctx, req.GetId())
 	if err := s.useCase.DeleteUser(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "delete", "user", resourceID(req.GetId()), ip, "")
+	label := userLabel(user)
+	if label == "" {
+		label = resourceID(req.GetId())
+	}
+	s.useCase.LogAuditEvent(ctx, "delete", "user", label, ip, auditFieldsDetail("删除用户 "+label, userAuditMap(user)))
 	return &emptypb.Empty{}, nil
 }
 
 func (s *IncidentService) AssignUserRoles(ctx context.Context, req *v1.AssignUserRolesRequest) (*v1.User, error) {
+	before, _ := s.useCase.CurrentUser(ctx, req.GetUserId())
 	user, err := s.useCase.AssignUserRoles(ctx, req.GetUserId(), req.GetRoleIds())
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "user", userLabel(user), ip, auditDiffDetail("更新用户角色 "+userLabel(user), userAuditMap(before), userAuditMap(user)))
 	return convertUser(user), nil
 }
 
@@ -196,37 +223,49 @@ func (s *IncidentService) GetRole(ctx context.Context, req *v1.GetRoleRequest) (
 }
 
 func (s *IncidentService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequest) (*v1.Role, error) {
+	before, _ := s.useCase.GetRole(ctx, req.GetId())
 	role, err := s.useCase.UpdateRole(ctx, &biz.UpdateRole{ID: req.GetId(), Description: req.GetDescription()})
 	if err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "update", "role", role.Name, ip, "")
+	s.useCase.LogAuditEvent(ctx, "update", "role", roleLabel(role), ip, auditDiffDetail("更新角色 "+roleLabel(role), roleAuditMap(before), roleAuditMap(role)))
 	return convertRole(role), nil
 }
 
 func (s *IncidentService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequest) (*emptypb.Empty, error) {
+	role, _ := s.useCase.GetRole(ctx, req.GetId())
 	if err := s.useCase.DeleteRole(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "delete", "role", resourceID(req.GetId()), ip, "")
+	label := roleLabel(role)
+	if label == "" {
+		label = resourceID(req.GetId())
+	}
+	s.useCase.LogAuditEvent(ctx, "delete", "role", label, ip, auditFieldsDetail("删除角色 "+label, roleAuditMap(role)))
 	return &emptypb.Empty{}, nil
 }
 
 func (s *IncidentService) AssignRolePermissions(ctx context.Context, req *v1.AssignRolePermissionsRequest) (*v1.Role, error) {
+	before, _ := s.useCase.GetRole(ctx, req.GetRoleId())
 	role, err := s.useCase.AssignRolePermissions(ctx, req.GetRoleId(), req.GetPermissionIds())
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "role", roleLabel(role), ip, auditDiffDetail("更新角色权限 "+roleLabel(role), roleAuditMap(before), roleAuditMap(role)))
 	return convertRole(role), nil
 }
 
 func (s *IncidentService) SetRoleInheritances(ctx context.Context, req *v1.SetRoleInheritancesRequest) (*v1.Role, error) {
+	before, _ := s.useCase.GetRole(ctx, req.GetRoleId())
 	role, err := s.useCase.SetRoleInheritances(ctx, req.GetRoleId(), req.GetInheritedRoleIds())
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "role", roleLabel(role), ip, auditDiffDetail("更新角色继承 "+roleLabel(role), roleAuditMap(before), roleAuditMap(role)))
 	return convertRole(role), nil
 }
 
@@ -240,6 +279,8 @@ func (s *IncidentService) CreatePermission(ctx context.Context, req *v1.CreatePe
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "create", "permission", permissionLabel(permission), ip, auditFieldsDetail("创建权限 "+permissionLabel(permission), permissionAuditMap(permission)))
 	return convertPermission(permission), nil
 }
 
@@ -265,6 +306,7 @@ func (s *IncidentService) ListPermissionActions(ctx context.Context, _ *emptypb.
 }
 
 func (s *IncidentService) UpdatePermission(ctx context.Context, req *v1.UpdatePermissionRequest) (*v1.Permission, error) {
+	before, _ := s.useCase.GetPermission(ctx, req.GetId())
 	permission, err := s.useCase.UpdatePermission(ctx, &biz.UpdatePermission{
 		ID:          req.GetId(),
 		Operation:   req.GetOperation(),
@@ -273,15 +315,22 @@ func (s *IncidentService) UpdatePermission(ctx context.Context, req *v1.UpdatePe
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "permission", permissionLabel(permission), ip, auditDiffDetail("更新权限 "+permissionLabel(permission), permissionAuditMap(before), permissionAuditMap(permission)))
 	return convertPermission(permission), nil
 }
 
 func (s *IncidentService) DeletePermission(ctx context.Context, req *v1.DeletePermissionRequest) (*emptypb.Empty, error) {
+	permission, _ := s.useCase.GetPermission(ctx, req.GetId())
 	if err := s.useCase.DeletePermission(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "delete", "permission", resourceID(req.GetId()), ip, "")
+	label := permissionLabel(permission)
+	if label == "" {
+		label = resourceID(req.GetId())
+	}
+	s.useCase.LogAuditEvent(ctx, "delete", "permission", label, ip, auditFieldsDetail("删除权限 "+label, permissionAuditMap(permission)))
 	return &emptypb.Empty{}, nil
 }
 
@@ -327,10 +376,13 @@ func (s *IncidentService) CreateSSOProvider(ctx context.Context, req *v1.CreateS
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "create", "sso_provider", ssoProviderLabel(p), ip, auditFieldsDetail("创建单点登录配置 "+ssoProviderLabel(p), ssoProviderAuditMap(p)))
 	return convertSSOProvider(p), nil
 }
 
 func (s *IncidentService) UpdateSSOProvider(ctx context.Context, req *v1.UpdateSSOProviderRequest) (*v1.SSOProvider, error) {
+	before, _ := s.useCase.GetSSOProvider(ctx, req.GetId())
 	p, err := s.useCase.UpdateSSOProvider(ctx, &biz.UpdateSSOProvider{
 		ID:        req.GetId(),
 		Name:      req.GetName(),
@@ -342,15 +394,22 @@ func (s *IncidentService) UpdateSSOProvider(ctx context.Context, req *v1.UpdateS
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "sso_provider", ssoProviderLabel(p), ip, auditDiffDetail("更新单点登录配置 "+ssoProviderLabel(p), ssoProviderAuditMap(before), ssoProviderAuditMap(p)))
 	return convertSSOProvider(p), nil
 }
 
 func (s *IncidentService) DeleteSSOProvider(ctx context.Context, req *v1.DeleteSSOProviderRequest) (*emptypb.Empty, error) {
+	provider, _ := s.useCase.GetSSOProvider(ctx, req.GetId())
 	if err := s.useCase.DeleteSSOProvider(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "delete", "sso_provider", resourceID(req.GetId()), ip, "")
+	label := ssoProviderLabel(provider)
+	if label == "" {
+		label = resourceID(req.GetId())
+	}
+	s.useCase.LogAuditEvent(ctx, "delete", "sso_provider", label, ip, auditFieldsDetail("删除单点登录配置 "+label, ssoProviderAuditMap(provider)))
 	return &emptypb.Empty{}, nil
 }
 
@@ -381,18 +440,41 @@ func (s *IncidentService) ListSessions(ctx context.Context, req *v1.ListSessions
 }
 
 func (s *IncidentService) KickSession(ctx context.Context, req *v1.KickSessionRequest) (*emptypb.Empty, error) {
+	session, _ := s.useCase.GetSession(ctx, req.GetId())
 	if err := s.useCase.KickSession(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "kick", "session", resourceID(req.GetId()), ip, "")
+	kickedBy := ""
+	if auth, ok := biz.AuthFromContext(ctx); ok {
+		kickedBy = auth.Username
+	}
+	label := sessionLabel(session)
+	if label == "" {
+		label = resourceID(req.GetId())
+	}
+	s.useCase.LogAuditEvent(ctx, "kick", "session", label, ip, auditFieldsDetail("踢出会话 "+label, sessionAuditFields(session, kickedBy)))
 	return &emptypb.Empty{}, nil
 }
 
 // ── Audit logs ────────────────────────────────────────────────────────────────
 
 func (s *IncidentService) ListAuditLogs(ctx context.Context, req *v1.ListAuditLogsRequest) (*v1.ListAuditLogsReply, error) {
-	logs, total, err := s.useCase.ListAuditLogs(ctx, req.GetAction(), biz.Page{Size: int(req.GetPageSize()), Token: int(req.GetPageToken())})
+	startTime, err := parseAuditLogTime(req.GetStartTime())
+	if err != nil {
+		return nil, err
+	}
+	endTime, err := parseAuditLogTime(req.GetEndTime())
+	if err != nil {
+		return nil, err
+	}
+	logs, total, err := s.useCase.ListAuditLogs(ctx, biz.AuditLogFilter{
+		Action:       req.GetAction(),
+		Username:     req.GetUsername(),
+		ResourceType: req.GetResourceType(),
+		StartTime:    startTime,
+		EndTime:      endTime,
+	}, biz.Page{Size: int(req.GetPageSize()), Token: int(req.GetPageToken())})
 	if err != nil {
 		return nil, err
 	}
@@ -414,6 +496,18 @@ func (s *IncidentService) ListAuditLogs(ctx context.Context, req *v1.ListAuditLo
 	return &v1.ListAuditLogsReply{Logs: result, Total: int32(total)}, nil
 }
 
+func parseAuditLogTime(value string) (time.Time, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return time.Time{}, nil
+	}
+	t, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return time.Time{}, errors.BadRequest("INVALID_ARGUMENT", "invalid audit log time")
+	}
+	return t, nil
+}
+
 // ── System settings ───────────────────────────────────────────────────────────
 
 func (s *IncidentService) GetSystemSettings(ctx context.Context, _ *emptypb.Empty) (*v1.SystemSettingsReply, error) {
@@ -424,22 +518,32 @@ func (s *IncidentService) GetSystemSettings(ctx context.Context, _ *emptypb.Empt
 	return &v1.SystemSettingsReply{
 		AuditLogRetentionDays:   settings.AuditLogRetentionDays,
 		SessionLogRetentionDays: settings.SessionLogRetentionDays,
+		ServiceName:             settings.ServiceName,
+		SiteIcon:                settings.SiteIcon,
+		CornerIcon:              settings.CornerIcon,
 	}, nil
 }
 
 func (s *IncidentService) UpdateSystemSettings(ctx context.Context, req *v1.UpdateSystemSettingsRequest) (*v1.SystemSettingsReply, error) {
+	before, _ := s.useCase.GetSettings(ctx)
 	settings := &biz.SystemSettings{
 		AuditLogRetentionDays:   req.GetAuditLogRetentionDays(),
 		SessionLogRetentionDays: req.GetSessionLogRetentionDays(),
+		ServiceName:             req.GetServiceName(),
+		SiteIcon:                req.GetSiteIcon(),
+		CornerIcon:              req.GetCornerIcon(),
 	}
 	if err := s.useCase.UpdateSettings(ctx, settings); err != nil {
 		return nil, err
 	}
 	ip, _ := requestMeta(ctx)
-	s.useCase.LogAuditEvent(ctx, "update", "settings", "system", ip, "")
+	s.useCase.LogAuditEvent(ctx, "update", "settings", "system", ip, auditDiffDetail("更新系统设置", settingsAuditMap(before), settingsAuditMap(settings)))
 	return &v1.SystemSettingsReply{
 		AuditLogRetentionDays:   settings.AuditLogRetentionDays,
 		SessionLogRetentionDays: settings.SessionLogRetentionDays,
+		ServiceName:             settings.ServiceName,
+		SiteIcon:                settings.SiteIcon,
+		CornerIcon:              settings.CornerIcon,
 	}, nil
 }
 
@@ -464,6 +568,18 @@ func requestMeta(ctx context.Context) (ip, userAgent string) {
 	}
 	userAgent = reqHeader.Get("User-Agent")
 	return
+}
+
+func bearerTokenFromContext(ctx context.Context) string {
+	header, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return ""
+	}
+	auths := strings.SplitN(header.RequestHeader().Get("Authorization"), " ", 2)
+	if len(auths) != 2 || !strings.EqualFold(auths[0], "Bearer") {
+		return ""
+	}
+	return strings.TrimSpace(auths[1])
 }
 
 func clientIPFromValues(values ...string) string {
@@ -502,6 +618,236 @@ func normalizeClientIP(value string) string {
 
 func resourceID(id int64) string {
 	return fmt.Sprintf("%d", id)
+}
+
+type auditDetailPayload struct {
+	Summary string         `json:"summary,omitempty"`
+	Fields  map[string]any `json:"fields,omitempty"`
+	Before  map[string]any `json:"before,omitempty"`
+	After   map[string]any `json:"after,omitempty"`
+}
+
+func auditFieldsDetail(summary string, fields map[string]any) string {
+	return marshalAuditDetail(auditDetailPayload{Summary: summary, Fields: fields})
+}
+
+func auditDiffDetail(summary string, before, after map[string]any) string {
+	beforeChanges, afterChanges := changedFields(before, after)
+	return marshalAuditDetail(auditDetailPayload{
+		Summary: summary,
+		Before:  beforeChanges,
+		After:   afterChanges,
+	})
+}
+
+func marshalAuditDetail(payload auditDetailPayload) string {
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return payload.Summary
+	}
+	return string(data)
+}
+
+func changedFields(before, after map[string]any) (map[string]any, map[string]any) {
+	if before == nil {
+		before = map[string]any{}
+	}
+	if after == nil {
+		after = map[string]any{}
+	}
+	beforeChanges := make(map[string]any)
+	afterChanges := make(map[string]any)
+	for key, beforeValue := range before {
+		afterValue, ok := after[key]
+		if !ok || !reflect.DeepEqual(beforeValue, afterValue) {
+			beforeChanges[key] = beforeValue
+			if ok {
+				afterChanges[key] = afterValue
+			} else {
+				afterChanges[key] = nil
+			}
+		}
+	}
+	for key, afterValue := range after {
+		if _, ok := before[key]; !ok {
+			beforeChanges[key] = nil
+			afterChanges[key] = afterValue
+		}
+	}
+	return beforeChanges, afterChanges
+}
+
+func userLabel(user *biz.User) string {
+	if user == nil {
+		return ""
+	}
+	if user.DisplayName != "" && user.DisplayName != user.Username {
+		return fmt.Sprintf("%s（%s）", user.DisplayName, user.Username)
+	}
+	if user.Username != "" {
+		return user.Username
+	}
+	return resourceID(user.ID)
+}
+
+func roleLabel(role *biz.Role) string {
+	if role == nil {
+		return ""
+	}
+	if role.Name != "" {
+		return role.Name
+	}
+	return resourceID(role.ID)
+}
+
+func permissionLabel(permission *biz.Permission) string {
+	if permission == nil {
+		return ""
+	}
+	parts := make([]string, 0, 3)
+	for _, part := range []string{permission.Module, permission.Operation, permission.Action} {
+		if part != "" {
+			parts = append(parts, part)
+		}
+	}
+	if len(parts) > 0 {
+		return strings.Join(parts, " / ")
+	}
+	return resourceID(permission.ID)
+}
+
+func ssoProviderLabel(provider *biz.SSOProvider) string {
+	if provider == nil {
+		return ""
+	}
+	if provider.Name != "" {
+		return provider.Name
+	}
+	return resourceID(provider.ID)
+}
+
+func sessionLabel(session *biz.UserSession) string {
+	if session == nil {
+		return ""
+	}
+	parts := make([]string, 0, 4)
+	for _, part := range []string{session.Username, session.IP, session.Browser, session.OS} {
+		if part != "" {
+			parts = append(parts, part)
+		}
+	}
+	label := strings.Join(parts, " / ")
+	if label == "" {
+		return resourceID(session.ID)
+	}
+	return fmt.Sprintf("%s (#%d)", label, session.ID)
+}
+
+func userAuditMap(user *biz.User) map[string]any {
+	if user == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"username":     user.Username,
+		"display_name": user.DisplayName,
+		"disabled":     user.Disabled,
+		"roles":        roleNames(user.Roles),
+	}
+}
+
+func roleAuditMap(role *biz.Role) map[string]any {
+	if role == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"name":            role.Name,
+		"description":     role.Description,
+		"permissions":     permissionLabels(role.Permissions),
+		"inherited_roles": roleNames(role.InheritedRoles),
+	}
+}
+
+func permissionAuditMap(permission *biz.Permission) map[string]any {
+	if permission == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"module":      permission.Module,
+		"action":      permission.Action,
+		"operation":   permission.Operation,
+		"description": permission.Description,
+	}
+}
+
+func ssoProviderAuditMap(provider *biz.SSOProvider) map[string]any {
+	if provider == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"name":       provider.Name,
+		"type":       provider.Type,
+		"enabled":    provider.Enabled,
+		"icon":       provider.Icon,
+		"sort_order": provider.SortOrder,
+		"config":     provider.Config,
+	}
+}
+
+func settingsAuditMap(settings *biz.SystemSettings) map[string]any {
+	if settings == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"audit_log_retention_days":   settings.AuditLogRetentionDays,
+		"session_log_retention_days": settings.SessionLogRetentionDays,
+		"service_name":               settings.ServiceName,
+		"site_icon":                  settings.SiteIcon,
+		"corner_icon":                settings.CornerIcon,
+	}
+}
+
+func sessionAuditFields(session *biz.UserSession, kickedBy string) map[string]any {
+	if session == nil {
+		return map[string]any{"kicked_by": kickedBy}
+	}
+	return map[string]any{
+		"session_id":     session.ID,
+		"username":       session.Username,
+		"ip":             session.IP,
+		"browser":        session.Browser,
+		"os":             session.OS,
+		"status":         session.Status,
+		"kicked_by":      kickedBy,
+		"login_at":       formatAuditTime(session.LoginAt),
+		"last_access_at": formatAuditTime(session.LastAccessAt),
+	}
+}
+
+func roleNames(roles []biz.Role) []string {
+	names := make([]string, 0, len(roles))
+	for i := range roles {
+		if label := roleLabel(&roles[i]); label != "" {
+			names = append(names, label)
+		}
+	}
+	return names
+}
+
+func permissionLabels(permissions []biz.Permission) []string {
+	labels := make([]string, 0, len(permissions))
+	for i := range permissions {
+		if label := permissionLabel(&permissions[i]); label != "" {
+			labels = append(labels, label)
+		}
+	}
+	return labels
+}
+
+func formatAuditTime(value time.Time) string {
+	if value.IsZero() {
+		return ""
+	}
+	return value.Format(time.RFC3339)
 }
 
 func convertSSOProviders(providers []biz.SSOProvider) []*v1.SSOProvider {

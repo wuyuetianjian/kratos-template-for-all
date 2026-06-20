@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	TemperateService_Health_FullMethodName                 = "/temperate.v1.TemperateService/Health"
 	TemperateService_Login_FullMethodName                  = "/temperate.v1.TemperateService/Login"
+	TemperateService_Logout_FullMethodName                 = "/temperate.v1.TemperateService/Logout"
 	TemperateService_GetInitialPassword_FullMethodName     = "/temperate.v1.TemperateService/GetInitialPassword"
 	TemperateService_ChangePassword_FullMethodName         = "/temperate.v1.TemperateService/ChangePassword"
 	TemperateService_GetCurrentUser_FullMethodName         = "/temperate.v1.TemperateService/GetCurrentUser"
@@ -62,6 +63,7 @@ const (
 type TemperateServiceClient interface {
 	Health(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMessageResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetInitialPassword(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InitialPasswordReply, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetCurrentUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
@@ -120,6 +122,16 @@ func (c *temperateServiceClient) Login(ctx context.Context, in *LoginRequest, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginReply)
 	err := c.cc.Invoke(ctx, TemperateService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_Logout_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -452,6 +464,7 @@ func (c *temperateServiceClient) UpdateSystemSettings(ctx context.Context, in *U
 type TemperateServiceServer interface {
 	Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	GetCurrentUser(context.Context, *emptypb.Empty) (*User, error)
@@ -501,6 +514,9 @@ func (UnimplementedTemperateServiceServer) Health(context.Context, *emptypb.Empt
 }
 func (UnimplementedTemperateServiceServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedTemperateServiceServer) Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedTemperateServiceServer) GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetInitialPassword not implemented")
@@ -651,6 +667,24 @@ func _TemperateService_Login_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TemperateServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_Logout_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).Logout(ctx, req.(*LogoutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1245,6 +1279,10 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _TemperateService_Login_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _TemperateService_Logout_Handler,
 		},
 		{
 			MethodName: "GetInitialPassword",

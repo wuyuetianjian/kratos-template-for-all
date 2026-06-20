@@ -24,6 +24,7 @@ type UseCase struct {
 	sessionRepo          SessionRepo
 	auditRepo            AuditLogRepo
 	settingsRepo         SettingsRepo
+	hub                  *SessionHub
 	initialAdminPassword string
 }
 
@@ -52,6 +53,7 @@ func NewUseCase(
 		sessionRepo:  sessionRepo,
 		auditRepo:    auditRepo,
 		settingsRepo: settingsRepo,
+		hub:          newSessionHub(),
 	}
 	if err := uc.BootstrapAdmin(context.Background()); err != nil {
 		return nil, err
