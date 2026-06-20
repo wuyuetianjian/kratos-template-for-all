@@ -161,10 +161,11 @@ type InitialPasswordResult struct {
 }
 
 type AuthContext struct {
-	UserID      int64
-	Username    string
-	Permissions []Permission
-	Roles       []Role
+	UserID           int64
+	Username         string
+	IsServiceAccount bool
+	Permissions      []Permission
+	Roles            []Role
 }
 
 type authContextKey struct{}

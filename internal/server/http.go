@@ -49,7 +49,7 @@ func NewHTTPServer(
 		middlewares = append(middlewares, ratelimit.Server())
 	}
 	if api.GetAuth() {
-		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth, auth))
+		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth, auth, auth))
 	}
 	middlewares = append(middlewares,
 		validate.Validator(func(req any) error {

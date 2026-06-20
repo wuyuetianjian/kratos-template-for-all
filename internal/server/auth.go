@@ -51,6 +51,10 @@ type sessionChecker interface {
 	CheckSession(context.Context, string) error
 }
 
+type serviceAccountAuthorizer interface {
+	AuthorizeServiceAccount(context.Context, string, string) (*biz.AuthContext, error)
+}
+
 type authOperationAllowlist struct {
 	operations map[string]struct{}
 	prefixes   []string
@@ -79,15 +83,15 @@ func (a authOperationAllowlist) Contains(operation string) bool {
 	return false
 }
 
-func selectedAuthMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker) middleware.Middleware {
-	return selector.Server(authMiddleware(signingMethod, key, auth, sessions)).
+func selectedAuthMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker, svcAuth serviceAccountAuthorizer) middleware.Middleware {
+	return selector.Server(authMiddleware(signingMethod, key, auth, sessions, svcAuth)).
 		Match(func(_ context.Context, operation string) bool {
 			return !authAllowlist.Contains(operation)
 		}).
 		Build()
 }
 
-func authMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker) middleware.Middleware {
+func authMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker, svcAuth serviceAccountAuthorizer) middleware.Middleware {
 	method, ok := jwtSigningMethod(signingMethod)
 	if !ok {
 		return func(middleware.Handler) middleware.Handler {
@@ -113,6 +117,18 @@ func authMiddleware(signingMethod, key string, auth authorizer, sessions session
 			auths := strings.SplitN(header.RequestHeader().Get(authorizationKey), " ", 2)
 			if len(auths) != 2 || !strings.EqualFold(auths[0], bearerWord) {
 				return nil, errMissingJWTToken
+			}
+
+			// Service account tokens start with "svc_"
+			if strings.HasPrefix(auths[1], "svc_") {
+				if svcAuth == nil {
+					return nil, errTokenInvalid
+				}
+				authContext, err := svcAuth.AuthorizeServiceAccount(ctx, auths[1], header.Operation())
+				if err != nil {
+					return nil, err
+				}
+				return handler(biz.WithAuthContext(ctx, authContext), req)
 			}
 
 			token, err := jwt.Parse(auths[1], func(token *jwt.Token) (any, error) {

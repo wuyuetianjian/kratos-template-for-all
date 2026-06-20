@@ -15,6 +15,7 @@ import (
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/serviceaccount"
 	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
@@ -41,6 +42,8 @@ type Client struct {
 	Role *RoleClient
 	// SSOProvider is the client for interacting with the SSOProvider builders.
 	SSOProvider *SSOProviderClient
+	// ServiceAccount is the client for interacting with the ServiceAccount builders.
+	ServiceAccount *ServiceAccountClient
 	// SystemSetting is the client for interacting with the SystemSetting builders.
 	SystemSetting *SystemSettingClient
 	// User is the client for interacting with the User builders.
@@ -63,6 +66,7 @@ func (c *Client) init() {
 	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.SSOProvider = NewSSOProviderClient(c.config)
+	c.ServiceAccount = NewServiceAccountClient(c.config)
 	c.SystemSetting = NewSystemSettingClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserSession = NewUserSessionClient(c.config)
@@ -156,16 +160,17 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		AuditLog:      NewAuditLogClient(cfg),
-		Module:        NewModuleClient(cfg),
-		Permission:    NewPermissionClient(cfg),
-		Role:          NewRoleClient(cfg),
-		SSOProvider:   NewSSOProviderClient(cfg),
-		SystemSetting: NewSystemSettingClient(cfg),
-		User:          NewUserClient(cfg),
-		UserSession:   NewUserSessionClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AuditLog:       NewAuditLogClient(cfg),
+		Module:         NewModuleClient(cfg),
+		Permission:     NewPermissionClient(cfg),
+		Role:           NewRoleClient(cfg),
+		SSOProvider:    NewSSOProviderClient(cfg),
+		ServiceAccount: NewServiceAccountClient(cfg),
+		SystemSetting:  NewSystemSettingClient(cfg),
+		User:           NewUserClient(cfg),
+		UserSession:    NewUserSessionClient(cfg),
 	}, nil
 }
 
@@ -183,16 +188,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		AuditLog:      NewAuditLogClient(cfg),
-		Module:        NewModuleClient(cfg),
-		Permission:    NewPermissionClient(cfg),
-		Role:          NewRoleClient(cfg),
-		SSOProvider:   NewSSOProviderClient(cfg),
-		SystemSetting: NewSystemSettingClient(cfg),
-		User:          NewUserClient(cfg),
-		UserSession:   NewUserSessionClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AuditLog:       NewAuditLogClient(cfg),
+		Module:         NewModuleClient(cfg),
+		Permission:     NewPermissionClient(cfg),
+		Role:           NewRoleClient(cfg),
+		SSOProvider:    NewSSOProviderClient(cfg),
+		ServiceAccount: NewServiceAccountClient(cfg),
+		SystemSetting:  NewSystemSettingClient(cfg),
+		User:           NewUserClient(cfg),
+		UserSession:    NewUserSessionClient(cfg),
 	}, nil
 }
 
@@ -222,8 +228,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.SystemSetting,
-		c.User, c.UserSession,
+		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.ServiceAccount,
+		c.SystemSetting, c.User, c.UserSession,
 	} {
 		n.Use(hooks...)
 	}
@@ -233,8 +239,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.SystemSetting,
-		c.User, c.UserSession,
+		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.ServiceAccount,
+		c.SystemSetting, c.User, c.UserSession,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -253,6 +259,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Role.mutate(ctx, m)
 	case *SSOProviderMutation:
 		return c.SSOProvider.mutate(ctx, m)
+	case *ServiceAccountMutation:
+		return c.ServiceAccount.mutate(ctx, m)
 	case *SystemSettingMutation:
 		return c.SystemSetting.mutate(ctx, m)
 	case *UserMutation:
@@ -835,6 +843,22 @@ func (c *RoleClient) QueryUsers(_m *Role) *UserQuery {
 	return query
 }
 
+// QueryServiceAccounts queries the service_accounts edge of a Role.
+func (c *RoleClient) QueryServiceAccounts(_m *Role) *ServiceAccountQuery {
+	query := (&ServiceAccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(role.Table, role.FieldID, id),
+			sqlgraph.To(serviceaccount.Table, serviceaccount.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, role.ServiceAccountsTable, role.ServiceAccountsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryPermissions queries the permissions edge of a Role.
 func (c *RoleClient) QueryPermissions(_m *Role) *PermissionQuery {
 	query := (&PermissionClient{config: c.config}).Query()
@@ -1022,6 +1046,155 @@ func (c *SSOProviderClient) mutate(ctx context.Context, m *SSOProviderMutation) 
 		return (&SSOProviderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown SSOProvider mutation op: %q", m.Op())
+	}
+}
+
+// ServiceAccountClient is a client for the ServiceAccount schema.
+type ServiceAccountClient struct {
+	config
+}
+
+// NewServiceAccountClient returns a client for the ServiceAccount from the given config.
+func NewServiceAccountClient(c config) *ServiceAccountClient {
+	return &ServiceAccountClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `serviceaccount.Hooks(f(g(h())))`.
+func (c *ServiceAccountClient) Use(hooks ...Hook) {
+	c.hooks.ServiceAccount = append(c.hooks.ServiceAccount, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `serviceaccount.Intercept(f(g(h())))`.
+func (c *ServiceAccountClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ServiceAccount = append(c.inters.ServiceAccount, interceptors...)
+}
+
+// Create returns a builder for creating a ServiceAccount entity.
+func (c *ServiceAccountClient) Create() *ServiceAccountCreate {
+	mutation := newServiceAccountMutation(c.config, OpCreate)
+	return &ServiceAccountCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ServiceAccount entities.
+func (c *ServiceAccountClient) CreateBulk(builders ...*ServiceAccountCreate) *ServiceAccountCreateBulk {
+	return &ServiceAccountCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ServiceAccountClient) MapCreateBulk(slice any, setFunc func(*ServiceAccountCreate, int)) *ServiceAccountCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ServiceAccountCreateBulk{err: fmt.Errorf("calling to ServiceAccountClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ServiceAccountCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ServiceAccountCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ServiceAccount.
+func (c *ServiceAccountClient) Update() *ServiceAccountUpdate {
+	mutation := newServiceAccountMutation(c.config, OpUpdate)
+	return &ServiceAccountUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ServiceAccountClient) UpdateOne(_m *ServiceAccount) *ServiceAccountUpdateOne {
+	mutation := newServiceAccountMutation(c.config, OpUpdateOne, withServiceAccount(_m))
+	return &ServiceAccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ServiceAccountClient) UpdateOneID(id int) *ServiceAccountUpdateOne {
+	mutation := newServiceAccountMutation(c.config, OpUpdateOne, withServiceAccountID(id))
+	return &ServiceAccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ServiceAccount.
+func (c *ServiceAccountClient) Delete() *ServiceAccountDelete {
+	mutation := newServiceAccountMutation(c.config, OpDelete)
+	return &ServiceAccountDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ServiceAccountClient) DeleteOne(_m *ServiceAccount) *ServiceAccountDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ServiceAccountClient) DeleteOneID(id int) *ServiceAccountDeleteOne {
+	builder := c.Delete().Where(serviceaccount.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ServiceAccountDeleteOne{builder}
+}
+
+// Query returns a query builder for ServiceAccount.
+func (c *ServiceAccountClient) Query() *ServiceAccountQuery {
+	return &ServiceAccountQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeServiceAccount},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ServiceAccount entity by its id.
+func (c *ServiceAccountClient) Get(ctx context.Context, id int) (*ServiceAccount, error) {
+	return c.Query().Where(serviceaccount.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ServiceAccountClient) GetX(ctx context.Context, id int) *ServiceAccount {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRoles queries the roles edge of a ServiceAccount.
+func (c *ServiceAccountClient) QueryRoles(_m *ServiceAccount) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(serviceaccount.Table, serviceaccount.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, serviceaccount.RolesTable, serviceaccount.RolesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ServiceAccountClient) Hooks() []Hook {
+	return c.hooks.ServiceAccount
+}
+
+// Interceptors returns the client interceptors.
+func (c *ServiceAccountClient) Interceptors() []Interceptor {
+	return c.inters.ServiceAccount
+}
+
+func (c *ServiceAccountClient) mutate(ctx context.Context, m *ServiceAccountMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ServiceAccountCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ServiceAccountUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ServiceAccountUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ServiceAccountDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ServiceAccount mutation op: %q", m.Op())
 	}
 }
 
@@ -1475,11 +1648,11 @@ func (c *UserSessionClient) mutate(ctx context.Context, m *UserSessionMutation) 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AuditLog, Module, Permission, Role, SSOProvider, SystemSetting, User,
-		UserSession []ent.Hook
+		AuditLog, Module, Permission, Role, SSOProvider, ServiceAccount, SystemSetting,
+		User, UserSession []ent.Hook
 	}
 	inters struct {
-		AuditLog, Module, Permission, Role, SSOProvider, SystemSetting, User,
-		UserSession []ent.Interceptor
+		AuditLog, Module, Permission, Role, SSOProvider, ServiceAccount, SystemSetting,
+		User, UserSession []ent.Interceptor
 	}
 )

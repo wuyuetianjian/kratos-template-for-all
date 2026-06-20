@@ -12,6 +12,7 @@ import (
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/serviceaccount"
 	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
@@ -80,14 +81,15 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			auditlog.Table:      auditlog.ValidColumn,
-			module.Table:        module.ValidColumn,
-			permission.Table:    permission.ValidColumn,
-			role.Table:          role.ValidColumn,
-			ssoprovider.Table:   ssoprovider.ValidColumn,
-			systemsetting.Table: systemsetting.ValidColumn,
-			user.Table:          user.ValidColumn,
-			usersession.Table:   usersession.ValidColumn,
+			auditlog.Table:       auditlog.ValidColumn,
+			module.Table:         module.ValidColumn,
+			permission.Table:     permission.ValidColumn,
+			role.Table:           role.ValidColumn,
+			ssoprovider.Table:    ssoprovider.ValidColumn,
+			serviceaccount.Table: serviceaccount.ValidColumn,
+			systemsetting.Table:  systemsetting.ValidColumn,
+			user.Table:           user.ValidColumn,
+			usersession.Table:    usersession.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

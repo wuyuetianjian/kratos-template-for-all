@@ -21,6 +21,9 @@ type Role func(*sql.Selector)
 // SSOProvider is the predicate function for ssoprovider builders.
 type SSOProvider func(*sql.Selector)
 
+// ServiceAccount is the predicate function for serviceaccount builders.
+type ServiceAccount func(*sql.Selector)
+
 // SystemSetting is the predicate function for systemsetting builders.
 type SystemSetting func(*sql.Selector)
 

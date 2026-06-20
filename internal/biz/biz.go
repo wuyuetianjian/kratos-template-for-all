@@ -24,6 +24,7 @@ type UseCase struct {
 	sessionRepo          SessionRepo
 	auditRepo            AuditLogRepo
 	settingsRepo         SettingsRepo
+	serviceAccountRepo   ServiceAccountRepo
 	hub                  *SessionHub
 	initialAdminPassword string
 }
@@ -39,21 +40,23 @@ func NewUseCase(
 	sessionRepo SessionRepo,
 	auditRepo AuditLogRepo,
 	settingsRepo SettingsRepo,
+	serviceAccountRepo ServiceAccountRepo,
 ) (*UseCase, error) {
 	if logger == nil {
 		logger = log.Default()
 	}
 	uc := &UseCase{
-		log:          logger.With("module", "biz/biz"),
-		cron:         cron,
-		confServer:   conf,
-		confData:     confData,
-		authRepo:     authRepo,
-		ssoRepo:      ssoRepo,
-		sessionRepo:  sessionRepo,
-		auditRepo:    auditRepo,
-		settingsRepo: settingsRepo,
-		hub:          newSessionHub(),
+		log:                logger.With("module", "biz/biz"),
+		cron:               cron,
+		confServer:         conf,
+		confData:           confData,
+		authRepo:           authRepo,
+		ssoRepo:            ssoRepo,
+		sessionRepo:        sessionRepo,
+		auditRepo:          auditRepo,
+		settingsRepo:       settingsRepo,
+		serviceAccountRepo: serviceAccountRepo,
+		hub:                newSessionHub(),
 	}
 	if err := uc.BootstrapAdmin(context.Background()); err != nil {
 		return nil, err

@@ -107,6 +107,24 @@ var (
 		Columns:    AuthSSOProvidersColumns,
 		PrimaryKey: []*schema.Column{AuthSSOProvidersColumns[0]},
 	}
+	// AuthServiceAccountsColumns holds the columns for the "auth_service_accounts" table.
+	AuthServiceAccountsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "token_prefix", Type: field.TypeString},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AuthServiceAccountsTable holds the schema information for the "auth_service_accounts" table.
+	AuthServiceAccountsTable = &schema.Table{
+		Name:       "auth_service_accounts",
+		Columns:    AuthServiceAccountsColumns,
+		PrimaryKey: []*schema.Column{AuthServiceAccountsColumns[0]},
+	}
 	// SystemSettingsColumns holds the columns for the "system_settings" table.
 	SystemSettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -214,6 +232,31 @@ var (
 			},
 		},
 	}
+	// AuthServiceAccountRolesColumns holds the columns for the "auth_service_account_roles" table.
+	AuthServiceAccountRolesColumns = []*schema.Column{
+		{Name: "service_account_id", Type: field.TypeInt},
+		{Name: "role_id", Type: field.TypeInt},
+	}
+	// AuthServiceAccountRolesTable holds the schema information for the "auth_service_account_roles" table.
+	AuthServiceAccountRolesTable = &schema.Table{
+		Name:       "auth_service_account_roles",
+		Columns:    AuthServiceAccountRolesColumns,
+		PrimaryKey: []*schema.Column{AuthServiceAccountRolesColumns[0], AuthServiceAccountRolesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_service_account_roles_service_account_id",
+				Columns:    []*schema.Column{AuthServiceAccountRolesColumns[0]},
+				RefColumns: []*schema.Column{AuthServiceAccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "auth_service_account_roles_role_id",
+				Columns:    []*schema.Column{AuthServiceAccountRolesColumns[1]},
+				RefColumns: []*schema.Column{AuthRolesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// AuthUserRolesColumns holds the columns for the "auth_user_roles" table.
 	AuthUserRolesColumns = []*schema.Column{
 		{Name: "user_id", Type: field.TypeInt},
@@ -246,11 +289,13 @@ var (
 		AuthPermissionsTable,
 		AuthRolesTable,
 		AuthSSOProvidersTable,
+		AuthServiceAccountsTable,
 		SystemSettingsTable,
 		AuthUsersTable,
 		AuthUserSessionsTable,
 		AuthRolePermissionsTable,
 		AuthRoleParentsTable,
+		AuthServiceAccountRolesTable,
 		AuthUserRolesTable,
 	}
 )
@@ -272,6 +317,9 @@ func init() {
 	AuthSSOProvidersTable.Annotation = &entsql.Annotation{
 		Table: "auth_sso_providers",
 	}
+	AuthServiceAccountsTable.Annotation = &entsql.Annotation{
+		Table: "auth_service_accounts",
+	}
 	SystemSettingsTable.Annotation = &entsql.Annotation{
 		Table: "system_settings",
 	}
@@ -286,6 +334,8 @@ func init() {
 	AuthRolePermissionsTable.ForeignKeys[1].RefTable = AuthPermissionsTable
 	AuthRoleParentsTable.ForeignKeys[0].RefTable = AuthRolesTable
 	AuthRoleParentsTable.ForeignKeys[1].RefTable = AuthRolesTable
+	AuthServiceAccountRolesTable.ForeignKeys[0].RefTable = AuthServiceAccountsTable
+	AuthServiceAccountRolesTable.ForeignKeys[1].RefTable = AuthRolesTable
 	AuthUserRolesTable.ForeignKeys[0].RefTable = AuthUsersTable
 	AuthUserRolesTable.ForeignKeys[1].RefTable = AuthRolesTable
 }

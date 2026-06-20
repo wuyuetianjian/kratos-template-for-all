@@ -37,13 +37,15 @@ type Role struct {
 type RoleEdges struct {
 	// Users holds the value of the users edge.
 	Users []*User `json:"users,omitempty"`
+	// ServiceAccounts holds the value of the service_accounts edge.
+	ServiceAccounts []*ServiceAccount `json:"service_accounts,omitempty"`
 	// Permissions holds the value of the permissions edge.
 	Permissions []*Permission `json:"permissions,omitempty"`
 	// Parents holds the value of the parents edge.
 	Parents []*Role `json:"parents,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // UsersOrErr returns the Users value or an error if the edge
@@ -55,10 +57,19 @@ func (e RoleEdges) UsersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "users"}
 }
 
+// ServiceAccountsOrErr returns the ServiceAccounts value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoleEdges) ServiceAccountsOrErr() ([]*ServiceAccount, error) {
+	if e.loadedTypes[1] {
+		return e.ServiceAccounts, nil
+	}
+	return nil, &NotLoadedError{edge: "service_accounts"}
+}
+
 // PermissionsOrErr returns the Permissions value or an error if the edge
 // was not loaded in eager-loading.
 func (e RoleEdges) PermissionsOrErr() ([]*Permission, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Permissions, nil
 	}
 	return nil, &NotLoadedError{edge: "permissions"}
@@ -67,7 +78,7 @@ func (e RoleEdges) PermissionsOrErr() ([]*Permission, error) {
 // ParentsOrErr returns the Parents value or an error if the edge
 // was not loaded in eager-loading.
 func (e RoleEdges) ParentsOrErr() ([]*Role, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Parents, nil
 	}
 	return nil, &NotLoadedError{edge: "parents"}
@@ -153,6 +164,11 @@ func (_m *Role) Value(name string) (ent.Value, error) {
 // QueryUsers queries the "users" edge of the Role entity.
 func (_m *Role) QueryUsers() *UserQuery {
 	return NewRoleClient(_m.config).QueryUsers(_m)
+}
+
+// QueryServiceAccounts queries the "service_accounts" edge of the Role entity.
+func (_m *Role) QueryServiceAccounts() *ServiceAccountQuery {
+	return NewRoleClient(_m.config).QueryServiceAccounts(_m)
 }
 
 // QueryPermissions queries the "permissions" edge of the Role entity.

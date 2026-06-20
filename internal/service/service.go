@@ -946,3 +946,110 @@ func convertPermission(permission *biz.Permission) *v1.Permission {
 		UpdatedAt:   timestamppb.New(permission.UpdatedAt),
 	}
 }
+
+// ── Service account handlers ──────────────────────────────────────────────────
+
+func (s *IncidentService) CreateServiceAccount(ctx context.Context, req *v1.CreateServiceAccountRequest) (*v1.ServiceAccountTokenReply, error) {
+	ip, _ := requestMeta(ctx)
+	result, err := s.useCase.CreateServiceAccount(ctx, &biz.CreateServiceAccount{
+		Name:          req.GetName(),
+		Description:   req.GetDescription(),
+		ExpiresInDays: req.GetExpiresInDays(),
+		RoleIDs:       req.GetRoleIds(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	s.useCase.LogAuditEvent(ctx, "create", "service_account", result.ServiceAccount.Name, ip,
+		fmt.Sprintf("expires_in_days=%d roles=%v", req.GetExpiresInDays(), req.GetRoleIds()))
+	return &v1.ServiceAccountTokenReply{
+		ServiceAccount: convertServiceAccount(result.ServiceAccount),
+		Token:          result.Token,
+	}, nil
+}
+
+func (s *IncidentService) ListServiceAccounts(ctx context.Context, req *v1.ListServiceAccountsRequest) (*v1.ListServiceAccountsReply, error) {
+	svcs, total, err := s.useCase.ListServiceAccounts(ctx, biz.Page{
+		Size:  int(req.GetPageSize()),
+		Token: int(req.GetPageToken()),
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*v1.ServiceAccount, 0, len(svcs))
+	for i := range svcs {
+		result = append(result, convertServiceAccount(&svcs[i]))
+	}
+	return &v1.ListServiceAccountsReply{ServiceAccounts: result, Total: int32(total)}, nil
+}
+
+func (s *IncidentService) GetServiceAccount(ctx context.Context, req *v1.GetServiceAccountRequest) (*v1.ServiceAccount, error) {
+	svc, err := s.useCase.GetServiceAccount(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return convertServiceAccount(svc), nil
+}
+
+func (s *IncidentService) UpdateServiceAccount(ctx context.Context, req *v1.UpdateServiceAccountRequest) (*v1.ServiceAccount, error) {
+	ip, _ := requestMeta(ctx)
+	svc, err := s.useCase.UpdateServiceAccount(ctx, &biz.UpdateServiceAccount{
+		ID:          req.GetId(),
+		Description: req.GetDescription(),
+		Disabled:    req.GetDisabled(),
+		RoleIDs:     req.GetRoleIds(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	s.useCase.LogAuditEvent(ctx, "update", "service_account", svc.Name, ip,
+		fmt.Sprintf("disabled=%v roles=%v", req.GetDisabled(), req.GetRoleIds()))
+	return convertServiceAccount(svc), nil
+}
+
+func (s *IncidentService) DeleteServiceAccount(ctx context.Context, req *v1.DeleteServiceAccountRequest) (*emptypb.Empty, error) {
+	ip, _ := requestMeta(ctx)
+	svc, err := s.useCase.GetServiceAccount(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	if err := s.useCase.DeleteServiceAccount(ctx, req.GetId()); err != nil {
+		return nil, err
+	}
+	s.useCase.LogAuditEvent(ctx, "delete", "service_account", svc.Name, ip, "")
+	return &emptypb.Empty{}, nil
+}
+
+func (s *IncidentService) RegenerateServiceAccountToken(ctx context.Context, req *v1.RegenerateServiceAccountTokenRequest) (*v1.ServiceAccountTokenReply, error) {
+	ip, _ := requestMeta(ctx)
+	result, err := s.useCase.RegenerateServiceAccountToken(ctx, req.GetId(), req.GetExpiresInDays())
+	if err != nil {
+		return nil, err
+	}
+	s.useCase.LogAuditEvent(ctx, "regenerate_token", "service_account", result.ServiceAccount.Name, ip,
+		fmt.Sprintf("expires_in_days=%d", req.GetExpiresInDays()))
+	return &v1.ServiceAccountTokenReply{
+		ServiceAccount: convertServiceAccount(result.ServiceAccount),
+		Token:          result.Token,
+	}, nil
+}
+
+func convertServiceAccount(svc *biz.ServiceAccount) *v1.ServiceAccount {
+	if svc == nil {
+		return nil
+	}
+	pb := &v1.ServiceAccount{
+		Id:          svc.ID,
+		Name:        svc.Name,
+		Description: svc.Description,
+		TokenPrefix: svc.TokenPrefix,
+		Disabled:    svc.Disabled,
+		Roles:       convertRoles(svc.Roles),
+		CreatedAt:   timestamppb.New(svc.CreatedAt),
+		UpdatedAt:   timestamppb.New(svc.UpdatedAt),
+	}
+	if svc.ExpiresAt != nil {
+		pb.ExpiresAt = timestamppb.New(*svc.ExpiresAt)
+	}
+	return pb
+}

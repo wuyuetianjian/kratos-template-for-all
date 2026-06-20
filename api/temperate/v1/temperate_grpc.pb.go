@@ -20,41 +20,47 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TemperateService_Health_FullMethodName                 = "/temperate.v1.TemperateService/Health"
-	TemperateService_Login_FullMethodName                  = "/temperate.v1.TemperateService/Login"
-	TemperateService_Logout_FullMethodName                 = "/temperate.v1.TemperateService/Logout"
-	TemperateService_GetInitialPassword_FullMethodName     = "/temperate.v1.TemperateService/GetInitialPassword"
-	TemperateService_ChangePassword_FullMethodName         = "/temperate.v1.TemperateService/ChangePassword"
-	TemperateService_GetCurrentUser_FullMethodName         = "/temperate.v1.TemperateService/GetCurrentUser"
-	TemperateService_CreateUser_FullMethodName             = "/temperate.v1.TemperateService/CreateUser"
-	TemperateService_ListUsers_FullMethodName              = "/temperate.v1.TemperateService/ListUsers"
-	TemperateService_GetUser_FullMethodName                = "/temperate.v1.TemperateService/GetUser"
-	TemperateService_UpdateUser_FullMethodName             = "/temperate.v1.TemperateService/UpdateUser"
-	TemperateService_DeleteUser_FullMethodName             = "/temperate.v1.TemperateService/DeleteUser"
-	TemperateService_AssignUserRoles_FullMethodName        = "/temperate.v1.TemperateService/AssignUserRoles"
-	TemperateService_CreateRole_FullMethodName             = "/temperate.v1.TemperateService/CreateRole"
-	TemperateService_ListRoles_FullMethodName              = "/temperate.v1.TemperateService/ListRoles"
-	TemperateService_GetRole_FullMethodName                = "/temperate.v1.TemperateService/GetRole"
-	TemperateService_UpdateRole_FullMethodName             = "/temperate.v1.TemperateService/UpdateRole"
-	TemperateService_DeleteRole_FullMethodName             = "/temperate.v1.TemperateService/DeleteRole"
-	TemperateService_AssignRolePermissions_FullMethodName  = "/temperate.v1.TemperateService/AssignRolePermissions"
-	TemperateService_SetRoleInheritances_FullMethodName    = "/temperate.v1.TemperateService/SetRoleInheritances"
-	TemperateService_CreatePermission_FullMethodName       = "/temperate.v1.TemperateService/CreatePermission"
-	TemperateService_ListPermissions_FullMethodName        = "/temperate.v1.TemperateService/ListPermissions"
-	TemperateService_ListPermissionActions_FullMethodName  = "/temperate.v1.TemperateService/ListPermissionActions"
-	TemperateService_UpdatePermission_FullMethodName       = "/temperate.v1.TemperateService/UpdatePermission"
-	TemperateService_DeletePermission_FullMethodName       = "/temperate.v1.TemperateService/DeletePermission"
-	TemperateService_ListSSOProvidersPublic_FullMethodName = "/temperate.v1.TemperateService/ListSSOProvidersPublic"
-	TemperateService_ListSSOProviders_FullMethodName       = "/temperate.v1.TemperateService/ListSSOProviders"
-	TemperateService_GetSSOProvider_FullMethodName         = "/temperate.v1.TemperateService/GetSSOProvider"
-	TemperateService_CreateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/CreateSSOProvider"
-	TemperateService_UpdateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/UpdateSSOProvider"
-	TemperateService_DeleteSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/DeleteSSOProvider"
-	TemperateService_ListSessions_FullMethodName           = "/temperate.v1.TemperateService/ListSessions"
-	TemperateService_KickSession_FullMethodName            = "/temperate.v1.TemperateService/KickSession"
-	TemperateService_ListAuditLogs_FullMethodName          = "/temperate.v1.TemperateService/ListAuditLogs"
-	TemperateService_GetSystemSettings_FullMethodName      = "/temperate.v1.TemperateService/GetSystemSettings"
-	TemperateService_UpdateSystemSettings_FullMethodName   = "/temperate.v1.TemperateService/UpdateSystemSettings"
+	TemperateService_Health_FullMethodName                        = "/temperate.v1.TemperateService/Health"
+	TemperateService_Login_FullMethodName                         = "/temperate.v1.TemperateService/Login"
+	TemperateService_Logout_FullMethodName                        = "/temperate.v1.TemperateService/Logout"
+	TemperateService_GetInitialPassword_FullMethodName            = "/temperate.v1.TemperateService/GetInitialPassword"
+	TemperateService_ChangePassword_FullMethodName                = "/temperate.v1.TemperateService/ChangePassword"
+	TemperateService_GetCurrentUser_FullMethodName                = "/temperate.v1.TemperateService/GetCurrentUser"
+	TemperateService_CreateUser_FullMethodName                    = "/temperate.v1.TemperateService/CreateUser"
+	TemperateService_ListUsers_FullMethodName                     = "/temperate.v1.TemperateService/ListUsers"
+	TemperateService_GetUser_FullMethodName                       = "/temperate.v1.TemperateService/GetUser"
+	TemperateService_UpdateUser_FullMethodName                    = "/temperate.v1.TemperateService/UpdateUser"
+	TemperateService_DeleteUser_FullMethodName                    = "/temperate.v1.TemperateService/DeleteUser"
+	TemperateService_AssignUserRoles_FullMethodName               = "/temperate.v1.TemperateService/AssignUserRoles"
+	TemperateService_CreateRole_FullMethodName                    = "/temperate.v1.TemperateService/CreateRole"
+	TemperateService_ListRoles_FullMethodName                     = "/temperate.v1.TemperateService/ListRoles"
+	TemperateService_GetRole_FullMethodName                       = "/temperate.v1.TemperateService/GetRole"
+	TemperateService_UpdateRole_FullMethodName                    = "/temperate.v1.TemperateService/UpdateRole"
+	TemperateService_DeleteRole_FullMethodName                    = "/temperate.v1.TemperateService/DeleteRole"
+	TemperateService_AssignRolePermissions_FullMethodName         = "/temperate.v1.TemperateService/AssignRolePermissions"
+	TemperateService_SetRoleInheritances_FullMethodName           = "/temperate.v1.TemperateService/SetRoleInheritances"
+	TemperateService_CreatePermission_FullMethodName              = "/temperate.v1.TemperateService/CreatePermission"
+	TemperateService_ListPermissions_FullMethodName               = "/temperate.v1.TemperateService/ListPermissions"
+	TemperateService_ListPermissionActions_FullMethodName         = "/temperate.v1.TemperateService/ListPermissionActions"
+	TemperateService_UpdatePermission_FullMethodName              = "/temperate.v1.TemperateService/UpdatePermission"
+	TemperateService_DeletePermission_FullMethodName              = "/temperate.v1.TemperateService/DeletePermission"
+	TemperateService_ListSSOProvidersPublic_FullMethodName        = "/temperate.v1.TemperateService/ListSSOProvidersPublic"
+	TemperateService_ListSSOProviders_FullMethodName              = "/temperate.v1.TemperateService/ListSSOProviders"
+	TemperateService_GetSSOProvider_FullMethodName                = "/temperate.v1.TemperateService/GetSSOProvider"
+	TemperateService_CreateSSOProvider_FullMethodName             = "/temperate.v1.TemperateService/CreateSSOProvider"
+	TemperateService_UpdateSSOProvider_FullMethodName             = "/temperate.v1.TemperateService/UpdateSSOProvider"
+	TemperateService_DeleteSSOProvider_FullMethodName             = "/temperate.v1.TemperateService/DeleteSSOProvider"
+	TemperateService_ListSessions_FullMethodName                  = "/temperate.v1.TemperateService/ListSessions"
+	TemperateService_KickSession_FullMethodName                   = "/temperate.v1.TemperateService/KickSession"
+	TemperateService_ListAuditLogs_FullMethodName                 = "/temperate.v1.TemperateService/ListAuditLogs"
+	TemperateService_GetSystemSettings_FullMethodName             = "/temperate.v1.TemperateService/GetSystemSettings"
+	TemperateService_UpdateSystemSettings_FullMethodName          = "/temperate.v1.TemperateService/UpdateSystemSettings"
+	TemperateService_CreateServiceAccount_FullMethodName          = "/temperate.v1.TemperateService/CreateServiceAccount"
+	TemperateService_ListServiceAccounts_FullMethodName           = "/temperate.v1.TemperateService/ListServiceAccounts"
+	TemperateService_GetServiceAccount_FullMethodName             = "/temperate.v1.TemperateService/GetServiceAccount"
+	TemperateService_UpdateServiceAccount_FullMethodName          = "/temperate.v1.TemperateService/UpdateServiceAccount"
+	TemperateService_DeleteServiceAccount_FullMethodName          = "/temperate.v1.TemperateService/DeleteServiceAccount"
+	TemperateService_RegenerateServiceAccountToken_FullMethodName = "/temperate.v1.TemperateService/RegenerateServiceAccountToken"
 )
 
 // TemperateServiceClient is the client API for TemperateService service.
@@ -98,6 +104,12 @@ type TemperateServiceClient interface {
 	ListAuditLogs(ctx context.Context, in *ListAuditLogsRequest, opts ...grpc.CallOption) (*ListAuditLogsReply, error)
 	GetSystemSettings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SystemSettingsReply, error)
 	UpdateSystemSettings(ctx context.Context, in *UpdateSystemSettingsRequest, opts ...grpc.CallOption) (*SystemSettingsReply, error)
+	CreateServiceAccount(ctx context.Context, in *CreateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccountTokenReply, error)
+	ListServiceAccounts(ctx context.Context, in *ListServiceAccountsRequest, opts ...grpc.CallOption) (*ListServiceAccountsReply, error)
+	GetServiceAccount(ctx context.Context, in *GetServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccount, error)
+	UpdateServiceAccount(ctx context.Context, in *UpdateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccount, error)
+	DeleteServiceAccount(ctx context.Context, in *DeleteServiceAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RegenerateServiceAccountToken(ctx context.Context, in *RegenerateServiceAccountTokenRequest, opts ...grpc.CallOption) (*ServiceAccountTokenReply, error)
 }
 
 type temperateServiceClient struct {
@@ -458,6 +470,66 @@ func (c *temperateServiceClient) UpdateSystemSettings(ctx context.Context, in *U
 	return out, nil
 }
 
+func (c *temperateServiceClient) CreateServiceAccount(ctx context.Context, in *CreateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccountTokenReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceAccountTokenReply)
+	err := c.cc.Invoke(ctx, TemperateService_CreateServiceAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListServiceAccounts(ctx context.Context, in *ListServiceAccountsRequest, opts ...grpc.CallOption) (*ListServiceAccountsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListServiceAccountsReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListServiceAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetServiceAccount(ctx context.Context, in *GetServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccount, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceAccount)
+	err := c.cc.Invoke(ctx, TemperateService_GetServiceAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdateServiceAccount(ctx context.Context, in *UpdateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccount, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceAccount)
+	err := c.cc.Invoke(ctx, TemperateService_UpdateServiceAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) DeleteServiceAccount(ctx context.Context, in *DeleteServiceAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_DeleteServiceAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) RegenerateServiceAccountToken(ctx context.Context, in *RegenerateServiceAccountTokenRequest, opts ...grpc.CallOption) (*ServiceAccountTokenReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceAccountTokenReply)
+	err := c.cc.Invoke(ctx, TemperateService_RegenerateServiceAccountToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TemperateServiceServer is the server API for TemperateService service.
 // All implementations must embed UnimplementedTemperateServiceServer
 // for forward compatibility.
@@ -499,6 +571,12 @@ type TemperateServiceServer interface {
 	ListAuditLogs(context.Context, *ListAuditLogsRequest) (*ListAuditLogsReply, error)
 	GetSystemSettings(context.Context, *emptypb.Empty) (*SystemSettingsReply, error)
 	UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error)
+	CreateServiceAccount(context.Context, *CreateServiceAccountRequest) (*ServiceAccountTokenReply, error)
+	ListServiceAccounts(context.Context, *ListServiceAccountsRequest) (*ListServiceAccountsReply, error)
+	GetServiceAccount(context.Context, *GetServiceAccountRequest) (*ServiceAccount, error)
+	UpdateServiceAccount(context.Context, *UpdateServiceAccountRequest) (*ServiceAccount, error)
+	DeleteServiceAccount(context.Context, *DeleteServiceAccountRequest) (*emptypb.Empty, error)
+	RegenerateServiceAccountToken(context.Context, *RegenerateServiceAccountTokenRequest) (*ServiceAccountTokenReply, error)
 	mustEmbedUnimplementedTemperateServiceServer()
 }
 
@@ -613,6 +691,24 @@ func (UnimplementedTemperateServiceServer) GetSystemSettings(context.Context, *e
 }
 func (UnimplementedTemperateServiceServer) UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateSystemSettings not implemented")
+}
+func (UnimplementedTemperateServiceServer) CreateServiceAccount(context.Context, *CreateServiceAccountRequest) (*ServiceAccountTokenReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateServiceAccount not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListServiceAccounts(context.Context, *ListServiceAccountsRequest) (*ListServiceAccountsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListServiceAccounts not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetServiceAccount(context.Context, *GetServiceAccountRequest) (*ServiceAccount, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetServiceAccount not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdateServiceAccount(context.Context, *UpdateServiceAccountRequest) (*ServiceAccount, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateServiceAccount not implemented")
+}
+func (UnimplementedTemperateServiceServer) DeleteServiceAccount(context.Context, *DeleteServiceAccountRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteServiceAccount not implemented")
+}
+func (UnimplementedTemperateServiceServer) RegenerateServiceAccountToken(context.Context, *RegenerateServiceAccountTokenRequest) (*ServiceAccountTokenReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegenerateServiceAccountToken not implemented")
 }
 func (UnimplementedTemperateServiceServer) mustEmbedUnimplementedTemperateServiceServer() {}
 func (UnimplementedTemperateServiceServer) testEmbeddedByValue()                          {}
@@ -1265,6 +1361,114 @@ func _TemperateService_UpdateSystemSettings_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TemperateService_CreateServiceAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateServiceAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).CreateServiceAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_CreateServiceAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).CreateServiceAccount(ctx, req.(*CreateServiceAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListServiceAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListServiceAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListServiceAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListServiceAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListServiceAccounts(ctx, req.(*ListServiceAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetServiceAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServiceAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetServiceAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetServiceAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetServiceAccount(ctx, req.(*GetServiceAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdateServiceAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateServiceAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdateServiceAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdateServiceAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdateServiceAccount(ctx, req.(*UpdateServiceAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_DeleteServiceAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteServiceAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).DeleteServiceAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_DeleteServiceAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).DeleteServiceAccount(ctx, req.(*DeleteServiceAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_RegenerateServiceAccountToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegenerateServiceAccountTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).RegenerateServiceAccountToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_RegenerateServiceAccountToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).RegenerateServiceAccountToken(ctx, req.(*RegenerateServiceAccountTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TemperateService_ServiceDesc is the grpc.ServiceDesc for TemperateService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1411,6 +1615,30 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateSystemSettings",
 			Handler:    _TemperateService_UpdateSystemSettings_Handler,
+		},
+		{
+			MethodName: "CreateServiceAccount",
+			Handler:    _TemperateService_CreateServiceAccount_Handler,
+		},
+		{
+			MethodName: "ListServiceAccounts",
+			Handler:    _TemperateService_ListServiceAccounts_Handler,
+		},
+		{
+			MethodName: "GetServiceAccount",
+			Handler:    _TemperateService_GetServiceAccount_Handler,
+		},
+		{
+			MethodName: "UpdateServiceAccount",
+			Handler:    _TemperateService_UpdateServiceAccount_Handler,
+		},
+		{
+			MethodName: "DeleteServiceAccount",
+			Handler:    _TemperateService_DeleteServiceAccount_Handler,
+		},
+		{
+			MethodName: "RegenerateServiceAccountToken",
+			Handler:    _TemperateService_RegenerateServiceAccountToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

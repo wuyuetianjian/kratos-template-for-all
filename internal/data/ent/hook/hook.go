@@ -68,6 +68,18 @@ func (f SSOProviderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SSOProviderMutation", m)
 }
 
+// The ServiceAccountFunc type is an adapter to allow the use of ordinary
+// function as ServiceAccount mutator.
+type ServiceAccountFunc func(context.Context, *ent.ServiceAccountMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ServiceAccountFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ServiceAccountMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceAccountMutation", m)
+}
+
 // The SystemSettingFunc type is an adapter to allow the use of ordinary
 // function as SystemSetting mutator.
 type SystemSettingFunc func(context.Context, *ent.SystemSettingMutation) (ent.Value, error)

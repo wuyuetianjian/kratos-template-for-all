@@ -491,6 +491,45 @@ registry:
 
 如果 `host` 为空，discovery 驱动会回退使用本机 hostname。
 
+## 服务账号
+
+服务账号允许机器、CI 流水线和其他后端服务使用长期有效的 Token 直接调用
+API，无需经过交互式登录流程。
+
+### Token 格式
+
+Token 格式为 `svc_<base64url(expiry_8bytes + random_24bytes)>`。解码后的
+前 8 字节以大端 int64 格式保存过期时间（Unix 时间戳），0 表示永不过期。
+这样服务端可以在不查询数据库的情况下快速拒绝已过期的 Token。
+
+Token 明文不会写入数据库，仅保存其 SHA-256 哈希值（存储在
+`auth_service_accounts` 表中）。
+
+### 认证方式
+
+服务账号 Token 通过与用户 JWT 相同的 `Authorization: Bearer <token>` 请求头
+发送。Auth 中间件检测到 `svc_` 前缀后，会将请求路由到服务账号校验逻辑，
+而不是 JWT 校验逻辑。
+
+服务账号的有效权限由其绑定角色推导得出，使用与用户账号相同的角色继承逻辑。
+
+### 管理 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| `POST` | `/v1/service-accounts` | 创建服务账号并返回 Token（仅显示一次） |
+| `GET` | `/v1/service-accounts` | 列出所有服务账号 |
+| `GET` | `/v1/service-accounts/{id}` | 查询单个服务账号 |
+| `PATCH` | `/v1/service-accounts/{id}` | 更新描述、禁用状态或角色 |
+| `DELETE` | `/v1/service-accounts/{id}` | 删除服务账号 |
+| `POST` | `/v1/service-accounts/{id}/regenerate-token` | 轮换 Token |
+
+完整 Token 值**仅在** `CreateServiceAccount` 和
+`RegenerateServiceAccountToken` 的响应中返回。后续查询仅返回 Token 前缀
+用于展示。
+
+所有创建、删除和重新生成操作均会以资源类型 `service_account` 记录到审计日志中。
+
 ## Docker
 
 ```bash

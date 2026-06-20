@@ -366,6 +366,125 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.Role'
+    /v1/service-accounts:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_ListServiceAccounts
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ListServiceAccountsReply'
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_CreateServiceAccount
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.CreateServiceAccountRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ServiceAccountTokenReply'
+    /v1/service-accounts/{id}:
+        get:
+            tags:
+                - TemperateService
+            operationId: TemperateService_GetServiceAccount
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ServiceAccount'
+        delete:
+            tags:
+                - TemperateService
+            operationId: TemperateService_DeleteServiceAccount
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        patch:
+            tags:
+                - TemperateService
+            operationId: TemperateService_UpdateServiceAccount
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.UpdateServiceAccountRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ServiceAccount'
+    /v1/service-accounts/{id}/regenerate-token:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_RegenerateServiceAccountToken
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.RegenerateServiceAccountTokenRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.ServiceAccountTokenReply'
     /v1/sessions:
         get:
             tags:
@@ -763,6 +882,22 @@ components:
                     type: object
                     additionalProperties:
                         type: string
+        temperate.v1.CreateServiceAccountRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                expiresInDays:
+                    type: integer
+                    format: int32
+                roleIds:
+                    type: array
+                    items:
+                        type: string
         temperate.v1.CreateUserRequest:
             required:
                 - username
@@ -846,6 +981,16 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/temperate.v1.SSOProvider'
+        temperate.v1.ListServiceAccountsReply:
+            type: object
+            properties:
+                serviceAccounts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.ServiceAccount'
+                total:
+                    type: integer
+                    format: int32
         temperate.v1.ListSessionsReply:
             type: object
             properties:
@@ -922,6 +1067,16 @@ components:
                     type: string
                 description:
                     type: string
+        temperate.v1.RegenerateServiceAccountTokenRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                expiresInDays:
+                    type: integer
+                    format: int32
         temperate.v1.Role:
             type: object
             properties:
@@ -983,6 +1138,39 @@ components:
                 type:
                     type: string
                 icon:
+                    type: string
+        temperate.v1.ServiceAccount:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                tokenPrefix:
+                    type: string
+                disabled:
+                    type: boolean
+                roles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/temperate.v1.Role'
+                expiresAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        temperate.v1.ServiceAccountTokenReply:
+            type: object
+            properties:
+                serviceAccount:
+                    $ref: '#/components/schemas/temperate.v1.ServiceAccount'
+                token:
                     type: string
         temperate.v1.SetRoleInheritancesRequest:
             required:
@@ -1049,6 +1237,21 @@ components:
                 config:
                     type: object
                     additionalProperties:
+                        type: string
+        temperate.v1.UpdateServiceAccountRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                description:
+                    type: string
+                disabled:
+                    type: boolean
+                roleIds:
+                    type: array
+                    items:
                         type: string
         temperate.v1.UpdateSystemSettingsRequest:
             type: object

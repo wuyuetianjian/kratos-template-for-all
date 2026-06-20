@@ -9,6 +9,7 @@ import (
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/predicate"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/serviceaccount"
 	"temperate/internal/data/ent/user"
 	"time"
 
@@ -99,6 +100,21 @@ func (_u *RoleUpdate) AddUsers(v ...*User) *RoleUpdate {
 	return _u.AddUserIDs(ids...)
 }
 
+// AddServiceAccountIDs adds the "service_accounts" edge to the ServiceAccount entity by IDs.
+func (_u *RoleUpdate) AddServiceAccountIDs(ids ...int) *RoleUpdate {
+	_u.mutation.AddServiceAccountIDs(ids...)
+	return _u
+}
+
+// AddServiceAccounts adds the "service_accounts" edges to the ServiceAccount entity.
+func (_u *RoleUpdate) AddServiceAccounts(v ...*ServiceAccount) *RoleUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddServiceAccountIDs(ids...)
+}
+
 // AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
 func (_u *RoleUpdate) AddPermissionIDs(ids ...int) *RoleUpdate {
 	_u.mutation.AddPermissionIDs(ids...)
@@ -153,6 +169,27 @@ func (_u *RoleUpdate) RemoveUsers(v ...*User) *RoleUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveUserIDs(ids...)
+}
+
+// ClearServiceAccounts clears all "service_accounts" edges to the ServiceAccount entity.
+func (_u *RoleUpdate) ClearServiceAccounts() *RoleUpdate {
+	_u.mutation.ClearServiceAccounts()
+	return _u
+}
+
+// RemoveServiceAccountIDs removes the "service_accounts" edge to ServiceAccount entities by IDs.
+func (_u *RoleUpdate) RemoveServiceAccountIDs(ids ...int) *RoleUpdate {
+	_u.mutation.RemoveServiceAccountIDs(ids...)
+	return _u
+}
+
+// RemoveServiceAccounts removes "service_accounts" edges to ServiceAccount entities.
+func (_u *RoleUpdate) RemoveServiceAccounts(v ...*ServiceAccount) *RoleUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveServiceAccountIDs(ids...)
 }
 
 // ClearPermissions clears all "permissions" edges to the Permission entity.
@@ -308,6 +345,51 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ServiceAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedServiceAccountsIDs(); len(nodes) > 0 && !_u.mutation.ServiceAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ServiceAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -494,6 +576,21 @@ func (_u *RoleUpdateOne) AddUsers(v ...*User) *RoleUpdateOne {
 	return _u.AddUserIDs(ids...)
 }
 
+// AddServiceAccountIDs adds the "service_accounts" edge to the ServiceAccount entity by IDs.
+func (_u *RoleUpdateOne) AddServiceAccountIDs(ids ...int) *RoleUpdateOne {
+	_u.mutation.AddServiceAccountIDs(ids...)
+	return _u
+}
+
+// AddServiceAccounts adds the "service_accounts" edges to the ServiceAccount entity.
+func (_u *RoleUpdateOne) AddServiceAccounts(v ...*ServiceAccount) *RoleUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddServiceAccountIDs(ids...)
+}
+
 // AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
 func (_u *RoleUpdateOne) AddPermissionIDs(ids ...int) *RoleUpdateOne {
 	_u.mutation.AddPermissionIDs(ids...)
@@ -548,6 +645,27 @@ func (_u *RoleUpdateOne) RemoveUsers(v ...*User) *RoleUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveUserIDs(ids...)
+}
+
+// ClearServiceAccounts clears all "service_accounts" edges to the ServiceAccount entity.
+func (_u *RoleUpdateOne) ClearServiceAccounts() *RoleUpdateOne {
+	_u.mutation.ClearServiceAccounts()
+	return _u
+}
+
+// RemoveServiceAccountIDs removes the "service_accounts" edge to ServiceAccount entities by IDs.
+func (_u *RoleUpdateOne) RemoveServiceAccountIDs(ids ...int) *RoleUpdateOne {
+	_u.mutation.RemoveServiceAccountIDs(ids...)
+	return _u
+}
+
+// RemoveServiceAccounts removes "service_accounts" edges to ServiceAccount entities.
+func (_u *RoleUpdateOne) RemoveServiceAccounts(v ...*ServiceAccount) *RoleUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveServiceAccountIDs(ids...)
 }
 
 // ClearPermissions clears all "permissions" edges to the Permission entity.
@@ -733,6 +851,51 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ServiceAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedServiceAccountsIDs(); len(nodes) > 0 && !_u.mutation.ServiceAccountsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ServiceAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

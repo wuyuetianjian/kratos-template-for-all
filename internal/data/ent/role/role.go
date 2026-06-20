@@ -26,6 +26,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeUsers holds the string denoting the users edge name in mutations.
 	EdgeUsers = "users"
+	// EdgeServiceAccounts holds the string denoting the service_accounts edge name in mutations.
+	EdgeServiceAccounts = "service_accounts"
 	// EdgePermissions holds the string denoting the permissions edge name in mutations.
 	EdgePermissions = "permissions"
 	// EdgeParents holds the string denoting the parents edge name in mutations.
@@ -37,6 +39,11 @@ const (
 	// UsersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UsersInverseTable = "auth_users"
+	// ServiceAccountsTable is the table that holds the service_accounts relation/edge. The primary key declared below.
+	ServiceAccountsTable = "auth_service_account_roles"
+	// ServiceAccountsInverseTable is the table name for the ServiceAccount entity.
+	// It exists in this package in order to avoid circular dependency with the "serviceaccount" package.
+	ServiceAccountsInverseTable = "auth_service_accounts"
 	// PermissionsTable is the table that holds the permissions relation/edge. The primary key declared below.
 	PermissionsTable = "auth_role_permissions"
 	// PermissionsInverseTable is the table name for the Permission entity.
@@ -60,6 +67,9 @@ var (
 	// UsersPrimaryKey and UsersColumn2 are the table columns denoting the
 	// primary key for the users relation (M2M).
 	UsersPrimaryKey = []string{"user_id", "role_id"}
+	// ServiceAccountsPrimaryKey and ServiceAccountsColumn2 are the table columns denoting the
+	// primary key for the service_accounts relation (M2M).
+	ServiceAccountsPrimaryKey = []string{"service_account_id", "role_id"}
 	// PermissionsPrimaryKey and PermissionsColumn2 are the table columns denoting the
 	// primary key for the permissions relation (M2M).
 	PermissionsPrimaryKey = []string{"role_id", "permission_id"}
@@ -138,6 +148,20 @@ func ByUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByServiceAccountsCount orders the results by service_accounts count.
+func ByServiceAccountsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newServiceAccountsStep(), opts...)
+	}
+}
+
+// ByServiceAccounts orders the results by service_accounts terms.
+func ByServiceAccounts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceAccountsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByPermissionsCount orders the results by permissions count.
 func ByPermissionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -170,6 +194,13 @@ func newUsersStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UsersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, UsersTable, UsersPrimaryKey...),
+	)
+}
+func newServiceAccountsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceAccountsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ServiceAccountsTable, ServiceAccountsPrimaryKey...),
 	)
 }
 func newPermissionsStep() *sqlgraph.Step {

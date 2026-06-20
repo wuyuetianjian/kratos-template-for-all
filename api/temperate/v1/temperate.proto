@@ -247,6 +247,47 @@ service TemperateService {
             body: "*"
         };
     }
+
+    // ── Service accounts ──────────────────────────────────────────────────────
+
+    rpc CreateServiceAccount(CreateServiceAccountRequest) returns (ServiceAccountTokenReply) {
+        option (google.api.http) = {
+            post: "/v1/service-accounts"
+            body: "*"
+        };
+    }
+
+    rpc ListServiceAccounts(ListServiceAccountsRequest) returns (ListServiceAccountsReply) {
+        option (google.api.http) = {
+            get: "/v1/service-accounts"
+        };
+    }
+
+    rpc GetServiceAccount(GetServiceAccountRequest) returns (ServiceAccount) {
+        option (google.api.http) = {
+            get: "/v1/service-accounts/{id}"
+        };
+    }
+
+    rpc UpdateServiceAccount(UpdateServiceAccountRequest) returns (ServiceAccount) {
+        option (google.api.http) = {
+            patch: "/v1/service-accounts/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteServiceAccount(DeleteServiceAccountRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/service-accounts/{id}"
+        };
+    }
+
+    rpc RegenerateServiceAccountToken(RegenerateServiceAccountTokenRequest) returns (ServiceAccountTokenReply) {
+        option (google.api.http) = {
+            post: "/v1/service-accounts/{id}/regenerate-token"
+            body: "*"
+        };
+    }
 }
 
 message GetMessageResponse {
@@ -561,4 +602,60 @@ message UpdateSystemSettingsRequest {
     string service_name = 3;
     string site_icon = 4;
     string corner_icon = 5;
+}
+
+// ── Service account messages ──────────────────────────────────────────────────
+
+message ServiceAccount {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string token_prefix = 4;
+    bool disabled = 5;
+    repeated Role roles = 6;
+    google.protobuf.Timestamp expires_at = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+}
+
+message CreateServiceAccountRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+    string description = 2;
+    int32 expires_in_days = 3;
+    repeated int64 role_ids = 4;
+}
+
+message ListServiceAccountsRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+}
+
+message ListServiceAccountsReply {
+    repeated ServiceAccount service_accounts = 1;
+    int32 total = 2;
+}
+
+message GetServiceAccountRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message UpdateServiceAccountRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    string description = 2;
+    bool disabled = 3;
+    repeated int64 role_ids = 4;
+}
+
+message DeleteServiceAccountRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message RegenerateServiceAccountTokenRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+    int32 expires_in_days = 2;
+}
+
+message ServiceAccountTokenReply {
+    ServiceAccount service_account = 1;
+    string token = 2;
 }

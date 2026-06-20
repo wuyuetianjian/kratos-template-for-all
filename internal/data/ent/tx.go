@@ -22,6 +22,8 @@ type Tx struct {
 	Role *RoleClient
 	// SSOProvider is the client for interacting with the SSOProvider builders.
 	SSOProvider *SSOProviderClient
+	// ServiceAccount is the client for interacting with the ServiceAccount builders.
+	ServiceAccount *ServiceAccountClient
 	// SystemSetting is the client for interacting with the SystemSetting builders.
 	SystemSetting *SystemSettingClient
 	// User is the client for interacting with the User builders.
@@ -164,6 +166,7 @@ func (tx *Tx) init() {
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.SSOProvider = NewSSOProviderClient(tx.config)
+	tx.ServiceAccount = NewServiceAccountClient(tx.config)
 	tx.SystemSetting = NewSystemSettingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserSession = NewUserSessionClient(tx.config)

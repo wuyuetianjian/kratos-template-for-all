@@ -8,6 +8,7 @@ import (
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/schema"
+	"temperate/internal/data/ent/serviceaccount"
 	"temperate/internal/data/ent/ssoprovider"
 	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
@@ -117,6 +118,34 @@ func init() {
 	ssoprovider.DefaultUpdatedAt = ssoproviderDescUpdatedAt.Default.(func() time.Time)
 	// ssoprovider.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	ssoprovider.UpdateDefaultUpdatedAt = ssoproviderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	serviceaccountFields := schema.ServiceAccount{}.Fields()
+	_ = serviceaccountFields
+	// serviceaccountDescName is the schema descriptor for name field.
+	serviceaccountDescName := serviceaccountFields[0].Descriptor()
+	// serviceaccount.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	serviceaccount.NameValidator = serviceaccountDescName.Validators[0].(func(string) error)
+	// serviceaccountDescTokenHash is the schema descriptor for token_hash field.
+	serviceaccountDescTokenHash := serviceaccountFields[2].Descriptor()
+	// serviceaccount.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	serviceaccount.TokenHashValidator = serviceaccountDescTokenHash.Validators[0].(func(string) error)
+	// serviceaccountDescTokenPrefix is the schema descriptor for token_prefix field.
+	serviceaccountDescTokenPrefix := serviceaccountFields[3].Descriptor()
+	// serviceaccount.TokenPrefixValidator is a validator for the "token_prefix" field. It is called by the builders before save.
+	serviceaccount.TokenPrefixValidator = serviceaccountDescTokenPrefix.Validators[0].(func(string) error)
+	// serviceaccountDescDisabled is the schema descriptor for disabled field.
+	serviceaccountDescDisabled := serviceaccountFields[5].Descriptor()
+	// serviceaccount.DefaultDisabled holds the default value on creation for the disabled field.
+	serviceaccount.DefaultDisabled = serviceaccountDescDisabled.Default.(bool)
+	// serviceaccountDescCreatedAt is the schema descriptor for created_at field.
+	serviceaccountDescCreatedAt := serviceaccountFields[6].Descriptor()
+	// serviceaccount.DefaultCreatedAt holds the default value on creation for the created_at field.
+	serviceaccount.DefaultCreatedAt = serviceaccountDescCreatedAt.Default.(func() time.Time)
+	// serviceaccountDescUpdatedAt is the schema descriptor for updated_at field.
+	serviceaccountDescUpdatedAt := serviceaccountFields[7].Descriptor()
+	// serviceaccount.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	serviceaccount.DefaultUpdatedAt = serviceaccountDescUpdatedAt.Default.(func() time.Time)
+	// serviceaccount.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	serviceaccount.UpdateDefaultUpdatedAt = serviceaccountDescUpdatedAt.UpdateDefault.(func() time.Time)
 	systemsettingFields := schema.SystemSetting{}.Fields()
 	_ = systemsettingFields
 	// systemsettingDescKey is the schema descriptor for key field.

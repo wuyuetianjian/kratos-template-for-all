@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
+	"temperate/internal/data/ent/serviceaccount"
 	"temperate/internal/data/ent/user"
 	"time"
 
@@ -97,6 +98,21 @@ func (_c *RoleCreate) AddUsers(v ...*User) *RoleCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddUserIDs(ids...)
+}
+
+// AddServiceAccountIDs adds the "service_accounts" edge to the ServiceAccount entity by IDs.
+func (_c *RoleCreate) AddServiceAccountIDs(ids ...int) *RoleCreate {
+	_c.mutation.AddServiceAccountIDs(ids...)
+	return _c
+}
+
+// AddServiceAccounts adds the "service_accounts" edges to the ServiceAccount entity.
+func (_c *RoleCreate) AddServiceAccounts(v ...*ServiceAccount) *RoleCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddServiceAccountIDs(ids...)
 }
 
 // AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
@@ -252,6 +268,22 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ServiceAccountsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   role.ServiceAccountsTable,
+			Columns: role.ServiceAccountsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceaccount.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

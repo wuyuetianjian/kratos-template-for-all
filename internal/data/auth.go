@@ -490,11 +490,15 @@ func (r *authRepo) getRole(ctx context.Context, roleID int64) (*biz.Role, error)
 }
 
 func (r *authRepo) collectRolePermissions(ctx context.Context, role *ent.Role, visited map[int]struct{}, permissions map[int]biz.Permission, roles *[]biz.Role) error {
+	return collectRolePermissions(ctx, r.data, role, visited, permissions, roles)
+}
+
+func collectRolePermissions(ctx context.Context, data *Data, role *ent.Role, visited map[int]struct{}, permissions map[int]biz.Permission, roles *[]biz.Role) error {
 	if _, ok := visited[role.ID]; ok {
 		return nil
 	}
 	visited[role.ID] = struct{}{}
-	loaded, err := r.data.ReadEnt.Role.Query().
+	loaded, err := data.ReadEnt.Role.Query().
 		Where(entrole.ID(role.ID)).
 		WithPermissions(withPermissionEdges).
 		WithParents(withRoleEdges).
@@ -507,7 +511,7 @@ func (r *authRepo) collectRolePermissions(ctx context.Context, role *ent.Role, v
 		permissions[permission.ID] = *toBizPermission(permission)
 	}
 	for _, parent := range loaded.Edges.Parents {
-		if err := r.collectRolePermissions(ctx, parent, visited, permissions, roles); err != nil {
+		if err := collectRolePermissions(ctx, data, parent, visited, permissions, roles); err != nil {
 			return err
 		}
 	}
@@ -643,6 +647,7 @@ const (
 	bizReasonAlreadyExists    = "ALREADY_EXISTS"
 	bizReasonSystemProtected  = "SYSTEM_PROTECTED"
 	bizReasonInvalidHierarchy = "INVALID_ROLE_INHERITANCE"
+	bizReasonUnauthorized     = "UNAUTHORIZED"
 )
 
 func unsupported(msg string) error {

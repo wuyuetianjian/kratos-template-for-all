@@ -524,6 +524,49 @@ A kicked session immediately returns `401 UNAUTHORIZED`. Administrators can
 view all sessions at `GET /v1/sessions` and force-logout a session with
 `POST /v1/sessions/{id}/kick`.
 
+## Service Accounts
+
+Service accounts allow machines, CI pipelines, and other backend services to
+call the API directly using long-lived tokens, without needing an interactive
+login flow.
+
+### Token Format
+
+Tokens are generated with the format `svc_<base64url(expiry_8bytes + random_24bytes)>`.
+The first eight bytes of the decoded payload encode the Unix expiry timestamp as
+a big-endian int64; zero means "never expires". This allows the server to
+reject expired tokens before hitting the database.
+
+Tokens are never stored in plain text. The SHA-256 hash is persisted in the
+`auth_service_accounts` table.
+
+### Authentication
+
+Service tokens are sent in the same `Authorization: Bearer <token>` header as
+JWT user tokens. The auth middleware detects the `svc_` prefix and routes the
+request to service account validation instead of JWT validation.
+
+The service account's effective permissions are derived from its assigned roles
+using the same role inheritance logic applied to user accounts.
+
+### Management API
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/v1/service-accounts` | Create a service account and return its token (shown once) |
+| `GET` | `/v1/service-accounts` | List service accounts |
+| `GET` | `/v1/service-accounts/{id}` | Get a single service account |
+| `PATCH` | `/v1/service-accounts/{id}` | Update description, disabled state, or roles |
+| `DELETE` | `/v1/service-accounts/{id}` | Delete a service account |
+| `POST` | `/v1/service-accounts/{id}/regenerate-token` | Rotate the token |
+
+The full token value is returned **only** in the `CreateServiceAccount` and
+`RegenerateServiceAccountToken` responses. Subsequent reads return only the
+token prefix for display purposes.
+
+All create, delete, and regenerate operations are recorded in the audit log
+under resource type `service_account`.
+
 ## Audit Logs
 
 Every mutating operation (create, update, delete, login, kick) is recorded as
