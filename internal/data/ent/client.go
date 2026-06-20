@@ -11,11 +11,14 @@ import (
 
 	"temperate/internal/data/ent/migrate"
 
+	"temperate/internal/data/ent/auditlog"
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/ssoprovider"
+	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
+	"temperate/internal/data/ent/usersession"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -28,6 +31,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AuditLog is the client for interacting with the AuditLog builders.
+	AuditLog *AuditLogClient
 	// Module is the client for interacting with the Module builders.
 	Module *ModuleClient
 	// Permission is the client for interacting with the Permission builders.
@@ -36,8 +41,12 @@ type Client struct {
 	Role *RoleClient
 	// SSOProvider is the client for interacting with the SSOProvider builders.
 	SSOProvider *SSOProviderClient
+	// SystemSetting is the client for interacting with the SystemSetting builders.
+	SystemSetting *SystemSettingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSession is the client for interacting with the UserSession builders.
+	UserSession *UserSessionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -49,11 +58,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AuditLog = NewAuditLogClient(c.config)
 	c.Module = NewModuleClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.SSOProvider = NewSSOProviderClient(c.config)
+	c.SystemSetting = NewSystemSettingClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserSession = NewUserSessionClient(c.config)
 }
 
 type (
@@ -144,13 +156,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		Module:      NewModuleClient(cfg),
-		Permission:  NewPermissionClient(cfg),
-		Role:        NewRoleClient(cfg),
-		SSOProvider: NewSSOProviderClient(cfg),
-		User:        NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		AuditLog:      NewAuditLogClient(cfg),
+		Module:        NewModuleClient(cfg),
+		Permission:    NewPermissionClient(cfg),
+		Role:          NewRoleClient(cfg),
+		SSOProvider:   NewSSOProviderClient(cfg),
+		SystemSetting: NewSystemSettingClient(cfg),
+		User:          NewUserClient(cfg),
+		UserSession:   NewUserSessionClient(cfg),
 	}, nil
 }
 
@@ -168,20 +183,23 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		Module:      NewModuleClient(cfg),
-		Permission:  NewPermissionClient(cfg),
-		Role:        NewRoleClient(cfg),
-		SSOProvider: NewSSOProviderClient(cfg),
-		User:        NewUserClient(cfg),
+		ctx:           ctx,
+		config:        cfg,
+		AuditLog:      NewAuditLogClient(cfg),
+		Module:        NewModuleClient(cfg),
+		Permission:    NewPermissionClient(cfg),
+		Role:          NewRoleClient(cfg),
+		SSOProvider:   NewSSOProviderClient(cfg),
+		SystemSetting: NewSystemSettingClient(cfg),
+		User:          NewUserClient(cfg),
+		UserSession:   NewUserSessionClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Module.
+//		AuditLog.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -203,26 +221,30 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Module.Use(hooks...)
-	c.Permission.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.SSOProvider.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.SystemSetting,
+		c.User, c.UserSession,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Module.Intercept(interceptors...)
-	c.Permission.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.SSOProvider.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AuditLog, c.Module, c.Permission, c.Role, c.SSOProvider, c.SystemSetting,
+		c.User, c.UserSession,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AuditLogMutation:
+		return c.AuditLog.mutate(ctx, m)
 	case *ModuleMutation:
 		return c.Module.mutate(ctx, m)
 	case *PermissionMutation:
@@ -231,10 +253,147 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Role.mutate(ctx, m)
 	case *SSOProviderMutation:
 		return c.SSOProvider.mutate(ctx, m)
+	case *SystemSettingMutation:
+		return c.SystemSetting.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserSessionMutation:
+		return c.UserSession.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AuditLogClient is a client for the AuditLog schema.
+type AuditLogClient struct {
+	config
+}
+
+// NewAuditLogClient returns a client for the AuditLog from the given config.
+func NewAuditLogClient(c config) *AuditLogClient {
+	return &AuditLogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `auditlog.Hooks(f(g(h())))`.
+func (c *AuditLogClient) Use(hooks ...Hook) {
+	c.hooks.AuditLog = append(c.hooks.AuditLog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `auditlog.Intercept(f(g(h())))`.
+func (c *AuditLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AuditLog = append(c.inters.AuditLog, interceptors...)
+}
+
+// Create returns a builder for creating a AuditLog entity.
+func (c *AuditLogClient) Create() *AuditLogCreate {
+	mutation := newAuditLogMutation(c.config, OpCreate)
+	return &AuditLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AuditLog entities.
+func (c *AuditLogClient) CreateBulk(builders ...*AuditLogCreate) *AuditLogCreateBulk {
+	return &AuditLogCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AuditLogClient) MapCreateBulk(slice any, setFunc func(*AuditLogCreate, int)) *AuditLogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AuditLogCreateBulk{err: fmt.Errorf("calling to AuditLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AuditLogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AuditLogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AuditLog.
+func (c *AuditLogClient) Update() *AuditLogUpdate {
+	mutation := newAuditLogMutation(c.config, OpUpdate)
+	return &AuditLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AuditLogClient) UpdateOne(_m *AuditLog) *AuditLogUpdateOne {
+	mutation := newAuditLogMutation(c.config, OpUpdateOne, withAuditLog(_m))
+	return &AuditLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AuditLogClient) UpdateOneID(id int) *AuditLogUpdateOne {
+	mutation := newAuditLogMutation(c.config, OpUpdateOne, withAuditLogID(id))
+	return &AuditLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AuditLog.
+func (c *AuditLogClient) Delete() *AuditLogDelete {
+	mutation := newAuditLogMutation(c.config, OpDelete)
+	return &AuditLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AuditLogClient) DeleteOne(_m *AuditLog) *AuditLogDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AuditLogClient) DeleteOneID(id int) *AuditLogDeleteOne {
+	builder := c.Delete().Where(auditlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AuditLogDeleteOne{builder}
+}
+
+// Query returns a query builder for AuditLog.
+func (c *AuditLogClient) Query() *AuditLogQuery {
+	return &AuditLogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAuditLog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AuditLog entity by its id.
+func (c *AuditLogClient) Get(ctx context.Context, id int) (*AuditLog, error) {
+	return c.Query().Where(auditlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AuditLogClient) GetX(ctx context.Context, id int) *AuditLog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AuditLogClient) Hooks() []Hook {
+	return c.hooks.AuditLog
+}
+
+// Interceptors returns the client interceptors.
+func (c *AuditLogClient) Interceptors() []Interceptor {
+	return c.inters.AuditLog
+}
+
+func (c *AuditLogClient) mutate(ctx context.Context, m *AuditLogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AuditLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AuditLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AuditLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AuditLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AuditLog mutation op: %q", m.Op())
 	}
 }
 
@@ -866,6 +1025,139 @@ func (c *SSOProviderClient) mutate(ctx context.Context, m *SSOProviderMutation) 
 	}
 }
 
+// SystemSettingClient is a client for the SystemSetting schema.
+type SystemSettingClient struct {
+	config
+}
+
+// NewSystemSettingClient returns a client for the SystemSetting from the given config.
+func NewSystemSettingClient(c config) *SystemSettingClient {
+	return &SystemSettingClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `systemsetting.Hooks(f(g(h())))`.
+func (c *SystemSettingClient) Use(hooks ...Hook) {
+	c.hooks.SystemSetting = append(c.hooks.SystemSetting, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `systemsetting.Intercept(f(g(h())))`.
+func (c *SystemSettingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SystemSetting = append(c.inters.SystemSetting, interceptors...)
+}
+
+// Create returns a builder for creating a SystemSetting entity.
+func (c *SystemSettingClient) Create() *SystemSettingCreate {
+	mutation := newSystemSettingMutation(c.config, OpCreate)
+	return &SystemSettingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SystemSetting entities.
+func (c *SystemSettingClient) CreateBulk(builders ...*SystemSettingCreate) *SystemSettingCreateBulk {
+	return &SystemSettingCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SystemSettingClient) MapCreateBulk(slice any, setFunc func(*SystemSettingCreate, int)) *SystemSettingCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SystemSettingCreateBulk{err: fmt.Errorf("calling to SystemSettingClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SystemSettingCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SystemSettingCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SystemSetting.
+func (c *SystemSettingClient) Update() *SystemSettingUpdate {
+	mutation := newSystemSettingMutation(c.config, OpUpdate)
+	return &SystemSettingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SystemSettingClient) UpdateOne(_m *SystemSetting) *SystemSettingUpdateOne {
+	mutation := newSystemSettingMutation(c.config, OpUpdateOne, withSystemSetting(_m))
+	return &SystemSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SystemSettingClient) UpdateOneID(id int) *SystemSettingUpdateOne {
+	mutation := newSystemSettingMutation(c.config, OpUpdateOne, withSystemSettingID(id))
+	return &SystemSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SystemSetting.
+func (c *SystemSettingClient) Delete() *SystemSettingDelete {
+	mutation := newSystemSettingMutation(c.config, OpDelete)
+	return &SystemSettingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SystemSettingClient) DeleteOne(_m *SystemSetting) *SystemSettingDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SystemSettingClient) DeleteOneID(id int) *SystemSettingDeleteOne {
+	builder := c.Delete().Where(systemsetting.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SystemSettingDeleteOne{builder}
+}
+
+// Query returns a query builder for SystemSetting.
+func (c *SystemSettingClient) Query() *SystemSettingQuery {
+	return &SystemSettingQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSystemSetting},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SystemSetting entity by its id.
+func (c *SystemSettingClient) Get(ctx context.Context, id int) (*SystemSetting, error) {
+	return c.Query().Where(systemsetting.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SystemSettingClient) GetX(ctx context.Context, id int) *SystemSetting {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SystemSettingClient) Hooks() []Hook {
+	return c.hooks.SystemSetting
+}
+
+// Interceptors returns the client interceptors.
+func (c *SystemSettingClient) Interceptors() []Interceptor {
+	return c.inters.SystemSetting
+}
+
+func (c *SystemSettingClient) mutate(ctx context.Context, m *SystemSettingMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SystemSettingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SystemSettingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SystemSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SystemSettingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SystemSetting mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -990,6 +1282,22 @@ func (c *UserClient) QueryRoles(_m *User) *RoleQuery {
 	return query
 }
 
+// QuerySessions queries the sessions edge of a User.
+func (c *UserClient) QuerySessions(_m *User) *UserSessionQuery {
+	query := (&UserSessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(usersession.Table, usersession.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SessionsTable, user.SessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -1015,12 +1323,163 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserSessionClient is a client for the UserSession schema.
+type UserSessionClient struct {
+	config
+}
+
+// NewUserSessionClient returns a client for the UserSession from the given config.
+func NewUserSessionClient(c config) *UserSessionClient {
+	return &UserSessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usersession.Hooks(f(g(h())))`.
+func (c *UserSessionClient) Use(hooks ...Hook) {
+	c.hooks.UserSession = append(c.hooks.UserSession, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usersession.Intercept(f(g(h())))`.
+func (c *UserSessionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserSession = append(c.inters.UserSession, interceptors...)
+}
+
+// Create returns a builder for creating a UserSession entity.
+func (c *UserSessionClient) Create() *UserSessionCreate {
+	mutation := newUserSessionMutation(c.config, OpCreate)
+	return &UserSessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserSession entities.
+func (c *UserSessionClient) CreateBulk(builders ...*UserSessionCreate) *UserSessionCreateBulk {
+	return &UserSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserSessionClient) MapCreateBulk(slice any, setFunc func(*UserSessionCreate, int)) *UserSessionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserSessionCreateBulk{err: fmt.Errorf("calling to UserSessionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserSessionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserSession.
+func (c *UserSessionClient) Update() *UserSessionUpdate {
+	mutation := newUserSessionMutation(c.config, OpUpdate)
+	return &UserSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserSessionClient) UpdateOne(_m *UserSession) *UserSessionUpdateOne {
+	mutation := newUserSessionMutation(c.config, OpUpdateOne, withUserSession(_m))
+	return &UserSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserSessionClient) UpdateOneID(id int) *UserSessionUpdateOne {
+	mutation := newUserSessionMutation(c.config, OpUpdateOne, withUserSessionID(id))
+	return &UserSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserSession.
+func (c *UserSessionClient) Delete() *UserSessionDelete {
+	mutation := newUserSessionMutation(c.config, OpDelete)
+	return &UserSessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserSessionClient) DeleteOne(_m *UserSession) *UserSessionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserSessionClient) DeleteOneID(id int) *UserSessionDeleteOne {
+	builder := c.Delete().Where(usersession.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserSessionDeleteOne{builder}
+}
+
+// Query returns a query builder for UserSession.
+func (c *UserSessionClient) Query() *UserSessionQuery {
+	return &UserSessionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserSession},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserSession entity by its id.
+func (c *UserSessionClient) Get(ctx context.Context, id int) (*UserSession, error) {
+	return c.Query().Where(usersession.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserSessionClient) GetX(ctx context.Context, id int) *UserSession {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserSession.
+func (c *UserSessionClient) QueryUser(_m *UserSession) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(usersession.Table, usersession.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, usersession.UserTable, usersession.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserSessionClient) Hooks() []Hook {
+	return c.hooks.UserSession
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserSessionClient) Interceptors() []Interceptor {
+	return c.inters.UserSession
+}
+
+func (c *UserSessionClient) mutate(ctx context.Context, m *UserSessionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserSessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserSessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserSession mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Module, Permission, Role, SSOProvider, User []ent.Hook
+		AuditLog, Module, Permission, Role, SSOProvider, SystemSetting, User,
+		UserSession []ent.Hook
 	}
 	inters struct {
-		Module, Permission, Role, SSOProvider, User []ent.Interceptor
+		AuditLog, Module, Permission, Role, SSOProvider, SystemSetting, User,
+		UserSession []ent.Interceptor
 	}
 )

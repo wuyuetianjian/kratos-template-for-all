@@ -38,7 +38,7 @@ func NewGRPCServer(
 		middlewares = append(middlewares, ratelimit.Server())
 	}
 	if api.GetAuth() {
-		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth))
+		middlewares = append(middlewares, selectedAuthMiddleware(api.GetSigningMethod(), api.GetJwtKey(), auth, auth))
 	}
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(middlewares...),

@@ -8,11 +8,14 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"temperate/internal/data/ent/auditlog"
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/ssoprovider"
+	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
+	"temperate/internal/data/ent/usersession"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -77,11 +80,14 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			module.Table:      module.ValidColumn,
-			permission.Table:  permission.ValidColumn,
-			role.Table:        role.ValidColumn,
-			ssoprovider.Table: ssoprovider.ValidColumn,
-			user.Table:        user.ValidColumn,
+			auditlog.Table:      auditlog.ValidColumn,
+			module.Table:        module.ValidColumn,
+			permission.Table:    permission.ValidColumn,
+			role.Table:          role.ValidColumn,
+			ssoprovider.Table:   ssoprovider.ValidColumn,
+			systemsetting.Table: systemsetting.ValidColumn,
+			user.Table:          user.ValidColumn,
+			usersession.Table:   usersession.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

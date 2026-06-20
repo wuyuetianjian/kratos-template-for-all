@@ -3,12 +3,15 @@
 package ent
 
 import (
+	"temperate/internal/data/ent/auditlog"
 	"temperate/internal/data/ent/module"
 	"temperate/internal/data/ent/permission"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/schema"
 	"temperate/internal/data/ent/ssoprovider"
+	"temperate/internal/data/ent/systemsetting"
 	"temperate/internal/data/ent/user"
+	"temperate/internal/data/ent/usersession"
 	"time"
 )
 
@@ -16,6 +19,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	auditlogFields := schema.AuditLog{}.Fields()
+	_ = auditlogFields
+	// auditlogDescCreatedAt is the schema descriptor for created_at field.
+	auditlogDescCreatedAt := auditlogFields[7].Descriptor()
+	// auditlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	auditlog.DefaultCreatedAt = auditlogDescCreatedAt.Default.(func() time.Time)
 	moduleFields := schema.Module{}.Fields()
 	_ = moduleFields
 	// moduleDescName is the schema descriptor for name field.
@@ -108,6 +117,16 @@ func init() {
 	ssoprovider.DefaultUpdatedAt = ssoproviderDescUpdatedAt.Default.(func() time.Time)
 	// ssoprovider.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	ssoprovider.UpdateDefaultUpdatedAt = ssoproviderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	systemsettingFields := schema.SystemSetting{}.Fields()
+	_ = systemsettingFields
+	// systemsettingDescKey is the schema descriptor for key field.
+	systemsettingDescKey := systemsettingFields[0].Descriptor()
+	// systemsetting.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	systemsetting.KeyValidator = systemsettingDescKey.Validators[0].(func(string) error)
+	// systemsettingDescValue is the schema descriptor for value field.
+	systemsettingDescValue := systemsettingFields[1].Descriptor()
+	// systemsetting.DefaultValue holds the default value on creation for the value field.
+	systemsetting.DefaultValue = systemsettingDescValue.Default.(string)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.
@@ -136,4 +155,22 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	usersessionFields := schema.UserSession{}.Fields()
+	_ = usersessionFields
+	// usersessionDescTokenHash is the schema descriptor for token_hash field.
+	usersessionDescTokenHash := usersessionFields[0].Descriptor()
+	// usersession.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	usersession.TokenHashValidator = usersessionDescTokenHash.Validators[0].(func(string) error)
+	// usersessionDescStatus is the schema descriptor for status field.
+	usersessionDescStatus := usersessionFields[4].Descriptor()
+	// usersession.DefaultStatus holds the default value on creation for the status field.
+	usersession.DefaultStatus = usersessionDescStatus.Default.(string)
+	// usersessionDescLoginAt is the schema descriptor for login_at field.
+	usersessionDescLoginAt := usersessionFields[6].Descriptor()
+	// usersession.DefaultLoginAt holds the default value on creation for the login_at field.
+	usersession.DefaultLoginAt = usersessionDescLoginAt.Default.(func() time.Time)
+	// usersessionDescLastAccessAt is the schema descriptor for last_access_at field.
+	usersessionDescLastAccessAt := usersessionFields[7].Descriptor()
+	// usersession.DefaultLastAccessAt holds the default value on creation for the last_access_at field.
+	usersession.DefaultLastAccessAt = usersessionDescLastAccessAt.Default.(func() time.Time)
 }

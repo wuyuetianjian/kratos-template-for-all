@@ -10,6 +10,7 @@ import (
 	"temperate/internal/data/ent/predicate"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/user"
+	"temperate/internal/data/ent/usersession"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -20,11 +21,12 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx        *QueryContext
-	order      []user.OrderOption
-	inters     []Interceptor
-	predicates []predicate.User
-	withRoles  *RoleQuery
+	ctx          *QueryContext
+	order        []user.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.User
+	withRoles    *RoleQuery
+	withSessions *UserSessionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (_q *UserQuery) QueryRoles() *RoleQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, user.RolesTable, user.RolesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySessions chains the current query on the "sessions" edge.
+func (_q *UserQuery) QuerySessions() *UserSessionQuery {
+	query := (&UserSessionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(usersession.Table, usersession.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SessionsTable, user.SessionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -270,12 +294,13 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]user.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.User{}, _q.predicates...),
-		withRoles:  _q.withRoles.Clone(),
+		config:       _q.config,
+		ctx:          _q.ctx.Clone(),
+		order:        append([]user.OrderOption{}, _q.order...),
+		inters:       append([]Interceptor{}, _q.inters...),
+		predicates:   append([]predicate.User{}, _q.predicates...),
+		withRoles:    _q.withRoles.Clone(),
+		withSessions: _q.withSessions.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -290,6 +315,17 @@ func (_q *UserQuery) WithRoles(opts ...func(*RoleQuery)) *UserQuery {
 		opt(query)
 	}
 	_q.withRoles = query
+	return _q
+}
+
+// WithSessions tells the query-builder to eager-load the nodes that are connected to
+// the "sessions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithSessions(opts ...func(*UserSessionQuery)) *UserQuery {
+	query := (&UserSessionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSessions = query
 	return _q
 }
 
@@ -371,8 +407,9 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			_q.withRoles != nil,
+			_q.withSessions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -397,6 +434,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadRoles(ctx, query, nodes,
 			func(n *User) { n.Edges.Roles = []*Role{} },
 			func(n *User, e *Role) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withSessions; query != nil {
+		if err := _q.loadSessions(ctx, query, nodes,
+			func(n *User) { n.Edges.Sessions = []*UserSession{} },
+			func(n *User, e *UserSession) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -461,6 +505,37 @@ func (_q *UserQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*U
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (_q *UserQuery) loadSessions(ctx context.Context, query *UserSessionQuery, nodes []*User, init func(*User), assign func(*User, *UserSession)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.UserSession(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.SessionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_sessions
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_sessions" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_sessions" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -32,6 +32,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
+	// EdgeSessions holds the string denoting the sessions edge name in mutations.
+	EdgeSessions = "sessions"
 	// Table holds the table name of the user in the database.
 	Table = "auth_users"
 	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
@@ -39,6 +41,13 @@ const (
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "auth_roles"
+	// SessionsTable is the table that holds the sessions relation/edge.
+	SessionsTable = "auth_user_sessions"
+	// SessionsInverseTable is the table name for the UserSession entity.
+	// It exists in this package in order to avoid circular dependency with the "usersession" package.
+	SessionsInverseTable = "auth_user_sessions"
+	// SessionsColumn is the table column denoting the sessions relation/edge.
+	SessionsColumn = "user_sessions"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -148,10 +157,31 @@ func ByRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySessionsCount orders the results by sessions count.
+func BySessionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSessionsStep(), opts...)
+	}
+}
+
+// BySessions orders the results by sessions terms.
+func BySessions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSessionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRolesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RolesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, RolesTable, RolesPrimaryKey...),
+	)
+}
+func newSessionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SessionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
 	)
 }

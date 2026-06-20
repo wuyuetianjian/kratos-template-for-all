@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AuditLog is the client for interacting with the AuditLog builders.
+	AuditLog *AuditLogClient
 	// Module is the client for interacting with the Module builders.
 	Module *ModuleClient
 	// Permission is the client for interacting with the Permission builders.
@@ -20,8 +22,12 @@ type Tx struct {
 	Role *RoleClient
 	// SSOProvider is the client for interacting with the SSOProvider builders.
 	SSOProvider *SSOProviderClient
+	// SystemSetting is the client for interacting with the SystemSetting builders.
+	SystemSetting *SystemSettingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSession is the client for interacting with the UserSession builders.
+	UserSession *UserSessionClient
 
 	// lazily loaded.
 	client     *Client
@@ -153,11 +159,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AuditLog = NewAuditLogClient(tx.config)
 	tx.Module = NewModuleClient(tx.config)
 	tx.Permission = NewPermissionClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.SSOProvider = NewSSOProviderClient(tx.config)
+	tx.SystemSetting = NewSystemSettingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserSession = NewUserSessionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -167,7 +176,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Module.QueryXXX(), the query will be executed
+// applies a query, for example: AuditLog.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

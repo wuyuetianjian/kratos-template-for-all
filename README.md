@@ -1,5 +1,7 @@
 # Kratos Project Template
 
+English | [简体中文](README.zh-CN.md)
+
 A project template for creating new Kratos services with HTTP and gRPC
 transports, protobuf-first APIs, Wire dependency injection, OpenAPI generation,
 and a small CRUD example.
@@ -7,6 +9,10 @@ and a small CRUD example.
 Use this repository as a starting point for a new service. The included sample
 resource is only reference code for API shape, layering, code generation, and
 testing. Replace it with your own domain model when creating a real project.
+
+## Related Repositories
+
+- Frontend: https://github.com/wuyuetianjian/front_vite_ant_temperate.git
 
 ## Create a New Project
 
@@ -502,6 +508,50 @@ registry:
 ```
 
 If `host` is empty, the discovery driver falls back to the local hostname.
+
+## Session Management
+
+When JWT authentication is enabled, every successful login creates a
+`UserSession` record in the database. Each session stores:
+
+- `token_hash` — SHA-256 of the raw JWT string (unique identifier).
+- `ip`, `browser`, `os` — parsed from request headers at login time.
+- `status` — `active`, `kicked`, or `expired`.
+- `login_at`, `last_access_at` — updated on each authenticated request.
+
+The auth middleware verifies the session status on every authenticated request.
+A kicked session immediately returns `401 UNAUTHORIZED`. Administrators can
+view all sessions at `GET /v1/sessions` and force-logout a session with
+`POST /v1/sessions/{id}/kick`.
+
+## Audit Logs
+
+Every mutating operation (create, update, delete, login, kick) is recorded as
+an `AuditLog` entry with the acting user's identity, IP address, resource type,
+and resource name. Audit logs are append-only; only cleanup jobs remove them
+based on the configured retention period.
+
+Query audit logs at `GET /v1/audit-logs`. An optional `action` query parameter
+filters by operation type (`login`, `create`, `update`, `delete`, `kick`).
+
+## System Settings
+
+Runtime-adjustable settings are stored as key-value rows in the
+`system_settings` table and managed through the API:
+
+```
+GET   /v1/settings          # read current settings
+PATCH /v1/settings          # update settings
+```
+
+| Key                          | Default | Description                              |
+|------------------------------|---------|------------------------------------------|
+| `audit_log_retention_days`   | 90      | Days to retain audit log entries         |
+| `session_log_retention_days` | 30      | Days to retain session records           |
+
+A cron job runs at midnight each day and deletes records older than the
+configured retention periods. Settings take effect at the next midnight run
+without a restart.
 
 ## Docker
 

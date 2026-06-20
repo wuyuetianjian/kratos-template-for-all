@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+
 	v1 "temperate/api/temperate/v1"
 	"temperate/internal/biz"
 
@@ -46,6 +47,10 @@ type authorizer interface {
 	Authorize(context.Context, int64, string) (*biz.AuthContext, error)
 }
 
+type sessionChecker interface {
+	CheckSession(context.Context, string) error
+}
+
 type authOperationAllowlist struct {
 	operations map[string]struct{}
 	prefixes   []string
@@ -74,15 +79,15 @@ func (a authOperationAllowlist) Contains(operation string) bool {
 	return false
 }
 
-func selectedAuthMiddleware(signingMethod, key string, auth authorizer) middleware.Middleware {
-	return selector.Server(authMiddleware(signingMethod, key, auth)).
+func selectedAuthMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker) middleware.Middleware {
+	return selector.Server(authMiddleware(signingMethod, key, auth, sessions)).
 		Match(func(_ context.Context, operation string) bool {
 			return !authAllowlist.Contains(operation)
 		}).
 		Build()
 }
 
-func authMiddleware(signingMethod, key string, auth authorizer) middleware.Middleware {
+func authMiddleware(signingMethod, key string, auth authorizer, sessions sessionChecker) middleware.Middleware {
 	method, ok := jwtSigningMethod(signingMethod)
 	if !ok {
 		return func(middleware.Handler) middleware.Handler {
@@ -131,6 +136,12 @@ func authMiddleware(signingMethod, key string, auth authorizer) middleware.Middl
 			userID, err := userIDFromClaims(token.Claims)
 			if err != nil {
 				return nil, err
+			}
+			if sessions != nil {
+				tokenHash := biz.TokenHash(auths[1])
+				if err := sessions.CheckSession(ctx, tokenHash); err != nil {
+					return nil, err
+				}
 			}
 			authContext, err := auth.Authorize(ctx, userID, header.Operation())
 			if err != nil {

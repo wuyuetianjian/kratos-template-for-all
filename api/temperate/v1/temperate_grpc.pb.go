@@ -49,6 +49,11 @@ const (
 	TemperateService_CreateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/CreateSSOProvider"
 	TemperateService_UpdateSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/UpdateSSOProvider"
 	TemperateService_DeleteSSOProvider_FullMethodName      = "/temperate.v1.TemperateService/DeleteSSOProvider"
+	TemperateService_ListSessions_FullMethodName           = "/temperate.v1.TemperateService/ListSessions"
+	TemperateService_KickSession_FullMethodName            = "/temperate.v1.TemperateService/KickSession"
+	TemperateService_ListAuditLogs_FullMethodName          = "/temperate.v1.TemperateService/ListAuditLogs"
+	TemperateService_GetSystemSettings_FullMethodName      = "/temperate.v1.TemperateService/GetSystemSettings"
+	TemperateService_UpdateSystemSettings_FullMethodName   = "/temperate.v1.TemperateService/UpdateSystemSettings"
 )
 
 // TemperateServiceClient is the client API for TemperateService service.
@@ -86,6 +91,11 @@ type TemperateServiceClient interface {
 	CreateSSOProvider(ctx context.Context, in *CreateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error)
 	UpdateSSOProvider(ctx context.Context, in *UpdateSSOProviderRequest, opts ...grpc.CallOption) (*SSOProvider, error)
 	DeleteSSOProvider(ctx context.Context, in *DeleteSSOProviderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsReply, error)
+	KickSession(ctx context.Context, in *KickSessionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListAuditLogs(ctx context.Context, in *ListAuditLogsRequest, opts ...grpc.CallOption) (*ListAuditLogsReply, error)
+	GetSystemSettings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SystemSettingsReply, error)
+	UpdateSystemSettings(ctx context.Context, in *UpdateSystemSettingsRequest, opts ...grpc.CallOption) (*SystemSettingsReply, error)
 }
 
 type temperateServiceClient struct {
@@ -386,6 +396,56 @@ func (c *temperateServiceClient) DeleteSSOProvider(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *temperateServiceClient) ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSessionsReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListSessions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) KickSession(ctx context.Context, in *KickSessionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_KickSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) ListAuditLogs(ctx context.Context, in *ListAuditLogsRequest, opts ...grpc.CallOption) (*ListAuditLogsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAuditLogsReply)
+	err := c.cc.Invoke(ctx, TemperateService_ListAuditLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) GetSystemSettings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SystemSettingsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SystemSettingsReply)
+	err := c.cc.Invoke(ctx, TemperateService_GetSystemSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) UpdateSystemSettings(ctx context.Context, in *UpdateSystemSettingsRequest, opts ...grpc.CallOption) (*SystemSettingsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SystemSettingsReply)
+	err := c.cc.Invoke(ctx, TemperateService_UpdateSystemSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TemperateServiceServer is the server API for TemperateService service.
 // All implementations must embed UnimplementedTemperateServiceServer
 // for forward compatibility.
@@ -421,6 +481,11 @@ type TemperateServiceServer interface {
 	CreateSSOProvider(context.Context, *CreateSSOProviderRequest) (*SSOProvider, error)
 	UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error)
 	DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error)
+	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsReply, error)
+	KickSession(context.Context, *KickSessionRequest) (*emptypb.Empty, error)
+	ListAuditLogs(context.Context, *ListAuditLogsRequest) (*ListAuditLogsReply, error)
+	GetSystemSettings(context.Context, *emptypb.Empty) (*SystemSettingsReply, error)
+	UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error)
 	mustEmbedUnimplementedTemperateServiceServer()
 }
 
@@ -517,6 +582,21 @@ func (UnimplementedTemperateServiceServer) UpdateSSOProvider(context.Context, *U
 }
 func (UnimplementedTemperateServiceServer) DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteSSOProvider not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSessions not implemented")
+}
+func (UnimplementedTemperateServiceServer) KickSession(context.Context, *KickSessionRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method KickSession not implemented")
+}
+func (UnimplementedTemperateServiceServer) ListAuditLogs(context.Context, *ListAuditLogsRequest) (*ListAuditLogsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAuditLogs not implemented")
+}
+func (UnimplementedTemperateServiceServer) GetSystemSettings(context.Context, *emptypb.Empty) (*SystemSettingsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSystemSettings not implemented")
+}
+func (UnimplementedTemperateServiceServer) UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateSystemSettings not implemented")
 }
 func (UnimplementedTemperateServiceServer) mustEmbedUnimplementedTemperateServiceServer() {}
 func (UnimplementedTemperateServiceServer) testEmbeddedByValue()                          {}
@@ -1061,6 +1141,96 @@ func _TemperateService_DeleteSSOProvider_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TemperateService_ListSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSessionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListSessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListSessions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListSessions(ctx, req.(*ListSessionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_KickSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KickSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).KickSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_KickSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).KickSession(ctx, req.(*KickSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_ListAuditLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAuditLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).ListAuditLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_ListAuditLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).ListAuditLogs(ctx, req.(*ListAuditLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_GetSystemSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).GetSystemSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_GetSystemSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).GetSystemSettings(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_UpdateSystemSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSystemSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).UpdateSystemSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_UpdateSystemSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).UpdateSystemSettings(ctx, req.(*UpdateSystemSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TemperateService_ServiceDesc is the grpc.ServiceDesc for TemperateService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1183,6 +1353,26 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSSOProvider",
 			Handler:    _TemperateService_DeleteSSOProvider_Handler,
+		},
+		{
+			MethodName: "ListSessions",
+			Handler:    _TemperateService_ListSessions_Handler,
+		},
+		{
+			MethodName: "KickSession",
+			Handler:    _TemperateService_KickSession_Handler,
+		},
+		{
+			MethodName: "ListAuditLogs",
+			Handler:    _TemperateService_ListAuditLogs_Handler,
+		},
+		{
+			MethodName: "GetSystemSettings",
+			Handler:    _TemperateService_GetSystemSettings_Handler,
+		},
+		{
+			MethodName: "UpdateSystemSettings",
+			Handler:    _TemperateService_UpdateSystemSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

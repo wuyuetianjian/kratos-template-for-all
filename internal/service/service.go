@@ -2,13 +2,18 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"net"
+	"strings"
 
 	v1 "temperate/api/temperate/v1"
 	"temperate/internal/biz"
 	"temperate/internal/conf"
 
 	"github.com/go-kratos/kratos/v3/log"
+	"github.com/go-kratos/kratos/v3/transport"
+	khttp "github.com/go-kratos/kratos/v3/transport/http"
 	"github.com/google/wire"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -47,6 +52,11 @@ func (s *IncidentService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.
 	if err != nil {
 		return nil, err
 	}
+	ip, ua := requestMeta(ctx)
+	browser, os := biz.ParseUserAgent(ua)
+	tokenHash := biz.TokenHash(result.Token)
+	_ = s.useCase.CreateSession(ctx, tokenHash, ip, browser, os, result.User.ID, result.User.Username)
+	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip, "")
 	return &v1.LoginReply{
 		Token:              result.Token,
 		User:               convertUser(result.User),
@@ -101,6 +111,8 @@ func (s *IncidentService) CreateUser(ctx context.Context, req *v1.CreateUserRequ
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "create", "user", req.GetUsername(), ip, "")
 	return convertUser(user), nil
 }
 
@@ -130,6 +142,8 @@ func (s *IncidentService) UpdateUser(ctx context.Context, req *v1.UpdateUserRequ
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "user", user.Username, ip, "")
 	return convertUser(user), nil
 }
 
@@ -137,6 +151,8 @@ func (s *IncidentService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequ
 	if err := s.useCase.DeleteUser(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "delete", "user", resourceID(req.GetId()), ip, "")
 	return &emptypb.Empty{}, nil
 }
 
@@ -158,6 +174,8 @@ func (s *IncidentService) CreateRole(ctx context.Context, req *v1.CreateRoleRequ
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "create", "role", req.GetName(), ip, "")
 	return convertRole(role), nil
 }
 
@@ -182,6 +200,8 @@ func (s *IncidentService) UpdateRole(ctx context.Context, req *v1.UpdateRoleRequ
 	if err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "role", role.Name, ip, "")
 	return convertRole(role), nil
 }
 
@@ -189,6 +209,8 @@ func (s *IncidentService) DeleteRole(ctx context.Context, req *v1.DeleteRoleRequ
 	if err := s.useCase.DeleteRole(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "delete", "role", resourceID(req.GetId()), ip, "")
 	return &emptypb.Empty{}, nil
 }
 
@@ -258,6 +280,8 @@ func (s *IncidentService) DeletePermission(ctx context.Context, req *v1.DeletePe
 	if err := s.useCase.DeletePermission(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "delete", "permission", resourceID(req.GetId()), ip, "")
 	return &emptypb.Empty{}, nil
 }
 
@@ -325,7 +349,159 @@ func (s *IncidentService) DeleteSSOProvider(ctx context.Context, req *v1.DeleteS
 	if err := s.useCase.DeleteSSOProvider(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "delete", "sso_provider", resourceID(req.GetId()), ip, "")
 	return &emptypb.Empty{}, nil
+}
+
+// ── Sessions ──────────────────────────────────────────────────────────────────
+
+func (s *IncidentService) ListSessions(ctx context.Context, req *v1.ListSessionsRequest) (*v1.ListSessionsReply, error) {
+	sessions, total, err := s.useCase.ListSessions(ctx, biz.Page{Size: int(req.GetPageSize()), Token: int(req.GetPageToken())})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*v1.UserSession, 0, len(sessions))
+	for i := range sessions {
+		sess := &sessions[i]
+		result = append(result, &v1.UserSession{
+			Id:           sess.ID,
+			UserId:       sess.UserID,
+			Username:     sess.Username,
+			Ip:           sess.IP,
+			Browser:      sess.Browser,
+			Os:           sess.OS,
+			Status:       sess.Status,
+			KickedBy:     sess.KickedBy,
+			LoginAt:      timestamppb.New(sess.LoginAt),
+			LastAccessAt: timestamppb.New(sess.LastAccessAt),
+		})
+	}
+	return &v1.ListSessionsReply{Sessions: result, Total: int32(total)}, nil
+}
+
+func (s *IncidentService) KickSession(ctx context.Context, req *v1.KickSessionRequest) (*emptypb.Empty, error) {
+	if err := s.useCase.KickSession(ctx, req.GetId()); err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "kick", "session", resourceID(req.GetId()), ip, "")
+	return &emptypb.Empty{}, nil
+}
+
+// ── Audit logs ────────────────────────────────────────────────────────────────
+
+func (s *IncidentService) ListAuditLogs(ctx context.Context, req *v1.ListAuditLogsRequest) (*v1.ListAuditLogsReply, error) {
+	logs, total, err := s.useCase.ListAuditLogs(ctx, req.GetAction(), biz.Page{Size: int(req.GetPageSize()), Token: int(req.GetPageToken())})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*v1.AuditLog, 0, len(logs))
+	for i := range logs {
+		l := &logs[i]
+		result = append(result, &v1.AuditLog{
+			Id:           l.ID,
+			UserId:       l.UserID,
+			Username:     l.Username,
+			Action:       l.Action,
+			ResourceType: l.ResourceType,
+			ResourceName: l.ResourceName,
+			Ip:           l.IP,
+			Detail:       l.Detail,
+			CreatedAt:    timestamppb.New(l.CreatedAt),
+		})
+	}
+	return &v1.ListAuditLogsReply{Logs: result, Total: int32(total)}, nil
+}
+
+// ── System settings ───────────────────────────────────────────────────────────
+
+func (s *IncidentService) GetSystemSettings(ctx context.Context, _ *emptypb.Empty) (*v1.SystemSettingsReply, error) {
+	settings, err := s.useCase.GetSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.SystemSettingsReply{
+		AuditLogRetentionDays:   settings.AuditLogRetentionDays,
+		SessionLogRetentionDays: settings.SessionLogRetentionDays,
+	}, nil
+}
+
+func (s *IncidentService) UpdateSystemSettings(ctx context.Context, req *v1.UpdateSystemSettingsRequest) (*v1.SystemSettingsReply, error) {
+	settings := &biz.SystemSettings{
+		AuditLogRetentionDays:   req.GetAuditLogRetentionDays(),
+		SessionLogRetentionDays: req.GetSessionLogRetentionDays(),
+	}
+	if err := s.useCase.UpdateSettings(ctx, settings); err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	s.useCase.LogAuditEvent(ctx, "update", "settings", "system", ip, "")
+	return &v1.SystemSettingsReply{
+		AuditLogRetentionDays:   settings.AuditLogRetentionDays,
+		SessionLogRetentionDays: settings.SessionLogRetentionDays,
+	}, nil
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+func requestMeta(ctx context.Context) (ip, userAgent string) {
+	header, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return
+	}
+	reqHeader := header.RequestHeader()
+	ip = clientIPFromValues(
+		reqHeader.Get("X-Forwarded-For"),
+		reqHeader.Get("X-Real-IP"),
+		reqHeader.Get("X-Client-IP"),
+		reqHeader.Get("Remote-Addr"),
+	)
+	if ip == "" {
+		if req, ok := khttp.RequestFromServerContext(ctx); ok && req != nil {
+			ip = normalizeClientIP(req.RemoteAddr)
+		}
+	}
+	userAgent = reqHeader.Get("User-Agent")
+	return
+}
+
+func clientIPFromValues(values ...string) string {
+	for _, value := range values {
+		if ip := normalizeClientIP(value); ip != "" {
+			return ip
+		}
+	}
+	return ""
+}
+
+func normalizeClientIP(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	if before, _, found := strings.Cut(value, ","); found {
+		value = strings.TrimSpace(before)
+	}
+	if before, _, found := strings.Cut(value, "（"); found {
+		value = strings.TrimSpace(before)
+	}
+	if before, _, found := strings.Cut(value, "("); found {
+		value = strings.TrimSpace(before)
+	}
+	if host, _, err := net.SplitHostPort(value); err == nil {
+		return strings.Trim(host, "[]")
+	}
+	if strings.HasPrefix(value, "[") {
+		if end := strings.Index(value, "]"); end > 0 {
+			return value[1:end]
+		}
+	}
+	return value
+}
+
+func resourceID(id int64) string {
+	return fmt.Sprintf("%d", id)
 }
 
 func convertSSOProviders(providers []biz.SSOProvider) []*v1.SSOProvider {

@@ -33,19 +33,24 @@ const OperationTemperateServiceGetCurrentUser = "/temperate.v1.TemperateService/
 const OperationTemperateServiceGetInitialPassword = "/temperate.v1.TemperateService/GetInitialPassword"
 const OperationTemperateServiceGetRole = "/temperate.v1.TemperateService/GetRole"
 const OperationTemperateServiceGetSSOProvider = "/temperate.v1.TemperateService/GetSSOProvider"
+const OperationTemperateServiceGetSystemSettings = "/temperate.v1.TemperateService/GetSystemSettings"
 const OperationTemperateServiceGetUser = "/temperate.v1.TemperateService/GetUser"
 const OperationTemperateServiceHealth = "/temperate.v1.TemperateService/Health"
+const OperationTemperateServiceKickSession = "/temperate.v1.TemperateService/KickSession"
+const OperationTemperateServiceListAuditLogs = "/temperate.v1.TemperateService/ListAuditLogs"
 const OperationTemperateServiceListPermissionActions = "/temperate.v1.TemperateService/ListPermissionActions"
 const OperationTemperateServiceListPermissions = "/temperate.v1.TemperateService/ListPermissions"
 const OperationTemperateServiceListRoles = "/temperate.v1.TemperateService/ListRoles"
 const OperationTemperateServiceListSSOProviders = "/temperate.v1.TemperateService/ListSSOProviders"
 const OperationTemperateServiceListSSOProvidersPublic = "/temperate.v1.TemperateService/ListSSOProvidersPublic"
+const OperationTemperateServiceListSessions = "/temperate.v1.TemperateService/ListSessions"
 const OperationTemperateServiceListUsers = "/temperate.v1.TemperateService/ListUsers"
 const OperationTemperateServiceLogin = "/temperate.v1.TemperateService/Login"
 const OperationTemperateServiceSetRoleInheritances = "/temperate.v1.TemperateService/SetRoleInheritances"
 const OperationTemperateServiceUpdatePermission = "/temperate.v1.TemperateService/UpdatePermission"
 const OperationTemperateServiceUpdateRole = "/temperate.v1.TemperateService/UpdateRole"
 const OperationTemperateServiceUpdateSSOProvider = "/temperate.v1.TemperateService/UpdateSSOProvider"
+const OperationTemperateServiceUpdateSystemSettings = "/temperate.v1.TemperateService/UpdateSystemSettings"
 const OperationTemperateServiceUpdateUser = "/temperate.v1.TemperateService/UpdateUser"
 
 type TemperateServiceHTTPServer interface {
@@ -64,8 +69,11 @@ type TemperateServiceHTTPServer interface {
 	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
 	GetSSOProvider(context.Context, *GetSSOProviderRequest) (*SSOProvider, error)
+	GetSystemSettings(context.Context, *emptypb.Empty) (*SystemSettingsReply, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
 	Health(context.Context, *emptypb.Empty) (*GetMessageResponse, error)
+	KickSession(context.Context, *KickSessionRequest) (*emptypb.Empty, error)
+	ListAuditLogs(context.Context, *ListAuditLogsRequest) (*ListAuditLogsReply, error)
 	ListPermissionActions(context.Context, *emptypb.Empty) (*ListPermissionActionsReply, error)
 	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsReply, error)
 	ListRoles(context.Context, *ListRolesRequest) (*ListRolesReply, error)
@@ -73,12 +81,14 @@ type TemperateServiceHTTPServer interface {
 	ListSSOProviders(context.Context, *ListSSOProvidersRequest) (*ListSSOProvidersReply, error)
 	// ListSSOProvidersPublic SSO provider configuration (public list for login page)
 	ListSSOProvidersPublic(context.Context, *emptypb.Empty) (*ListSSOProvidersPublicReply, error)
+	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsReply, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
 	UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error)
+	UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
 }
 
@@ -113,6 +123,11 @@ func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTP
 	r.Handle("POST", "/v1/sso/providers", _TemperateService_CreateSSOProvider0_HTTP_Handler(srv))
 	r.Handle("PATCH", "/v1/sso/providers/{id}", _TemperateService_UpdateSSOProvider0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/v1/sso/providers/{id}", _TemperateService_DeleteSSOProvider0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/sessions", _TemperateService_ListSessions0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/sessions/{id}/kick", _TemperateService_KickSession0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/audit-logs", _TemperateService_ListAuditLogs0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/settings", _TemperateService_GetSystemSettings0_HTTP_Handler(srv))
+	r.Handle("PATCH", "/v1/settings", _TemperateService_UpdateSystemSettings0_HTTP_Handler(srv))
 }
 
 func _TemperateService_Health0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
@@ -708,6 +723,104 @@ func _TemperateService_DeleteSSOProvider0_HTTP_Handler(srv TemperateServiceHTTPS
 	}
 }
 
+func _TemperateService_ListSessions0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListSessionsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListSessions)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListSessions(ctx, req.(*ListSessionsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListSessionsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_KickSession0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in KickSessionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceKickSession)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.KickSession(ctx, req.(*KickSessionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_ListAuditLogs0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListAuditLogsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceListAuditLogs)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListAuditLogs(ctx, req.(*ListAuditLogsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListAuditLogsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_GetSystemSettings0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceGetSystemSettings)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSystemSettings(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SystemSettingsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_UpdateSystemSettings0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateSystemSettingsRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceUpdateSystemSettings)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateSystemSettings(ctx, req.(*UpdateSystemSettingsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SystemSettingsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TemperateServiceHTTPClient interface {
 	AssignRolePermissions(ctx context.Context, req *AssignRolePermissionsRequest, opts ...http.CallOption) (rsp *Role, err error)
 	AssignUserRoles(ctx context.Context, req *AssignUserRolesRequest, opts ...http.CallOption) (rsp *User, err error)
@@ -724,8 +837,11 @@ type TemperateServiceHTTPClient interface {
 	GetInitialPassword(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *InitialPasswordReply, err error)
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
 	GetSSOProvider(ctx context.Context, req *GetSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
+	GetSystemSettings(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *SystemSettingsReply, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *User, err error)
 	Health(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetMessageResponse, err error)
+	KickSession(ctx context.Context, req *KickSessionRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	ListAuditLogs(ctx context.Context, req *ListAuditLogsRequest, opts ...http.CallOption) (rsp *ListAuditLogsReply, err error)
 	ListPermissionActions(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListPermissionActionsReply, err error)
 	ListPermissions(ctx context.Context, req *ListPermissionsRequest, opts ...http.CallOption) (rsp *ListPermissionsReply, err error)
 	ListRoles(ctx context.Context, req *ListRolesRequest, opts ...http.CallOption) (rsp *ListRolesReply, err error)
@@ -733,12 +849,14 @@ type TemperateServiceHTTPClient interface {
 	ListSSOProviders(ctx context.Context, req *ListSSOProvidersRequest, opts ...http.CallOption) (rsp *ListSSOProvidersReply, err error)
 	// ListSSOProvidersPublic SSO provider configuration (public list for login page)
 	ListSSOProvidersPublic(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListSSOProvidersPublicReply, err error)
+	ListSessions(ctx context.Context, req *ListSessionsRequest, opts ...http.CallOption) (rsp *ListSessionsReply, err error)
 	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	SetRoleInheritances(ctx context.Context, req *SetRoleInheritancesRequest, opts ...http.CallOption) (rsp *Role, err error)
 	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
 	UpdateSSOProvider(ctx context.Context, req *UpdateSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
+	UpdateSystemSettings(ctx context.Context, req *UpdateSystemSettingsRequest, opts ...http.CallOption) (rsp *SystemSettingsReply, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *User, err error)
 }
 
@@ -997,6 +1115,22 @@ func (c *TemperateServiceHTTPClientImpl) GetSSOProvider(ctx context.Context, in 
 	return &out, nil
 }
 
+func (c *TemperateServiceHTTPClientImpl) GetSystemSettings(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*SystemSettingsReply, error) {
+	var out SystemSettingsReply
+	pattern := "/v1/settings"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceGetSystemSettings),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *TemperateServiceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*User, error) {
 	var out User
 	pattern := "/v1/users/{id}"
@@ -1020,6 +1154,38 @@ func (c *TemperateServiceHTTPClientImpl) Health(ctx context.Context, in *emptypb
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationTemperateServiceHealth),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) KickSession(ctx context.Context, in *KickSessionRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/sessions/{id}/kick"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceKickSession),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ListAuditLogs(ctx context.Context, in *ListAuditLogsRequest, opts ...http.CallOption) (*ListAuditLogsReply, error) {
+	var out ListAuditLogsReply
+	pattern := "/v1/audit-logs"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListAuditLogs),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
@@ -1102,6 +1268,22 @@ func (c *TemperateServiceHTTPClientImpl) ListSSOProvidersPublic(ctx context.Cont
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationTemperateServiceListSSOProvidersPublic),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...http.CallOption) (*ListSessionsReply, error) {
+	var out ListSessionsReply
+	pattern := "/v1/sessions"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationTemperateServiceListSessions),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
@@ -1203,6 +1385,23 @@ func (c *TemperateServiceHTTPClientImpl) UpdateSSOProvider(ctx context.Context, 
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationTemperateServiceUpdateSSOProvider),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) UpdateSystemSettings(ctx context.Context, in *UpdateSystemSettingsRequest, opts ...http.CallOption) (*SystemSettingsReply, error) {
+	var out SystemSettingsReply
+	pattern := "/v1/settings"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceUpdateSystemSettings),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)

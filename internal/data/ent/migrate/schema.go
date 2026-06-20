@@ -9,6 +9,24 @@ import (
 )
 
 var (
+	// AuditLogsColumns holds the columns for the "audit_logs" table.
+	AuditLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "username", Type: field.TypeString},
+		{Name: "action", Type: field.TypeString},
+		{Name: "resource_type", Type: field.TypeString, Nullable: true},
+		{Name: "resource_name", Type: field.TypeString, Nullable: true},
+		{Name: "ip", Type: field.TypeString, Nullable: true},
+		{Name: "detail", Type: field.TypeString, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// AuditLogsTable holds the schema information for the "audit_logs" table.
+	AuditLogsTable = &schema.Table{
+		Name:       "audit_logs",
+		Columns:    AuditLogsColumns,
+		PrimaryKey: []*schema.Column{AuditLogsColumns[0]},
+	}
 	// AuthModulesColumns holds the columns for the "auth_modules" table.
 	AuthModulesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -89,6 +107,18 @@ var (
 		Columns:    AuthSSOProvidersColumns,
 		PrimaryKey: []*schema.Column{AuthSSOProvidersColumns[0]},
 	}
+	// SystemSettingsColumns holds the columns for the "system_settings" table.
+	SystemSettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "key", Type: field.TypeString, Unique: true},
+		{Name: "value", Type: field.TypeString, Default: ""},
+	}
+	// SystemSettingsTable holds the schema information for the "system_settings" table.
+	SystemSettingsTable = &schema.Table{
+		Name:       "system_settings",
+		Columns:    SystemSettingsColumns,
+		PrimaryKey: []*schema.Column{SystemSettingsColumns[0]},
+	}
 	// AuthUsersColumns holds the columns for the "auth_users" table.
 	AuthUsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -106,6 +136,33 @@ var (
 		Name:       "auth_users",
 		Columns:    AuthUsersColumns,
 		PrimaryKey: []*schema.Column{AuthUsersColumns[0]},
+	}
+	// AuthUserSessionsColumns holds the columns for the "auth_user_sessions" table.
+	AuthUserSessionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "ip", Type: field.TypeString, Nullable: true},
+		{Name: "browser", Type: field.TypeString, Nullable: true},
+		{Name: "os", Type: field.TypeString, Nullable: true},
+		{Name: "status", Type: field.TypeString, Default: "active"},
+		{Name: "kicked_by", Type: field.TypeString, Nullable: true},
+		{Name: "login_at", Type: field.TypeTime},
+		{Name: "last_access_at", Type: field.TypeTime},
+		{Name: "user_sessions", Type: field.TypeInt},
+	}
+	// AuthUserSessionsTable holds the schema information for the "auth_user_sessions" table.
+	AuthUserSessionsTable = &schema.Table{
+		Name:       "auth_user_sessions",
+		Columns:    AuthUserSessionsColumns,
+		PrimaryKey: []*schema.Column{AuthUserSessionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "auth_user_sessions_auth_users_sessions",
+				Columns:    []*schema.Column{AuthUserSessionsColumns[9]},
+				RefColumns: []*schema.Column{AuthUsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// AuthRolePermissionsColumns holds the columns for the "auth_role_permissions" table.
 	AuthRolePermissionsColumns = []*schema.Column{
@@ -184,11 +241,14 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AuditLogsTable,
 		AuthModulesTable,
 		AuthPermissionsTable,
 		AuthRolesTable,
 		AuthSSOProvidersTable,
+		SystemSettingsTable,
 		AuthUsersTable,
+		AuthUserSessionsTable,
 		AuthRolePermissionsTable,
 		AuthRoleParentsTable,
 		AuthUserRolesTable,
@@ -196,6 +256,9 @@ var (
 )
 
 func init() {
+	AuditLogsTable.Annotation = &entsql.Annotation{
+		Table: "audit_logs",
+	}
 	AuthModulesTable.Annotation = &entsql.Annotation{
 		Table: "auth_modules",
 	}
@@ -209,8 +272,15 @@ func init() {
 	AuthSSOProvidersTable.Annotation = &entsql.Annotation{
 		Table: "auth_sso_providers",
 	}
+	SystemSettingsTable.Annotation = &entsql.Annotation{
+		Table: "system_settings",
+	}
 	AuthUsersTable.Annotation = &entsql.Annotation{
 		Table: "auth_users",
+	}
+	AuthUserSessionsTable.ForeignKeys[0].RefTable = AuthUsersTable
+	AuthUserSessionsTable.Annotation = &entsql.Annotation{
+		Table: "auth_user_sessions",
 	}
 	AuthRolePermissionsTable.ForeignKeys[0].RefTable = AuthRolesTable
 	AuthRolePermissionsTable.ForeignKeys[1].RefTable = AuthPermissionsTable

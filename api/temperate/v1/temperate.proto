@@ -203,6 +203,43 @@ service TemperateService {
             delete: "/v1/sso/providers/{id}"
         };
     }
+
+    // ── Sessions ──────────────────────────────────────────────────────────────
+
+    rpc ListSessions(ListSessionsRequest) returns (ListSessionsReply) {
+        option (google.api.http) = {
+            get: "/v1/sessions"
+        };
+    }
+
+    rpc KickSession(KickSessionRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/sessions/{id}/kick"
+        };
+    }
+
+    // ── Audit logs ────────────────────────────────────────────────────────────
+
+    rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsReply) {
+        option (google.api.http) = {
+            get: "/v1/audit-logs"
+        };
+    }
+
+    // ── System settings ───────────────────────────────────────────────────────
+
+    rpc GetSystemSettings(google.protobuf.Empty) returns (SystemSettingsReply) {
+        option (google.api.http) = {
+            get: "/v1/settings"
+        };
+    }
+
+    rpc UpdateSystemSettings(UpdateSystemSettingsRequest) returns (SystemSettingsReply) {
+        option (google.api.http) = {
+            patch: "/v1/settings"
+            body: "*"
+        };
+    }
 }
 
 message GetMessageResponse {
@@ -437,4 +474,70 @@ message UpdateSSOProviderRequest {
 
 message DeleteSSOProviderRequest {
     int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// ── Session messages ──────────────────────────────────────────────────────────
+
+message UserSession {
+    int64 id = 1;
+    int64 user_id = 2;
+    string username = 3;
+    string ip = 4;
+    string browser = 5;
+    string os = 6;
+    string status = 7;
+    string kicked_by = 8;
+    google.protobuf.Timestamp login_at = 9;
+    google.protobuf.Timestamp last_access_at = 10;
+}
+
+message ListSessionsRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+}
+
+message ListSessionsReply {
+    repeated UserSession sessions = 1;
+    int32 total = 2;
+}
+
+message KickSessionRequest {
+    int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// ── Audit log messages ────────────────────────────────────────────────────────
+
+message AuditLog {
+    int64 id = 1;
+    int64 user_id = 2;
+    string username = 3;
+    string action = 4;
+    string resource_type = 5;
+    string resource_name = 6;
+    string ip = 7;
+    string detail = 8;
+    google.protobuf.Timestamp created_at = 9;
+}
+
+message ListAuditLogsRequest {
+    int32 page_size = 1;
+    int32 page_token = 2;
+    string action = 3;
+}
+
+message ListAuditLogsReply {
+    repeated AuditLog logs = 1;
+    int32 total = 2;
+}
+
+// ── System settings messages ──────────────────────────────────────────────────
+
+message SystemSettingsReply {
+    int32 audit_log_retention_days = 1;
+    int32 session_log_retention_days = 2;
+}
+
+message UpdateSystemSettingsRequest {
+    int32 audit_log_retention_days = 1;
+    int32 session_log_retention_days = 2;
 }

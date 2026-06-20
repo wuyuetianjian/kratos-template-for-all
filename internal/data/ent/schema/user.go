@@ -33,6 +33,7 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("roles", Role.Type).StorageKey(edge.Table("auth_user_roles"), edge.Columns("user_id", "role_id")),
+		edge.To("sessions", UserSession.Type),
 	}
 }
 

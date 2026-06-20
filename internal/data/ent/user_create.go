@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"temperate/internal/data/ent/role"
 	"temperate/internal/data/ent/user"
+	"temperate/internal/data/ent/usersession"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -130,6 +131,21 @@ func (_c *UserCreate) AddRoles(v ...*Role) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddRoleIDs(ids...)
+}
+
+// AddSessionIDs adds the "sessions" edge to the UserSession entity by IDs.
+func (_c *UserCreate) AddSessionIDs(ids ...int) *UserCreate {
+	_c.mutation.AddSessionIDs(ids...)
+	return _c
+}
+
+// AddSessions adds the "sessions" edges to the UserSession entity.
+func (_c *UserCreate) AddSessions(v ...*UserSession) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddSessionIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -284,6 +300,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SessionsTable,
+			Columns: []string{user.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(usersession.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
