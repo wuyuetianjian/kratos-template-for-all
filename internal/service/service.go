@@ -726,6 +726,16 @@ func ssoProviderLabel(provider *biz.SSOProvider) string {
 	return resourceID(provider.ID)
 }
 
+func serviceAccountLabel(svc *biz.ServiceAccount) string {
+	if svc == nil {
+		return ""
+	}
+	if svc.Name != "" {
+		return svc.Name
+	}
+	return resourceID(svc.ID)
+}
+
 func sessionLabel(session *biz.UserSession) string {
 	if session == nil {
 		return ""
@@ -793,6 +803,27 @@ func ssoProviderAuditMap(provider *biz.SSOProvider) map[string]any {
 	}
 }
 
+func serviceAccountAuditMap(svc *biz.ServiceAccount) map[string]any {
+	if svc == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"name":         svc.Name,
+		"description":  svc.Description,
+		"disabled":     svc.Disabled,
+		"roles":        roleNames(svc.Roles),
+		"token_prefix": svc.TokenPrefix,
+		"expires_at":   formatAuditOptionalTime(svc.ExpiresAt),
+	}
+}
+
+func serviceAccountTokenAuditFields(svc *biz.ServiceAccount, expiresInDays int32) map[string]any {
+	fields := serviceAccountAuditMap(svc)
+	fields["token_regenerated"] = true
+	fields["expires_in_days"] = expiresInDays
+	return fields
+}
+
 func settingsAuditMap(settings *biz.SystemSettings) map[string]any {
 	if settings == nil {
 		return map[string]any{}
@@ -848,6 +879,13 @@ func formatAuditTime(value time.Time) string {
 		return ""
 	}
 	return value.Format(time.RFC3339)
+}
+
+func formatAuditOptionalTime(value *time.Time) string {
+	if value == nil {
+		return ""
+	}
+	return formatAuditTime(*value)
 }
 
 func convertSSOProviders(providers []biz.SSOProvider) []*v1.SSOProvider {
@@ -960,8 +998,9 @@ func (s *IncidentService) CreateServiceAccount(ctx context.Context, req *v1.Crea
 	if err != nil {
 		return nil, err
 	}
-	s.useCase.LogAuditEvent(ctx, "create", "service_account", result.ServiceAccount.Name, ip,
-		fmt.Sprintf("expires_in_days=%d roles=%v", req.GetExpiresInDays(), req.GetRoleIds()))
+	label := serviceAccountLabel(result.ServiceAccount)
+	s.useCase.LogAuditEvent(ctx, "create", "service_account", label, ip,
+		auditFieldsDetail("创建服务账号 "+label, serviceAccountAuditMap(result.ServiceAccount)))
 	return &v1.ServiceAccountTokenReply{
 		ServiceAccount: convertServiceAccount(result.ServiceAccount),
 		Token:          result.Token,
@@ -993,6 +1032,7 @@ func (s *IncidentService) GetServiceAccount(ctx context.Context, req *v1.GetServ
 
 func (s *IncidentService) UpdateServiceAccount(ctx context.Context, req *v1.UpdateServiceAccountRequest) (*v1.ServiceAccount, error) {
 	ip, _ := requestMeta(ctx)
+	before, _ := s.useCase.GetServiceAccount(ctx, req.GetId())
 	svc, err := s.useCase.UpdateServiceAccount(ctx, &biz.UpdateServiceAccount{
 		ID:          req.GetId(),
 		Description: req.GetDescription(),
@@ -1002,8 +1042,9 @@ func (s *IncidentService) UpdateServiceAccount(ctx context.Context, req *v1.Upda
 	if err != nil {
 		return nil, err
 	}
-	s.useCase.LogAuditEvent(ctx, "update", "service_account", svc.Name, ip,
-		fmt.Sprintf("disabled=%v roles=%v", req.GetDisabled(), req.GetRoleIds()))
+	label := serviceAccountLabel(svc)
+	s.useCase.LogAuditEvent(ctx, "update", "service_account", label, ip,
+		auditDiffDetail("更新服务账号 "+label, serviceAccountAuditMap(before), serviceAccountAuditMap(svc)))
 	return convertServiceAccount(svc), nil
 }
 
@@ -1016,7 +1057,9 @@ func (s *IncidentService) DeleteServiceAccount(ctx context.Context, req *v1.Dele
 	if err := s.useCase.DeleteServiceAccount(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
-	s.useCase.LogAuditEvent(ctx, "delete", "service_account", svc.Name, ip, "")
+	label := serviceAccountLabel(svc)
+	s.useCase.LogAuditEvent(ctx, "delete", "service_account", label, ip,
+		auditFieldsDetail("删除服务账号 "+label, serviceAccountAuditMap(svc)))
 	return &emptypb.Empty{}, nil
 }
 
@@ -1026,8 +1069,9 @@ func (s *IncidentService) RegenerateServiceAccountToken(ctx context.Context, req
 	if err != nil {
 		return nil, err
 	}
-	s.useCase.LogAuditEvent(ctx, "regenerate_token", "service_account", result.ServiceAccount.Name, ip,
-		fmt.Sprintf("expires_in_days=%d", req.GetExpiresInDays()))
+	label := serviceAccountLabel(result.ServiceAccount)
+	s.useCase.LogAuditEvent(ctx, "regenerate_token", "service_account", label, ip,
+		auditFieldsDetail("重置服务账号令牌 "+label, serviceAccountTokenAuditFields(result.ServiceAccount, req.GetExpiresInDays())))
 	return &v1.ServiceAccountTokenReply{
 		ServiceAccount: convertServiceAccount(result.ServiceAccount),
 		Token:          result.Token,
