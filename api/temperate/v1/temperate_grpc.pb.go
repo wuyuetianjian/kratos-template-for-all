@@ -61,6 +61,11 @@ const (
 	TemperateService_UpdateServiceAccount_FullMethodName          = "/temperate.v1.TemperateService/UpdateServiceAccount"
 	TemperateService_DeleteServiceAccount_FullMethodName          = "/temperate.v1.TemperateService/DeleteServiceAccount"
 	TemperateService_RegenerateServiceAccountToken_FullMethodName = "/temperate.v1.TemperateService/RegenerateServiceAccountToken"
+	TemperateService_Setup2FA_FullMethodName                      = "/temperate.v1.TemperateService/Setup2FA"
+	TemperateService_Enable2FA_FullMethodName                     = "/temperate.v1.TemperateService/Enable2FA"
+	TemperateService_Disable2FA_FullMethodName                    = "/temperate.v1.TemperateService/Disable2FA"
+	TemperateService_AdminResetUser2FA_FullMethodName             = "/temperate.v1.TemperateService/AdminResetUser2FA"
+	TemperateService_VerifyTOTPLogin_FullMethodName               = "/temperate.v1.TemperateService/VerifyTOTPLogin"
 )
 
 // TemperateServiceClient is the client API for TemperateService service.
@@ -110,6 +115,11 @@ type TemperateServiceClient interface {
 	UpdateServiceAccount(ctx context.Context, in *UpdateServiceAccountRequest, opts ...grpc.CallOption) (*ServiceAccount, error)
 	DeleteServiceAccount(ctx context.Context, in *DeleteServiceAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RegenerateServiceAccountToken(ctx context.Context, in *RegenerateServiceAccountTokenRequest, opts ...grpc.CallOption) (*ServiceAccountTokenReply, error)
+	Setup2FA(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Setup2FAReply, error)
+	Enable2FA(ctx context.Context, in *Enable2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Disable2FA(ctx context.Context, in *Disable2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AdminResetUser2FA(ctx context.Context, in *AdminResetUser2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	VerifyTOTPLogin(ctx context.Context, in *VerifyTOTPLoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 }
 
 type temperateServiceClient struct {
@@ -530,6 +540,56 @@ func (c *temperateServiceClient) RegenerateServiceAccountToken(ctx context.Conte
 	return out, nil
 }
 
+func (c *temperateServiceClient) Setup2FA(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Setup2FAReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Setup2FAReply)
+	err := c.cc.Invoke(ctx, TemperateService_Setup2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) Enable2FA(ctx context.Context, in *Enable2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_Enable2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) Disable2FA(ctx context.Context, in *Disable2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_Disable2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) AdminResetUser2FA(ctx context.Context, in *AdminResetUser2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, TemperateService_AdminResetUser2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *temperateServiceClient) VerifyTOTPLogin(ctx context.Context, in *VerifyTOTPLoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, TemperateService_VerifyTOTPLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TemperateServiceServer is the server API for TemperateService service.
 // All implementations must embed UnimplementedTemperateServiceServer
 // for forward compatibility.
@@ -577,6 +637,11 @@ type TemperateServiceServer interface {
 	UpdateServiceAccount(context.Context, *UpdateServiceAccountRequest) (*ServiceAccount, error)
 	DeleteServiceAccount(context.Context, *DeleteServiceAccountRequest) (*emptypb.Empty, error)
 	RegenerateServiceAccountToken(context.Context, *RegenerateServiceAccountTokenRequest) (*ServiceAccountTokenReply, error)
+	Setup2FA(context.Context, *emptypb.Empty) (*Setup2FAReply, error)
+	Enable2FA(context.Context, *Enable2FARequest) (*emptypb.Empty, error)
+	Disable2FA(context.Context, *Disable2FARequest) (*emptypb.Empty, error)
+	AdminResetUser2FA(context.Context, *AdminResetUser2FARequest) (*emptypb.Empty, error)
+	VerifyTOTPLogin(context.Context, *VerifyTOTPLoginRequest) (*LoginReply, error)
 	mustEmbedUnimplementedTemperateServiceServer()
 }
 
@@ -709,6 +774,21 @@ func (UnimplementedTemperateServiceServer) DeleteServiceAccount(context.Context,
 }
 func (UnimplementedTemperateServiceServer) RegenerateServiceAccountToken(context.Context, *RegenerateServiceAccountTokenRequest) (*ServiceAccountTokenReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method RegenerateServiceAccountToken not implemented")
+}
+func (UnimplementedTemperateServiceServer) Setup2FA(context.Context, *emptypb.Empty) (*Setup2FAReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method Setup2FA not implemented")
+}
+func (UnimplementedTemperateServiceServer) Enable2FA(context.Context, *Enable2FARequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method Enable2FA not implemented")
+}
+func (UnimplementedTemperateServiceServer) Disable2FA(context.Context, *Disable2FARequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method Disable2FA not implemented")
+}
+func (UnimplementedTemperateServiceServer) AdminResetUser2FA(context.Context, *AdminResetUser2FARequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminResetUser2FA not implemented")
+}
+func (UnimplementedTemperateServiceServer) VerifyTOTPLogin(context.Context, *VerifyTOTPLoginRequest) (*LoginReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyTOTPLogin not implemented")
 }
 func (UnimplementedTemperateServiceServer) mustEmbedUnimplementedTemperateServiceServer() {}
 func (UnimplementedTemperateServiceServer) testEmbeddedByValue()                          {}
@@ -1469,6 +1549,96 @@ func _TemperateService_RegenerateServiceAccountToken_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TemperateService_Setup2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).Setup2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_Setup2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).Setup2FA(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_Enable2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Enable2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).Enable2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_Enable2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).Enable2FA(ctx, req.(*Enable2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_Disable2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Disable2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).Disable2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_Disable2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).Disable2FA(ctx, req.(*Disable2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_AdminResetUser2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminResetUser2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).AdminResetUser2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_AdminResetUser2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).AdminResetUser2FA(ctx, req.(*AdminResetUser2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TemperateService_VerifyTOTPLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyTOTPLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TemperateServiceServer).VerifyTOTPLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TemperateService_VerifyTOTPLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TemperateServiceServer).VerifyTOTPLogin(ctx, req.(*VerifyTOTPLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TemperateService_ServiceDesc is the grpc.ServiceDesc for TemperateService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1639,6 +1809,26 @@ var TemperateService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegenerateServiceAccountToken",
 			Handler:    _TemperateService_RegenerateServiceAccountToken_Handler,
+		},
+		{
+			MethodName: "Setup2FA",
+			Handler:    _TemperateService_Setup2FA_Handler,
+		},
+		{
+			MethodName: "Enable2FA",
+			Handler:    _TemperateService_Enable2FA_Handler,
+		},
+		{
+			MethodName: "Disable2FA",
+			Handler:    _TemperateService_Disable2FA_Handler,
+		},
+		{
+			MethodName: "AdminResetUser2FA",
+			Handler:    _TemperateService_AdminResetUser2FA_Handler,
+		},
+		{
+			MethodName: "VerifyTOTPLogin",
+			Handler:    _TemperateService_VerifyTOTPLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

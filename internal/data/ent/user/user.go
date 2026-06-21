@@ -26,6 +26,10 @@ const (
 	FieldSystem = "system"
 	// FieldInitialPasswordUsed holds the string denoting the initial_password_used field in the database.
 	FieldInitialPasswordUsed = "initial_password_used"
+	// FieldTotpSecret holds the string denoting the totp_secret field in the database.
+	FieldTotpSecret = "totp_secret"
+	// FieldTotpEnabled holds the string denoting the totp_enabled field in the database.
+	FieldTotpEnabled = "totp_enabled"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -59,6 +63,8 @@ var Columns = []string{
 	FieldDisabled,
 	FieldSystem,
 	FieldInitialPasswordUsed,
+	FieldTotpSecret,
+	FieldTotpEnabled,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -88,6 +94,8 @@ var (
 	DefaultSystem bool
 	// DefaultInitialPasswordUsed holds the default value on creation for the "initial_password_used" field.
 	DefaultInitialPasswordUsed bool
+	// DefaultTotpEnabled holds the default value on creation for the "totp_enabled" field.
+	DefaultTotpEnabled bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -132,6 +140,16 @@ func BySystem(opts ...sql.OrderTermOption) OrderOption {
 // ByInitialPasswordUsed orders the results by the initial_password_used field.
 func ByInitialPasswordUsed(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInitialPasswordUsed, opts...).ToFunc()
+}
+
+// ByTotpSecret orders the results by the totp_secret field.
+func ByTotpSecret(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotpSecret, opts...).ToFunc()
+}
+
+// ByTotpEnabled orders the results by the totp_enabled field.
+func ByTotpEnabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotpEnabled, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

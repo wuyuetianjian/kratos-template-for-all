@@ -170,3 +170,20 @@ All other operations require a valid token. Users with the `Admin` role or
 `system:*` permission are allowed to call every operation. Other users must have
 a permission whose `operation` matches the current Kratos operation or a
 wildcard permission such as `<module>:*`.
+
+## 2FA Audit Log Consistency
+
+Two-factor authentication audit events must use the same structured detail
+format as other admin and session operations:
+
+- TOTP login verification is recorded as a `login` event on the `session`
+  resource with browser, operating system, username, and a verification marker.
+- 2FA setup, enable, disable, and administrator reset operations are recorded
+  on the `user` resource with structured fields or before/after diffs.
+- TOTP secrets, QR URLs, and one-time codes must never be written to audit log
+  details.
+- The frontend audit log page must provide labels for 2FA actions and fields,
+  and must render details through the same popover/detail view used by other
+  audit entries.
+
+Validation should cover backend tests and the frontend production build.

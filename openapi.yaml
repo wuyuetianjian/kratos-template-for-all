@@ -61,6 +61,52 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.ListAuditLogsReply'
+    /v1/auth/2fa/disable:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Disable2FA
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.Disable2FARequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/auth/2fa/enable:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Enable2FA
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.Enable2FARequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/auth/2fa/setup:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_Setup2FA
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.Setup2FAReply'
     /v1/auth/change-password:
         post:
             tags:
@@ -133,6 +179,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.User'
+    /v1/auth/verify-totp:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_VerifyTOTPLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.VerifyTOTPLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/temperate.v1.LoginReply'
     /v1/permissions:
         get:
             tags:
@@ -750,6 +814,27 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/temperate.v1.User'
+    /v1/users/{userId}/reset-2fa:
+        post:
+            tags:
+                - TemperateService
+            operationId: TemperateService_AdminResetUser2FA
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/temperate.v1.AdminResetUser2FARequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /v1/users/{userId}/roles:
         put:
             tags:
@@ -776,6 +861,13 @@ paths:
                                 $ref: '#/components/schemas/temperate.v1.User'
 components:
     schemas:
+        temperate.v1.AdminResetUser2FARequest:
+            required:
+                - userId
+            type: object
+            properties:
+                userId:
+                    type: string
         temperate.v1.AssignRolePermissionsRequest:
             required:
                 - roleId
@@ -916,6 +1008,20 @@ components:
                     type: array
                     items:
                         type: string
+        temperate.v1.Disable2FARequest:
+            required:
+                - totpCode
+            type: object
+            properties:
+                totpCode:
+                    type: string
+        temperate.v1.Enable2FARequest:
+            required:
+                - totpCode
+            type: object
+            properties:
+                totpCode:
+                    type: string
         temperate.v1.GetMessageResponse:
             type: object
             properties:
@@ -1021,6 +1127,10 @@ components:
                 mustChangePassword:
                     type: boolean
                 initialPassword:
+                    type: string
+                requires2fa:
+                    type: boolean
+                preAuthToken:
                     type: string
         temperate.v1.LoginRequest:
             required:
@@ -1183,6 +1293,13 @@ components:
                     type: array
                     items:
                         type: string
+        temperate.v1.Setup2FAReply:
+            type: object
+            properties:
+                secret:
+                    type: string
+                qrUrl:
+                    type: string
         temperate.v1.SystemSettingsReply:
             type: object
             properties:
@@ -1198,6 +1315,8 @@ components:
                     type: string
                 cornerIcon:
                     type: string
+                totpEnabled:
+                    type: boolean
         temperate.v1.UpdatePermissionRequest:
             required:
                 - id
@@ -1268,6 +1387,8 @@ components:
                     type: string
                 cornerIcon:
                     type: string
+                totpEnabled:
+                    type: boolean
         temperate.v1.UpdateUserRequest:
             required:
                 - id
@@ -1306,6 +1427,8 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+                totpEnabled:
+                    type: boolean
         temperate.v1.UserSession:
             type: object
             properties:
@@ -1331,5 +1454,15 @@ components:
                 lastAccessAt:
                     type: string
                     format: date-time
+        temperate.v1.VerifyTOTPLoginRequest:
+            required:
+                - preAuthToken
+                - totpCode
+            type: object
+            properties:
+                preAuthToken:
+                    type: string
+                totpCode:
+                    type: string
 tags:
     - name: TemperateService

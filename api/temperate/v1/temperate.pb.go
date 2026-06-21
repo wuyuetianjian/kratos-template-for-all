@@ -127,6 +127,8 @@ type LoginReply struct {
 	User               *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	MustChangePassword bool                   `protobuf:"varint,3,opt,name=must_change_password,json=mustChangePassword,proto3" json:"must_change_password,omitempty"`
 	InitialPassword    string                 `protobuf:"bytes,4,opt,name=initial_password,json=initialPassword,proto3" json:"initial_password,omitempty"`
+	Requires_2Fa       bool                   `protobuf:"varint,5,opt,name=requires_2fa,json=requires2fa,proto3" json:"requires_2fa,omitempty"`
+	PreAuthToken       string                 `protobuf:"bytes,6,opt,name=pre_auth_token,json=preAuthToken,proto3" json:"pre_auth_token,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -185,6 +187,20 @@ func (x *LoginReply) GetMustChangePassword() bool {
 func (x *LoginReply) GetInitialPassword() string {
 	if x != nil {
 		return x.InitialPassword
+	}
+	return ""
+}
+
+func (x *LoginReply) GetRequires_2Fa() bool {
+	if x != nil {
+		return x.Requires_2Fa
+	}
+	return false
+}
+
+func (x *LoginReply) GetPreAuthToken() string {
+	if x != nil {
+		return x.PreAuthToken
 	}
 	return ""
 }
@@ -355,6 +371,7 @@ type User struct {
 	Roles         []*Role                `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	TotpEnabled   bool                   `protobuf:"varint,9,opt,name=totp_enabled,json=totpEnabled,proto3" json:"totp_enabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -443,6 +460,13 @@ func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
 		return x.UpdatedAt
 	}
 	return nil
+}
+
+func (x *User) GetTotpEnabled() bool {
+	if x != nil {
+		return x.TotpEnabled
+	}
+	return false
 }
 
 type Role struct {
@@ -2916,6 +2940,7 @@ type SystemSettingsReply struct {
 	ServiceName             string                 `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	SiteIcon                string                 `protobuf:"bytes,4,opt,name=site_icon,json=siteIcon,proto3" json:"site_icon,omitempty"`
 	CornerIcon              string                 `protobuf:"bytes,5,opt,name=corner_icon,json=cornerIcon,proto3" json:"corner_icon,omitempty"`
+	TotpEnabled             bool                   `protobuf:"varint,6,opt,name=totp_enabled,json=totpEnabled,proto3" json:"totp_enabled,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -2985,6 +3010,13 @@ func (x *SystemSettingsReply) GetCornerIcon() string {
 	return ""
 }
 
+func (x *SystemSettingsReply) GetTotpEnabled() bool {
+	if x != nil {
+		return x.TotpEnabled
+	}
+	return false
+}
+
 type UpdateSystemSettingsRequest struct {
 	state                   protoimpl.MessageState `protogen:"open.v1"`
 	AuditLogRetentionDays   int32                  `protobuf:"varint,1,opt,name=audit_log_retention_days,json=auditLogRetentionDays,proto3" json:"audit_log_retention_days,omitempty"`
@@ -2992,6 +3024,7 @@ type UpdateSystemSettingsRequest struct {
 	ServiceName             string                 `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	SiteIcon                string                 `protobuf:"bytes,4,opt,name=site_icon,json=siteIcon,proto3" json:"site_icon,omitempty"`
 	CornerIcon              string                 `protobuf:"bytes,5,opt,name=corner_icon,json=cornerIcon,proto3" json:"corner_icon,omitempty"`
+	TotpEnabled             bool                   `protobuf:"varint,6,opt,name=totp_enabled,json=totpEnabled,proto3" json:"totp_enabled,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -3059,6 +3092,13 @@ func (x *UpdateSystemSettingsRequest) GetCornerIcon() string {
 		return x.CornerIcon
 	}
 	return ""
+}
+
+func (x *UpdateSystemSettingsRequest) GetTotpEnabled() bool {
+	if x != nil {
+		return x.TotpEnabled
+	}
+	return false
 }
 
 type ServiceAccount struct {
@@ -3601,6 +3641,242 @@ func (x *ServiceAccountTokenReply) GetToken() string {
 	return ""
 }
 
+type Setup2FAReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Secret        string                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
+	QrUrl         string                 `protobuf:"bytes,2,opt,name=qr_url,json=qrUrl,proto3" json:"qr_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Setup2FAReply) Reset() {
+	*x = Setup2FAReply{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Setup2FAReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Setup2FAReply) ProtoMessage() {}
+
+func (x *Setup2FAReply) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Setup2FAReply.ProtoReflect.Descriptor instead.
+func (*Setup2FAReply) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *Setup2FAReply) GetSecret() string {
+	if x != nil {
+		return x.Secret
+	}
+	return ""
+}
+
+func (x *Setup2FAReply) GetQrUrl() string {
+	if x != nil {
+		return x.QrUrl
+	}
+	return ""
+}
+
+type Enable2FARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TotpCode      string                 `protobuf:"bytes,1,opt,name=totp_code,json=totpCode,proto3" json:"totp_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Enable2FARequest) Reset() {
+	*x = Enable2FARequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Enable2FARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Enable2FARequest) ProtoMessage() {}
+
+func (x *Enable2FARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Enable2FARequest.ProtoReflect.Descriptor instead.
+func (*Enable2FARequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *Enable2FARequest) GetTotpCode() string {
+	if x != nil {
+		return x.TotpCode
+	}
+	return ""
+}
+
+type Disable2FARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TotpCode      string                 `protobuf:"bytes,1,opt,name=totp_code,json=totpCode,proto3" json:"totp_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Disable2FARequest) Reset() {
+	*x = Disable2FARequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Disable2FARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Disable2FARequest) ProtoMessage() {}
+
+func (x *Disable2FARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Disable2FARequest.ProtoReflect.Descriptor instead.
+func (*Disable2FARequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *Disable2FARequest) GetTotpCode() string {
+	if x != nil {
+		return x.TotpCode
+	}
+	return ""
+}
+
+type AdminResetUser2FARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminResetUser2FARequest) Reset() {
+	*x = AdminResetUser2FARequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminResetUser2FARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminResetUser2FARequest) ProtoMessage() {}
+
+func (x *AdminResetUser2FARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminResetUser2FARequest.ProtoReflect.Descriptor instead.
+func (*AdminResetUser2FARequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *AdminResetUser2FARequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type VerifyTOTPLoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PreAuthToken  string                 `protobuf:"bytes,1,opt,name=pre_auth_token,json=preAuthToken,proto3" json:"pre_auth_token,omitempty"`
+	TotpCode      string                 `protobuf:"bytes,2,opt,name=totp_code,json=totpCode,proto3" json:"totp_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyTOTPLoginRequest) Reset() {
+	*x = VerifyTOTPLoginRequest{}
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyTOTPLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyTOTPLoginRequest) ProtoMessage() {}
+
+func (x *VerifyTOTPLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_temperate_v1_temperate_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyTOTPLoginRequest.ProtoReflect.Descriptor instead.
+func (*VerifyTOTPLoginRequest) Descriptor() ([]byte, []int) {
+	return file_api_temperate_v1_temperate_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *VerifyTOTPLoginRequest) GetPreAuthToken() string {
+	if x != nil {
+		return x.PreAuthToken
+	}
+	return ""
+}
+
+func (x *VerifyTOTPLoginRequest) GetTotpCode() string {
+	if x != nil {
+		return x.TotpCode
+	}
+	return ""
+}
+
 var File_api_temperate_v1_temperate_proto protoreflect.FileDescriptor
 
 const file_api_temperate_v1_temperate_proto_rawDesc = "" +
@@ -3610,13 +3886,15 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"P\n" +
 	"\fLoginRequest\x12\x1f\n" +
 	"\busername\x18\x01 \x01(\tB\x03\xe0A\x02R\busername\x12\x1f\n" +
-	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\"\xa7\x01\n" +
+	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\"\xf0\x01\n" +
 	"\n" +
 	"LoginReply\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12&\n" +
 	"\x04user\x18\x02 \x01(\v2\x12.temperate.v1.UserR\x04user\x120\n" +
 	"\x14must_change_password\x18\x03 \x01(\bR\x12mustChangePassword\x12)\n" +
-	"\x10initial_password\x18\x04 \x01(\tR\x0finitialPassword\"'\n" +
+	"\x10initial_password\x18\x04 \x01(\tR\x0finitialPassword\x12!\n" +
+	"\frequires_2fa\x18\x05 \x01(\bR\vrequires2fa\x12$\n" +
+	"\x0epre_auth_token\x18\x06 \x01(\tR\fpreAuthToken\"'\n" +
 	"\rLogoutRequest\x12\x16\n" +
 	"\x06detail\x18\x01 \x01(\tR\x06detail\"{\n" +
 	"\x14InitialPasswordReply\x12\x1c\n" +
@@ -3625,7 +3903,7 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\x10initial_password\x18\x03 \x01(\tR\x0finitialPassword\"g\n" +
 	"\x15ChangePasswordRequest\x12&\n" +
 	"\fold_password\x18\x01 \x01(\tB\x03\xe0A\x02R\voldPassword\x12&\n" +
-	"\fnew_password\x18\x02 \x01(\tB\x03\xe0A\x02R\vnewPassword\"\xa9\x02\n" +
+	"\fnew_password\x18\x02 \x01(\tB\x03\xe0A\x02R\vnewPassword\"\xcc\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
@@ -3636,7 +3914,8 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xd3\x02\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12!\n" +
+	"\ftotp_enabled\x18\t \x01(\bR\vtotpEnabled\"\xd3\x02\n" +
 	"\x04Role\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -3831,21 +4110,23 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\bend_time\x18\a \x01(\tR\aendTime\"V\n" +
 	"\x12ListAuditLogsReply\x12*\n" +
 	"\x04logs\x18\x01 \x03(\v2\x16.temperate.v1.AuditLogR\x04logs\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xec\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\x8f\x02\n" +
 	"\x13SystemSettingsReply\x127\n" +
 	"\x18audit_log_retention_days\x18\x01 \x01(\x05R\x15auditLogRetentionDays\x12;\n" +
 	"\x1asession_log_retention_days\x18\x02 \x01(\x05R\x17sessionLogRetentionDays\x12!\n" +
 	"\fservice_name\x18\x03 \x01(\tR\vserviceName\x12\x1b\n" +
 	"\tsite_icon\x18\x04 \x01(\tR\bsiteIcon\x12\x1f\n" +
 	"\vcorner_icon\x18\x05 \x01(\tR\n" +
-	"cornerIcon\"\xf4\x01\n" +
+	"cornerIcon\x12!\n" +
+	"\ftotp_enabled\x18\x06 \x01(\bR\vtotpEnabled\"\x97\x02\n" +
 	"\x1bUpdateSystemSettingsRequest\x127\n" +
 	"\x18audit_log_retention_days\x18\x01 \x01(\x05R\x15auditLogRetentionDays\x12;\n" +
 	"\x1asession_log_retention_days\x18\x02 \x01(\x05R\x17sessionLogRetentionDays\x12!\n" +
 	"\fservice_name\x18\x03 \x01(\tR\vserviceName\x12\x1b\n" +
 	"\tsite_icon\x18\x04 \x01(\tR\bsiteIcon\x12\x1f\n" +
 	"\vcorner_icon\x18\x05 \x01(\tR\n" +
-	"cornerIcon\"\xf0\x02\n" +
+	"cornerIcon\x12!\n" +
+	"\ftotp_enabled\x18\x06 \x01(\bR\vtotpEnabled\"\xf0\x02\n" +
 	"\x0eServiceAccount\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -3885,7 +4166,19 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\x0fexpires_in_days\x18\x02 \x01(\x05R\rexpiresInDays\"w\n" +
 	"\x18ServiceAccountTokenReply\x12E\n" +
 	"\x0fservice_account\x18\x01 \x01(\v2\x1c.temperate.v1.ServiceAccountR\x0eserviceAccount\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token2\xf7#\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\">\n" +
+	"\rSetup2FAReply\x12\x16\n" +
+	"\x06secret\x18\x01 \x01(\tR\x06secret\x12\x15\n" +
+	"\x06qr_url\x18\x02 \x01(\tR\x05qrUrl\"4\n" +
+	"\x10Enable2FARequest\x12 \n" +
+	"\ttotp_code\x18\x01 \x01(\tB\x03\xe0A\x02R\btotpCode\"5\n" +
+	"\x11Disable2FARequest\x12 \n" +
+	"\ttotp_code\x18\x01 \x01(\tB\x03\xe0A\x02R\btotpCode\"8\n" +
+	"\x18AdminResetUser2FARequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x06userId\"e\n" +
+	"\x16VerifyTOTPLoginRequest\x12)\n" +
+	"\x0epre_auth_token\x18\x01 \x01(\tB\x03\xe0A\x02R\fpreAuthToken\x12 \n" +
+	"\ttotp_code\x18\x02 \x01(\tB\x03\xe0A\x02R\btotpCode2\x97(\n" +
 	"\x10TemperateService\x12S\n" +
 	"\x06Health\x12\x16.google.protobuf.Empty\x1a .temperate.v1.GetMessageResponse\"\x0f\x82\xd3\xe4\x93\x02\t\x12\a/health\x12X\n" +
 	"\x05Login\x12\x1a.temperate.v1.LoginRequest\x1a\x18.temperate.v1.LoginReply\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12Y\n" +
@@ -3933,7 +4226,13 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\x11GetServiceAccount\x12&.temperate.v1.GetServiceAccountRequest\x1a\x1c.temperate.v1.ServiceAccount\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/service-accounts/{id}\x12\x85\x01\n" +
 	"\x14UpdateServiceAccount\x12).temperate.v1.UpdateServiceAccountRequest\x1a\x1c.temperate.v1.ServiceAccount\"$\x82\xd3\xe4\x93\x02\x1e:\x01*2\x19/v1/service-accounts/{id}\x12|\n" +
 	"\x14DeleteServiceAccount\x12).temperate.v1.DeleteServiceAccountRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b*\x19/v1/service-accounts/{id}\x12\xb2\x01\n" +
-	"\x1dRegenerateServiceAccountToken\x122.temperate.v1.RegenerateServiceAccountTokenRequest\x1a&.temperate.v1.ServiceAccountTokenReply\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/v1/service-accounts/{id}/regenerate-tokenBP\n" +
+	"\x1dRegenerateServiceAccountToken\x122.temperate.v1.RegenerateServiceAccountTokenRequest\x1a&.temperate.v1.ServiceAccountTokenReply\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/v1/service-accounts/{id}/regenerate-token\x12^\n" +
+	"\bSetup2FA\x12\x16.google.protobuf.Empty\x1a\x1b.temperate.v1.Setup2FAReply\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/v1/auth/2fa/setup\x12c\n" +
+	"\tEnable2FA\x12\x1e.temperate.v1.Enable2FARequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/auth/2fa/enable\x12f\n" +
+	"\n" +
+	"Disable2FA\x12\x1f.temperate.v1.Disable2FARequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/auth/2fa/disable\x12}\n" +
+	"\x11AdminResetUser2FA\x12&.temperate.v1.AdminResetUser2FARequest\x1a\x16.google.protobuf.Empty\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/v1/users/{user_id}/reset-2fa\x12r\n" +
+	"\x0fVerifyTOTPLogin\x12$.temperate.v1.VerifyTOTPLoginRequest\x1a\x18.temperate.v1.LoginReply\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/auth/verify-totpBP\n" +
 	"\x1dio.grpc.examples.temperate.v1B\x0eTemperateProtoP\x01Z\x1dtemperate/api/temperate/v1;v1b\x06proto3"
 
 var (
@@ -3948,7 +4247,7 @@ func file_api_temperate_v1_temperate_proto_rawDescGZIP() []byte {
 	return file_api_temperate_v1_temperate_proto_rawDescData
 }
 
-var file_api_temperate_v1_temperate_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
+var file_api_temperate_v1_temperate_proto_msgTypes = make([]protoimpl.MessageInfo, 66)
 var file_api_temperate_v1_temperate_proto_goTypes = []any{
 	(*GetMessageResponse)(nil),                   // 0: temperate.v1.GetMessageResponse
 	(*LoginRequest)(nil),                         // 1: temperate.v1.LoginRequest
@@ -4008,51 +4307,56 @@ var file_api_temperate_v1_temperate_proto_goTypes = []any{
 	(*DeleteServiceAccountRequest)(nil),          // 55: temperate.v1.DeleteServiceAccountRequest
 	(*RegenerateServiceAccountTokenRequest)(nil), // 56: temperate.v1.RegenerateServiceAccountTokenRequest
 	(*ServiceAccountTokenReply)(nil),             // 57: temperate.v1.ServiceAccountTokenReply
-	nil,                                          // 58: temperate.v1.SSOProvider.ConfigEntry
-	nil,                                          // 59: temperate.v1.CreateSSOProviderRequest.ConfigEntry
-	nil,                                          // 60: temperate.v1.UpdateSSOProviderRequest.ConfigEntry
-	(*timestamppb.Timestamp)(nil),                // 61: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                        // 62: google.protobuf.Empty
+	(*Setup2FAReply)(nil),                        // 58: temperate.v1.Setup2FAReply
+	(*Enable2FARequest)(nil),                     // 59: temperate.v1.Enable2FARequest
+	(*Disable2FARequest)(nil),                    // 60: temperate.v1.Disable2FARequest
+	(*AdminResetUser2FARequest)(nil),             // 61: temperate.v1.AdminResetUser2FARequest
+	(*VerifyTOTPLoginRequest)(nil),               // 62: temperate.v1.VerifyTOTPLoginRequest
+	nil,                                          // 63: temperate.v1.SSOProvider.ConfigEntry
+	nil,                                          // 64: temperate.v1.CreateSSOProviderRequest.ConfigEntry
+	nil,                                          // 65: temperate.v1.UpdateSSOProviderRequest.ConfigEntry
+	(*timestamppb.Timestamp)(nil),                // 66: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                        // 67: google.protobuf.Empty
 }
 var file_api_temperate_v1_temperate_proto_depIdxs = []int32{
 	6,  // 0: temperate.v1.LoginReply.user:type_name -> temperate.v1.User
 	7,  // 1: temperate.v1.User.roles:type_name -> temperate.v1.Role
-	61, // 2: temperate.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	61, // 3: temperate.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	66, // 2: temperate.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	66, // 3: temperate.v1.User.updated_at:type_name -> google.protobuf.Timestamp
 	8,  // 4: temperate.v1.Role.permissions:type_name -> temperate.v1.Permission
 	7,  // 5: temperate.v1.Role.inherited_roles:type_name -> temperate.v1.Role
-	61, // 6: temperate.v1.Role.created_at:type_name -> google.protobuf.Timestamp
-	61, // 7: temperate.v1.Role.updated_at:type_name -> google.protobuf.Timestamp
-	61, // 8: temperate.v1.Permission.created_at:type_name -> google.protobuf.Timestamp
-	61, // 9: temperate.v1.Permission.updated_at:type_name -> google.protobuf.Timestamp
+	66, // 6: temperate.v1.Role.created_at:type_name -> google.protobuf.Timestamp
+	66, // 7: temperate.v1.Role.updated_at:type_name -> google.protobuf.Timestamp
+	66, // 8: temperate.v1.Permission.created_at:type_name -> google.protobuf.Timestamp
+	66, // 9: temperate.v1.Permission.updated_at:type_name -> google.protobuf.Timestamp
 	6,  // 10: temperate.v1.ListUsersReply.users:type_name -> temperate.v1.User
 	7,  // 11: temperate.v1.ListRolesReply.roles:type_name -> temperate.v1.Role
 	8,  // 12: temperate.v1.ListPermissionsReply.permissions:type_name -> temperate.v1.Permission
 	27, // 13: temperate.v1.ListPermissionActionsReply.actions:type_name -> temperate.v1.PermissionAction
-	58, // 14: temperate.v1.SSOProvider.config:type_name -> temperate.v1.SSOProvider.ConfigEntry
-	61, // 15: temperate.v1.SSOProvider.created_at:type_name -> google.protobuf.Timestamp
-	61, // 16: temperate.v1.SSOProvider.updated_at:type_name -> google.protobuf.Timestamp
+	63, // 14: temperate.v1.SSOProvider.config:type_name -> temperate.v1.SSOProvider.ConfigEntry
+	66, // 15: temperate.v1.SSOProvider.created_at:type_name -> google.protobuf.Timestamp
+	66, // 16: temperate.v1.SSOProvider.updated_at:type_name -> google.protobuf.Timestamp
 	32, // 17: temperate.v1.ListSSOProvidersPublicReply.providers:type_name -> temperate.v1.SSOProviderBrief
 	31, // 18: temperate.v1.ListSSOProvidersReply.providers:type_name -> temperate.v1.SSOProvider
-	59, // 19: temperate.v1.CreateSSOProviderRequest.config:type_name -> temperate.v1.CreateSSOProviderRequest.ConfigEntry
-	60, // 20: temperate.v1.UpdateSSOProviderRequest.config:type_name -> temperate.v1.UpdateSSOProviderRequest.ConfigEntry
-	61, // 21: temperate.v1.UserSession.login_at:type_name -> google.protobuf.Timestamp
-	61, // 22: temperate.v1.UserSession.last_access_at:type_name -> google.protobuf.Timestamp
+	64, // 19: temperate.v1.CreateSSOProviderRequest.config:type_name -> temperate.v1.CreateSSOProviderRequest.ConfigEntry
+	65, // 20: temperate.v1.UpdateSSOProviderRequest.config:type_name -> temperate.v1.UpdateSSOProviderRequest.ConfigEntry
+	66, // 21: temperate.v1.UserSession.login_at:type_name -> google.protobuf.Timestamp
+	66, // 22: temperate.v1.UserSession.last_access_at:type_name -> google.protobuf.Timestamp
 	40, // 23: temperate.v1.ListSessionsReply.sessions:type_name -> temperate.v1.UserSession
-	61, // 24: temperate.v1.AuditLog.created_at:type_name -> google.protobuf.Timestamp
+	66, // 24: temperate.v1.AuditLog.created_at:type_name -> google.protobuf.Timestamp
 	44, // 25: temperate.v1.ListAuditLogsReply.logs:type_name -> temperate.v1.AuditLog
 	7,  // 26: temperate.v1.ServiceAccount.roles:type_name -> temperate.v1.Role
-	61, // 27: temperate.v1.ServiceAccount.expires_at:type_name -> google.protobuf.Timestamp
-	61, // 28: temperate.v1.ServiceAccount.created_at:type_name -> google.protobuf.Timestamp
-	61, // 29: temperate.v1.ServiceAccount.updated_at:type_name -> google.protobuf.Timestamp
+	66, // 27: temperate.v1.ServiceAccount.expires_at:type_name -> google.protobuf.Timestamp
+	66, // 28: temperate.v1.ServiceAccount.created_at:type_name -> google.protobuf.Timestamp
+	66, // 29: temperate.v1.ServiceAccount.updated_at:type_name -> google.protobuf.Timestamp
 	49, // 30: temperate.v1.ListServiceAccountsReply.service_accounts:type_name -> temperate.v1.ServiceAccount
 	49, // 31: temperate.v1.ServiceAccountTokenReply.service_account:type_name -> temperate.v1.ServiceAccount
-	62, // 32: temperate.v1.TemperateService.Health:input_type -> google.protobuf.Empty
+	67, // 32: temperate.v1.TemperateService.Health:input_type -> google.protobuf.Empty
 	1,  // 33: temperate.v1.TemperateService.Login:input_type -> temperate.v1.LoginRequest
 	3,  // 34: temperate.v1.TemperateService.Logout:input_type -> temperate.v1.LogoutRequest
-	62, // 35: temperate.v1.TemperateService.GetInitialPassword:input_type -> google.protobuf.Empty
+	67, // 35: temperate.v1.TemperateService.GetInitialPassword:input_type -> google.protobuf.Empty
 	5,  // 36: temperate.v1.TemperateService.ChangePassword:input_type -> temperate.v1.ChangePasswordRequest
-	62, // 37: temperate.v1.TemperateService.GetCurrentUser:input_type -> google.protobuf.Empty
+	67, // 37: temperate.v1.TemperateService.GetCurrentUser:input_type -> google.protobuf.Empty
 	9,  // 38: temperate.v1.TemperateService.CreateUser:input_type -> temperate.v1.CreateUserRequest
 	10, // 39: temperate.v1.TemperateService.ListUsers:input_type -> temperate.v1.ListUsersRequest
 	12, // 40: temperate.v1.TemperateService.GetUser:input_type -> temperate.v1.GetUserRequest
@@ -4068,10 +4372,10 @@ var file_api_temperate_v1_temperate_proto_depIdxs = []int32{
 	23, // 50: temperate.v1.TemperateService.SetRoleInheritances:input_type -> temperate.v1.SetRoleInheritancesRequest
 	24, // 51: temperate.v1.TemperateService.CreatePermission:input_type -> temperate.v1.CreatePermissionRequest
 	25, // 52: temperate.v1.TemperateService.ListPermissions:input_type -> temperate.v1.ListPermissionsRequest
-	62, // 53: temperate.v1.TemperateService.ListPermissionActions:input_type -> google.protobuf.Empty
+	67, // 53: temperate.v1.TemperateService.ListPermissionActions:input_type -> google.protobuf.Empty
 	29, // 54: temperate.v1.TemperateService.UpdatePermission:input_type -> temperate.v1.UpdatePermissionRequest
 	30, // 55: temperate.v1.TemperateService.DeletePermission:input_type -> temperate.v1.DeletePermissionRequest
-	62, // 56: temperate.v1.TemperateService.ListSSOProvidersPublic:input_type -> google.protobuf.Empty
+	67, // 56: temperate.v1.TemperateService.ListSSOProvidersPublic:input_type -> google.protobuf.Empty
 	34, // 57: temperate.v1.TemperateService.ListSSOProviders:input_type -> temperate.v1.ListSSOProvidersRequest
 	36, // 58: temperate.v1.TemperateService.GetSSOProvider:input_type -> temperate.v1.GetSSOProviderRequest
 	37, // 59: temperate.v1.TemperateService.CreateSSOProvider:input_type -> temperate.v1.CreateSSOProviderRequest
@@ -4080,7 +4384,7 @@ var file_api_temperate_v1_temperate_proto_depIdxs = []int32{
 	41, // 62: temperate.v1.TemperateService.ListSessions:input_type -> temperate.v1.ListSessionsRequest
 	43, // 63: temperate.v1.TemperateService.KickSession:input_type -> temperate.v1.KickSessionRequest
 	45, // 64: temperate.v1.TemperateService.ListAuditLogs:input_type -> temperate.v1.ListAuditLogsRequest
-	62, // 65: temperate.v1.TemperateService.GetSystemSettings:input_type -> google.protobuf.Empty
+	67, // 65: temperate.v1.TemperateService.GetSystemSettings:input_type -> google.protobuf.Empty
 	48, // 66: temperate.v1.TemperateService.UpdateSystemSettings:input_type -> temperate.v1.UpdateSystemSettingsRequest
 	50, // 67: temperate.v1.TemperateService.CreateServiceAccount:input_type -> temperate.v1.CreateServiceAccountRequest
 	51, // 68: temperate.v1.TemperateService.ListServiceAccounts:input_type -> temperate.v1.ListServiceAccountsRequest
@@ -4088,49 +4392,59 @@ var file_api_temperate_v1_temperate_proto_depIdxs = []int32{
 	54, // 70: temperate.v1.TemperateService.UpdateServiceAccount:input_type -> temperate.v1.UpdateServiceAccountRequest
 	55, // 71: temperate.v1.TemperateService.DeleteServiceAccount:input_type -> temperate.v1.DeleteServiceAccountRequest
 	56, // 72: temperate.v1.TemperateService.RegenerateServiceAccountToken:input_type -> temperate.v1.RegenerateServiceAccountTokenRequest
-	0,  // 73: temperate.v1.TemperateService.Health:output_type -> temperate.v1.GetMessageResponse
-	2,  // 74: temperate.v1.TemperateService.Login:output_type -> temperate.v1.LoginReply
-	62, // 75: temperate.v1.TemperateService.Logout:output_type -> google.protobuf.Empty
-	4,  // 76: temperate.v1.TemperateService.GetInitialPassword:output_type -> temperate.v1.InitialPasswordReply
-	62, // 77: temperate.v1.TemperateService.ChangePassword:output_type -> google.protobuf.Empty
-	6,  // 78: temperate.v1.TemperateService.GetCurrentUser:output_type -> temperate.v1.User
-	6,  // 79: temperate.v1.TemperateService.CreateUser:output_type -> temperate.v1.User
-	11, // 80: temperate.v1.TemperateService.ListUsers:output_type -> temperate.v1.ListUsersReply
-	6,  // 81: temperate.v1.TemperateService.GetUser:output_type -> temperate.v1.User
-	6,  // 82: temperate.v1.TemperateService.UpdateUser:output_type -> temperate.v1.User
-	62, // 83: temperate.v1.TemperateService.DeleteUser:output_type -> google.protobuf.Empty
-	6,  // 84: temperate.v1.TemperateService.AssignUserRoles:output_type -> temperate.v1.User
-	7,  // 85: temperate.v1.TemperateService.CreateRole:output_type -> temperate.v1.Role
-	18, // 86: temperate.v1.TemperateService.ListRoles:output_type -> temperate.v1.ListRolesReply
-	7,  // 87: temperate.v1.TemperateService.GetRole:output_type -> temperate.v1.Role
-	7,  // 88: temperate.v1.TemperateService.UpdateRole:output_type -> temperate.v1.Role
-	62, // 89: temperate.v1.TemperateService.DeleteRole:output_type -> google.protobuf.Empty
-	7,  // 90: temperate.v1.TemperateService.AssignRolePermissions:output_type -> temperate.v1.Role
-	7,  // 91: temperate.v1.TemperateService.SetRoleInheritances:output_type -> temperate.v1.Role
-	8,  // 92: temperate.v1.TemperateService.CreatePermission:output_type -> temperate.v1.Permission
-	26, // 93: temperate.v1.TemperateService.ListPermissions:output_type -> temperate.v1.ListPermissionsReply
-	28, // 94: temperate.v1.TemperateService.ListPermissionActions:output_type -> temperate.v1.ListPermissionActionsReply
-	8,  // 95: temperate.v1.TemperateService.UpdatePermission:output_type -> temperate.v1.Permission
-	62, // 96: temperate.v1.TemperateService.DeletePermission:output_type -> google.protobuf.Empty
-	33, // 97: temperate.v1.TemperateService.ListSSOProvidersPublic:output_type -> temperate.v1.ListSSOProvidersPublicReply
-	35, // 98: temperate.v1.TemperateService.ListSSOProviders:output_type -> temperate.v1.ListSSOProvidersReply
-	31, // 99: temperate.v1.TemperateService.GetSSOProvider:output_type -> temperate.v1.SSOProvider
-	31, // 100: temperate.v1.TemperateService.CreateSSOProvider:output_type -> temperate.v1.SSOProvider
-	31, // 101: temperate.v1.TemperateService.UpdateSSOProvider:output_type -> temperate.v1.SSOProvider
-	62, // 102: temperate.v1.TemperateService.DeleteSSOProvider:output_type -> google.protobuf.Empty
-	42, // 103: temperate.v1.TemperateService.ListSessions:output_type -> temperate.v1.ListSessionsReply
-	62, // 104: temperate.v1.TemperateService.KickSession:output_type -> google.protobuf.Empty
-	46, // 105: temperate.v1.TemperateService.ListAuditLogs:output_type -> temperate.v1.ListAuditLogsReply
-	47, // 106: temperate.v1.TemperateService.GetSystemSettings:output_type -> temperate.v1.SystemSettingsReply
-	47, // 107: temperate.v1.TemperateService.UpdateSystemSettings:output_type -> temperate.v1.SystemSettingsReply
-	57, // 108: temperate.v1.TemperateService.CreateServiceAccount:output_type -> temperate.v1.ServiceAccountTokenReply
-	52, // 109: temperate.v1.TemperateService.ListServiceAccounts:output_type -> temperate.v1.ListServiceAccountsReply
-	49, // 110: temperate.v1.TemperateService.GetServiceAccount:output_type -> temperate.v1.ServiceAccount
-	49, // 111: temperate.v1.TemperateService.UpdateServiceAccount:output_type -> temperate.v1.ServiceAccount
-	62, // 112: temperate.v1.TemperateService.DeleteServiceAccount:output_type -> google.protobuf.Empty
-	57, // 113: temperate.v1.TemperateService.RegenerateServiceAccountToken:output_type -> temperate.v1.ServiceAccountTokenReply
-	73, // [73:114] is the sub-list for method output_type
-	32, // [32:73] is the sub-list for method input_type
+	67, // 73: temperate.v1.TemperateService.Setup2FA:input_type -> google.protobuf.Empty
+	59, // 74: temperate.v1.TemperateService.Enable2FA:input_type -> temperate.v1.Enable2FARequest
+	60, // 75: temperate.v1.TemperateService.Disable2FA:input_type -> temperate.v1.Disable2FARequest
+	61, // 76: temperate.v1.TemperateService.AdminResetUser2FA:input_type -> temperate.v1.AdminResetUser2FARequest
+	62, // 77: temperate.v1.TemperateService.VerifyTOTPLogin:input_type -> temperate.v1.VerifyTOTPLoginRequest
+	0,  // 78: temperate.v1.TemperateService.Health:output_type -> temperate.v1.GetMessageResponse
+	2,  // 79: temperate.v1.TemperateService.Login:output_type -> temperate.v1.LoginReply
+	67, // 80: temperate.v1.TemperateService.Logout:output_type -> google.protobuf.Empty
+	4,  // 81: temperate.v1.TemperateService.GetInitialPassword:output_type -> temperate.v1.InitialPasswordReply
+	67, // 82: temperate.v1.TemperateService.ChangePassword:output_type -> google.protobuf.Empty
+	6,  // 83: temperate.v1.TemperateService.GetCurrentUser:output_type -> temperate.v1.User
+	6,  // 84: temperate.v1.TemperateService.CreateUser:output_type -> temperate.v1.User
+	11, // 85: temperate.v1.TemperateService.ListUsers:output_type -> temperate.v1.ListUsersReply
+	6,  // 86: temperate.v1.TemperateService.GetUser:output_type -> temperate.v1.User
+	6,  // 87: temperate.v1.TemperateService.UpdateUser:output_type -> temperate.v1.User
+	67, // 88: temperate.v1.TemperateService.DeleteUser:output_type -> google.protobuf.Empty
+	6,  // 89: temperate.v1.TemperateService.AssignUserRoles:output_type -> temperate.v1.User
+	7,  // 90: temperate.v1.TemperateService.CreateRole:output_type -> temperate.v1.Role
+	18, // 91: temperate.v1.TemperateService.ListRoles:output_type -> temperate.v1.ListRolesReply
+	7,  // 92: temperate.v1.TemperateService.GetRole:output_type -> temperate.v1.Role
+	7,  // 93: temperate.v1.TemperateService.UpdateRole:output_type -> temperate.v1.Role
+	67, // 94: temperate.v1.TemperateService.DeleteRole:output_type -> google.protobuf.Empty
+	7,  // 95: temperate.v1.TemperateService.AssignRolePermissions:output_type -> temperate.v1.Role
+	7,  // 96: temperate.v1.TemperateService.SetRoleInheritances:output_type -> temperate.v1.Role
+	8,  // 97: temperate.v1.TemperateService.CreatePermission:output_type -> temperate.v1.Permission
+	26, // 98: temperate.v1.TemperateService.ListPermissions:output_type -> temperate.v1.ListPermissionsReply
+	28, // 99: temperate.v1.TemperateService.ListPermissionActions:output_type -> temperate.v1.ListPermissionActionsReply
+	8,  // 100: temperate.v1.TemperateService.UpdatePermission:output_type -> temperate.v1.Permission
+	67, // 101: temperate.v1.TemperateService.DeletePermission:output_type -> google.protobuf.Empty
+	33, // 102: temperate.v1.TemperateService.ListSSOProvidersPublic:output_type -> temperate.v1.ListSSOProvidersPublicReply
+	35, // 103: temperate.v1.TemperateService.ListSSOProviders:output_type -> temperate.v1.ListSSOProvidersReply
+	31, // 104: temperate.v1.TemperateService.GetSSOProvider:output_type -> temperate.v1.SSOProvider
+	31, // 105: temperate.v1.TemperateService.CreateSSOProvider:output_type -> temperate.v1.SSOProvider
+	31, // 106: temperate.v1.TemperateService.UpdateSSOProvider:output_type -> temperate.v1.SSOProvider
+	67, // 107: temperate.v1.TemperateService.DeleteSSOProvider:output_type -> google.protobuf.Empty
+	42, // 108: temperate.v1.TemperateService.ListSessions:output_type -> temperate.v1.ListSessionsReply
+	67, // 109: temperate.v1.TemperateService.KickSession:output_type -> google.protobuf.Empty
+	46, // 110: temperate.v1.TemperateService.ListAuditLogs:output_type -> temperate.v1.ListAuditLogsReply
+	47, // 111: temperate.v1.TemperateService.GetSystemSettings:output_type -> temperate.v1.SystemSettingsReply
+	47, // 112: temperate.v1.TemperateService.UpdateSystemSettings:output_type -> temperate.v1.SystemSettingsReply
+	57, // 113: temperate.v1.TemperateService.CreateServiceAccount:output_type -> temperate.v1.ServiceAccountTokenReply
+	52, // 114: temperate.v1.TemperateService.ListServiceAccounts:output_type -> temperate.v1.ListServiceAccountsReply
+	49, // 115: temperate.v1.TemperateService.GetServiceAccount:output_type -> temperate.v1.ServiceAccount
+	49, // 116: temperate.v1.TemperateService.UpdateServiceAccount:output_type -> temperate.v1.ServiceAccount
+	67, // 117: temperate.v1.TemperateService.DeleteServiceAccount:output_type -> google.protobuf.Empty
+	57, // 118: temperate.v1.TemperateService.RegenerateServiceAccountToken:output_type -> temperate.v1.ServiceAccountTokenReply
+	58, // 119: temperate.v1.TemperateService.Setup2FA:output_type -> temperate.v1.Setup2FAReply
+	67, // 120: temperate.v1.TemperateService.Enable2FA:output_type -> google.protobuf.Empty
+	67, // 121: temperate.v1.TemperateService.Disable2FA:output_type -> google.protobuf.Empty
+	67, // 122: temperate.v1.TemperateService.AdminResetUser2FA:output_type -> google.protobuf.Empty
+	2,  // 123: temperate.v1.TemperateService.VerifyTOTPLogin:output_type -> temperate.v1.LoginReply
+	78, // [78:124] is the sub-list for method output_type
+	32, // [32:78] is the sub-list for method input_type
 	32, // [32:32] is the sub-list for extension type_name
 	32, // [32:32] is the sub-list for extension extendee
 	0,  // [0:32] is the sub-list for field type_name
@@ -4147,7 +4461,7 @@ func file_api_temperate_v1_temperate_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_temperate_v1_temperate_proto_rawDesc), len(file_api_temperate_v1_temperate_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   61,
+			NumMessages:   66,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

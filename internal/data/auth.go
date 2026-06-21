@@ -150,6 +150,24 @@ func (r *authRepo) ChangePassword(ctx context.Context, userID int64, passwordHas
 		Exec(ctx)
 }
 
+func (r *authRepo) SetTOTPSecret(ctx context.Context, userID int64, secret string) error {
+	return r.data.WriteEnt.User.UpdateOneID(int(userID)).
+		SetTotpSecret(secret).
+		SetTotpEnabled(false).
+		Exec(ctx)
+}
+
+func (r *authRepo) EnableTOTP(ctx context.Context, userID int64) error {
+	return r.data.WriteEnt.User.UpdateOneID(int(userID)).SetTotpEnabled(true).Exec(ctx)
+}
+
+func (r *authRepo) DisableTOTP(ctx context.Context, userID int64) error {
+	return r.data.WriteEnt.User.UpdateOneID(int(userID)).
+		SetTotpEnabled(false).
+		ClearTotpSecret().
+		Exec(ctx)
+}
+
 func (r *authRepo) EffectivePermissions(ctx context.Context, userID int64) ([]biz.Permission, []biz.Role, error) {
 	roles, err := r.data.ReadEnt.User.Query().
 		Where(entuser.ID(int(userID))).
@@ -590,6 +608,8 @@ func toBizUser(user *ent.User) *biz.User {
 		Disabled:            user.Disabled,
 		System:              user.System,
 		InitialPasswordUsed: user.InitialPasswordUsed,
+		TOTPSecret:          user.TotpSecret,
+		TOTPEnabled:         user.TotpEnabled,
 		Roles:               toBizRoles(user.Edges.Roles),
 		CreatedAt:           user.CreatedAt,
 		UpdatedAt:           user.UpdatedAt,

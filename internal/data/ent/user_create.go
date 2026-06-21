@@ -90,6 +90,34 @@ func (_c *UserCreate) SetNillableInitialPasswordUsed(v *bool) *UserCreate {
 	return _c
 }
 
+// SetTotpSecret sets the "totp_secret" field.
+func (_c *UserCreate) SetTotpSecret(v string) *UserCreate {
+	_c.mutation.SetTotpSecret(v)
+	return _c
+}
+
+// SetNillableTotpSecret sets the "totp_secret" field if the given value is not nil.
+func (_c *UserCreate) SetNillableTotpSecret(v *string) *UserCreate {
+	if v != nil {
+		_c.SetTotpSecret(*v)
+	}
+	return _c
+}
+
+// SetTotpEnabled sets the "totp_enabled" field.
+func (_c *UserCreate) SetTotpEnabled(v bool) *UserCreate {
+	_c.mutation.SetTotpEnabled(v)
+	return _c
+}
+
+// SetNillableTotpEnabled sets the "totp_enabled" field if the given value is not nil.
+func (_c *UserCreate) SetNillableTotpEnabled(v *bool) *UserCreate {
+	if v != nil {
+		_c.SetTotpEnabled(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *UserCreate) SetCreatedAt(v time.Time) *UserCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -195,6 +223,10 @@ func (_c *UserCreate) defaults() {
 		v := user.DefaultInitialPasswordUsed
 		_c.mutation.SetInitialPasswordUsed(v)
 	}
+	if _, ok := _c.mutation.TotpEnabled(); !ok {
+		v := user.DefaultTotpEnabled
+		_c.mutation.SetTotpEnabled(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -226,6 +258,9 @@ func (_c *UserCreate) check() error {
 	}
 	if _, ok := _c.mutation.InitialPasswordUsed(); !ok {
 		return &ValidationError{Name: "initial_password_used", err: errors.New(`ent: missing required field "User.initial_password_used"`)}
+	}
+	if _, ok := _c.mutation.TotpEnabled(); !ok {
+		return &ValidationError{Name: "totp_enabled", err: errors.New(`ent: missing required field "User.totp_enabled"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -282,6 +317,14 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.InitialPasswordUsed(); ok {
 		_spec.SetField(user.FieldInitialPasswordUsed, field.TypeBool, value)
 		_node.InitialPasswordUsed = value
+	}
+	if value, ok := _c.mutation.TotpSecret(); ok {
+		_spec.SetField(user.FieldTotpSecret, field.TypeString, value)
+		_node.TotpSecret = value
+	}
+	if value, ok := _c.mutation.TotpEnabled(); ok {
+		_spec.SetField(user.FieldTotpEnabled, field.TypeBool, value)
+		_node.TotpEnabled = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

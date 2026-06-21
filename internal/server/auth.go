@@ -39,6 +39,7 @@ var authAllowlist = newAuthAllowlist(
 		v1.OperationTemperateServiceLogin,
 		v1.OperationTemperateServiceGetInitialPassword,
 		v1.OperationTemperateServiceListSSOProvidersPublic,
+		v1.OperationTemperateServiceVerifyTOTPLogin,
 	},
 	nil,
 )

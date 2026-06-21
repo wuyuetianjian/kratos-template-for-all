@@ -56,17 +56,124 @@ func (s *IncidentService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.
 	if err != nil {
 		return nil, err
 	}
+	if result.Requires2FA {
+		return &v1.LoginReply{
+			Requires_2Fa: true,
+			PreAuthToken: result.PreAuthToken,
+			User:         convertUser(result.User),
+		}, nil
+	}
 	ip, ua := requestMeta(ctx)
 	browser, os := biz.ParseUserAgent(ua)
 	tokenHash := biz.TokenHash(result.Token)
 	_ = s.useCase.CreateSession(ctx, tokenHash, ip, browser, os, result.User.ID, result.User.Username)
-	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip, fmt.Sprintf("browser=%s os=%s", browser, os))
+	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip,
+		auditFieldsDetail("登录 "+userLabel(result.User), loginAuditFields(result.User, browser, os, false)))
 	return &v1.LoginReply{
 		Token:              result.Token,
 		User:               convertUser(result.User),
 		MustChangePassword: result.MustChangePassword,
 		InitialPassword:    result.InitialPassword,
 	}, nil
+}
+
+func (s *IncidentService) VerifyTOTPLogin(ctx context.Context, req *v1.VerifyTOTPLoginRequest) (*v1.LoginReply, error) {
+	result, err := s.useCase.VerifyTOTPLogin(ctx, req.GetPreAuthToken(), req.GetTotpCode())
+	if err != nil {
+		return nil, err
+	}
+	ip, ua := requestMeta(ctx)
+	browser, os := biz.ParseUserAgent(ua)
+	tokenHash := biz.TokenHash(result.Token)
+	_ = s.useCase.CreateSession(ctx, tokenHash, ip, browser, os, result.User.ID, result.User.Username)
+	s.useCase.LogAuditEvent(ctx, "login", "session", result.User.Username, ip,
+		auditFieldsDetail("完成 2FA 登录 "+userLabel(result.User), loginAuditFields(result.User, browser, os, true)))
+	return &v1.LoginReply{
+		Token: result.Token,
+		User:  convertUser(result.User),
+	}, nil
+}
+
+func (s *IncidentService) Setup2FA(ctx context.Context, _ *emptypb.Empty) (*v1.Setup2FAReply, error) {
+	auth, ok := biz.AuthFromContext(ctx)
+	if !ok {
+		return nil, biz.ErrUnauthorized()
+	}
+	result, err := s.useCase.Setup2FA(ctx, auth.UserID)
+	if err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	user, _ := s.useCase.CurrentUser(ctx, auth.UserID)
+	label := userLabel(user)
+	if label == "" {
+		label = auth.Username
+	}
+	s.useCase.LogAuditEvent(ctx, "setup_2fa", "user", label, ip,
+		auditFieldsDetail("创建 2FA 绑定 "+label, twoFactorSetupAuditFields(user, label)))
+	return &v1.Setup2FAReply{Secret: result.Secret, QrUrl: result.QRURL}, nil
+}
+
+func (s *IncidentService) Enable2FA(ctx context.Context, req *v1.Enable2FARequest) (*emptypb.Empty, error) {
+	auth, ok := biz.AuthFromContext(ctx)
+	if !ok {
+		return nil, biz.ErrUnauthorized()
+	}
+	before, _ := s.useCase.CurrentUser(ctx, auth.UserID)
+	if err := s.useCase.Enable2FA(ctx, auth.UserID, req.GetTotpCode()); err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	after, _ := s.useCase.CurrentUser(ctx, auth.UserID)
+	label := userLabel(after)
+	if label == "" {
+		label = userLabel(before)
+	}
+	if label == "" {
+		label = auth.Username
+	}
+	s.useCase.LogAuditEvent(ctx, "enable_2fa", "user", label, ip,
+		auditDiffDetail("启用 2FA "+label, twoFactorAuditMap(before), twoFactorAuditMap(after)))
+	return &emptypb.Empty{}, nil
+}
+
+func (s *IncidentService) Disable2FA(ctx context.Context, req *v1.Disable2FARequest) (*emptypb.Empty, error) {
+	auth, ok := biz.AuthFromContext(ctx)
+	if !ok {
+		return nil, biz.ErrUnauthorized()
+	}
+	before, _ := s.useCase.CurrentUser(ctx, auth.UserID)
+	if err := s.useCase.Disable2FA(ctx, auth.UserID, req.GetTotpCode()); err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	after, _ := s.useCase.CurrentUser(ctx, auth.UserID)
+	label := userLabel(after)
+	if label == "" {
+		label = userLabel(before)
+	}
+	if label == "" {
+		label = auth.Username
+	}
+	s.useCase.LogAuditEvent(ctx, "disable_2fa", "user", label, ip,
+		auditDiffDetail("关闭 2FA "+label, twoFactorAuditMap(before), twoFactorAuditMap(after)))
+	return &emptypb.Empty{}, nil
+}
+
+func (s *IncidentService) AdminResetUser2FA(ctx context.Context, req *v1.AdminResetUser2FARequest) (*emptypb.Empty, error) {
+	before, _ := s.useCase.CurrentUser(ctx, req.GetUserId())
+	if err := s.useCase.AdminDisableUser2FA(ctx, req.GetUserId()); err != nil {
+		return nil, err
+	}
+	ip, _ := requestMeta(ctx)
+	after, _ := s.useCase.CurrentUser(ctx, req.GetUserId())
+	label := userLabel(after)
+	if label == "" {
+		label = userLabel(before)
+	}
+	s.useCase.LogAuditEvent(ctx, "admin_reset_2fa", "user", label, ip,
+		auditDiffDetail("管理员重置 2FA "+label, twoFactorAuditMap(before), twoFactorAuditMap(after)))
+	return &emptypb.Empty{}, nil
 }
 
 func (s *IncidentService) Logout(ctx context.Context, req *v1.LogoutRequest) (*emptypb.Empty, error) {
@@ -521,6 +628,7 @@ func (s *IncidentService) GetSystemSettings(ctx context.Context, _ *emptypb.Empt
 		ServiceName:             settings.ServiceName,
 		SiteIcon:                settings.SiteIcon,
 		CornerIcon:              settings.CornerIcon,
+		TotpEnabled:             settings.TOTPEnabled,
 	}, nil
 }
 
@@ -532,6 +640,7 @@ func (s *IncidentService) UpdateSystemSettings(ctx context.Context, req *v1.Upda
 		ServiceName:             req.GetServiceName(),
 		SiteIcon:                req.GetSiteIcon(),
 		CornerIcon:              req.GetCornerIcon(),
+		TOTPEnabled:             req.GetTotpEnabled(),
 	}
 	if err := s.useCase.UpdateSettings(ctx, settings); err != nil {
 		return nil, err
@@ -544,6 +653,7 @@ func (s *IncidentService) UpdateSystemSettings(ctx context.Context, req *v1.Upda
 		ServiceName:             settings.ServiceName,
 		SiteIcon:                settings.SiteIcon,
 		CornerIcon:              settings.CornerIcon,
+		TotpEnabled:             settings.TOTPEnabled,
 	}, nil
 }
 
@@ -765,6 +875,35 @@ func userAuditMap(user *biz.User) map[string]any {
 	}
 }
 
+func loginAuditFields(user *biz.User, browser, os string, verified2FA bool) map[string]any {
+	fields := twoFactorAuditMap(user)
+	fields["browser"] = browser
+	fields["os"] = os
+	fields["totp_verified"] = verified2FA
+	return fields
+}
+
+func twoFactorAuditMap(user *biz.User) map[string]any {
+	if user == nil {
+		return map[string]any{}
+	}
+	return map[string]any{
+		"user_id":      user.ID,
+		"username":     user.Username,
+		"display_name": user.DisplayName,
+		"totp_enabled": user.TOTPEnabled,
+	}
+}
+
+func twoFactorSetupAuditFields(user *biz.User, label string) map[string]any {
+	fields := twoFactorAuditMap(user)
+	if len(fields) == 0 && label != "" {
+		fields["username"] = label
+	}
+	fields["setup_pending"] = true
+	return fields
+}
+
 func roleAuditMap(role *biz.Role) map[string]any {
 	if role == nil {
 		return map[string]any{}
@@ -834,6 +973,7 @@ func settingsAuditMap(settings *biz.SystemSettings) map[string]any {
 		"service_name":               settings.ServiceName,
 		"site_icon":                  settings.SiteIcon,
 		"corner_icon":                settings.CornerIcon,
+		"totp_enabled":               settings.TOTPEnabled,
 	}
 }
 
@@ -931,6 +1071,7 @@ func convertUser(user *biz.User) *v1.User {
 		DisplayName: user.DisplayName,
 		Disabled:    user.Disabled,
 		System:      user.System,
+		TotpEnabled: user.TOTPEnabled,
 		Roles:       convertRoles(user.Roles),
 		CreatedAt:   timestamppb.New(user.CreatedAt),
 		UpdatedAt:   timestamppb.New(user.UpdatedAt),

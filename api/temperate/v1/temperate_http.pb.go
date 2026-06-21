@@ -18,6 +18,7 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationTemperateServiceAdminResetUser2FA = "/temperate.v1.TemperateService/AdminResetUser2FA"
 const OperationTemperateServiceAssignRolePermissions = "/temperate.v1.TemperateService/AssignRolePermissions"
 const OperationTemperateServiceAssignUserRoles = "/temperate.v1.TemperateService/AssignUserRoles"
 const OperationTemperateServiceChangePassword = "/temperate.v1.TemperateService/ChangePassword"
@@ -31,6 +32,8 @@ const OperationTemperateServiceDeleteRole = "/temperate.v1.TemperateService/Dele
 const OperationTemperateServiceDeleteSSOProvider = "/temperate.v1.TemperateService/DeleteSSOProvider"
 const OperationTemperateServiceDeleteServiceAccount = "/temperate.v1.TemperateService/DeleteServiceAccount"
 const OperationTemperateServiceDeleteUser = "/temperate.v1.TemperateService/DeleteUser"
+const OperationTemperateServiceDisable2FA = "/temperate.v1.TemperateService/Disable2FA"
+const OperationTemperateServiceEnable2FA = "/temperate.v1.TemperateService/Enable2FA"
 const OperationTemperateServiceGetCurrentUser = "/temperate.v1.TemperateService/GetCurrentUser"
 const OperationTemperateServiceGetInitialPassword = "/temperate.v1.TemperateService/GetInitialPassword"
 const OperationTemperateServiceGetRole = "/temperate.v1.TemperateService/GetRole"
@@ -53,14 +56,17 @@ const OperationTemperateServiceLogin = "/temperate.v1.TemperateService/Login"
 const OperationTemperateServiceLogout = "/temperate.v1.TemperateService/Logout"
 const OperationTemperateServiceRegenerateServiceAccountToken = "/temperate.v1.TemperateService/RegenerateServiceAccountToken"
 const OperationTemperateServiceSetRoleInheritances = "/temperate.v1.TemperateService/SetRoleInheritances"
+const OperationTemperateServiceSetup2FA = "/temperate.v1.TemperateService/Setup2FA"
 const OperationTemperateServiceUpdatePermission = "/temperate.v1.TemperateService/UpdatePermission"
 const OperationTemperateServiceUpdateRole = "/temperate.v1.TemperateService/UpdateRole"
 const OperationTemperateServiceUpdateSSOProvider = "/temperate.v1.TemperateService/UpdateSSOProvider"
 const OperationTemperateServiceUpdateServiceAccount = "/temperate.v1.TemperateService/UpdateServiceAccount"
 const OperationTemperateServiceUpdateSystemSettings = "/temperate.v1.TemperateService/UpdateSystemSettings"
 const OperationTemperateServiceUpdateUser = "/temperate.v1.TemperateService/UpdateUser"
+const OperationTemperateServiceVerifyTOTPLogin = "/temperate.v1.TemperateService/VerifyTOTPLogin"
 
 type TemperateServiceHTTPServer interface {
+	AdminResetUser2FA(context.Context, *AdminResetUser2FARequest) (*emptypb.Empty, error)
 	AssignRolePermissions(context.Context, *AssignRolePermissionsRequest) (*Role, error)
 	AssignUserRoles(context.Context, *AssignUserRolesRequest) (*User, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
@@ -74,6 +80,8 @@ type TemperateServiceHTTPServer interface {
 	DeleteSSOProvider(context.Context, *DeleteSSOProviderRequest) (*emptypb.Empty, error)
 	DeleteServiceAccount(context.Context, *DeleteServiceAccountRequest) (*emptypb.Empty, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*emptypb.Empty, error)
+	Disable2FA(context.Context, *Disable2FARequest) (*emptypb.Empty, error)
+	Enable2FA(context.Context, *Enable2FARequest) (*emptypb.Empty, error)
 	GetCurrentUser(context.Context, *emptypb.Empty) (*User, error)
 	GetInitialPassword(context.Context, *emptypb.Empty) (*InitialPasswordReply, error)
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
@@ -98,12 +106,14 @@ type TemperateServiceHTTPServer interface {
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	RegenerateServiceAccountToken(context.Context, *RegenerateServiceAccountTokenRequest) (*ServiceAccountTokenReply, error)
 	SetRoleInheritances(context.Context, *SetRoleInheritancesRequest) (*Role, error)
+	Setup2FA(context.Context, *emptypb.Empty) (*Setup2FAReply, error)
 	UpdatePermission(context.Context, *UpdatePermissionRequest) (*Permission, error)
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
 	UpdateSSOProvider(context.Context, *UpdateSSOProviderRequest) (*SSOProvider, error)
 	UpdateServiceAccount(context.Context, *UpdateServiceAccountRequest) (*ServiceAccount, error)
 	UpdateSystemSettings(context.Context, *UpdateSystemSettingsRequest) (*SystemSettingsReply, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*User, error)
+	VerifyTOTPLogin(context.Context, *VerifyTOTPLoginRequest) (*LoginReply, error)
 }
 
 func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTPServer) {
@@ -149,6 +159,11 @@ func RegisterTemperateServiceHTTPServer(s *http.Server, srv TemperateServiceHTTP
 	r.Handle("PATCH", "/v1/service-accounts/{id}", _TemperateService_UpdateServiceAccount0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/v1/service-accounts/{id}", _TemperateService_DeleteServiceAccount0_HTTP_Handler(srv))
 	r.Handle("POST", "/v1/service-accounts/{id}/regenerate-token", _TemperateService_RegenerateServiceAccountToken0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/2fa/setup", _TemperateService_Setup2FA0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/2fa/enable", _TemperateService_Enable2FA0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/2fa/disable", _TemperateService_Disable2FA0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/users/{user_id}/reset-2fa", _TemperateService_AdminResetUser2FA0_HTTP_Handler(srv))
+	r.Handle("POST", "/v1/auth/verify-totp", _TemperateService_VerifyTOTPLogin0_HTTP_Handler(srv))
 }
 
 func _TemperateService_Health0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
@@ -987,7 +1002,106 @@ func _TemperateService_RegenerateServiceAccountToken0_HTTP_Handler(srv Temperate
 	}
 }
 
+func _TemperateService_Setup2FA0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceSetup2FA)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Setup2FA(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Setup2FAReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_Enable2FA0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Enable2FARequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceEnable2FA)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Enable2FA(ctx, req.(*Enable2FARequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_Disable2FA0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Disable2FARequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceDisable2FA)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Disable2FA(ctx, req.(*Disable2FARequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_AdminResetUser2FA0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminResetUser2FARequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceAdminResetUser2FA)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminResetUser2FA(ctx, req.(*AdminResetUser2FARequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TemperateService_VerifyTOTPLogin0_HTTP_Handler(srv TemperateServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in VerifyTOTPLoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTemperateServiceVerifyTOTPLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.VerifyTOTPLogin(ctx, req.(*VerifyTOTPLoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TemperateServiceHTTPClient interface {
+	AdminResetUser2FA(ctx context.Context, req *AdminResetUser2FARequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	AssignRolePermissions(ctx context.Context, req *AssignRolePermissionsRequest, opts ...http.CallOption) (rsp *Role, err error)
 	AssignUserRoles(ctx context.Context, req *AssignUserRolesRequest, opts ...http.CallOption) (rsp *User, err error)
 	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
@@ -1001,6 +1115,8 @@ type TemperateServiceHTTPClient interface {
 	DeleteSSOProvider(ctx context.Context, req *DeleteSSOProviderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteServiceAccount(ctx context.Context, req *DeleteServiceAccountRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	Disable2FA(ctx context.Context, req *Disable2FARequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	Enable2FA(ctx context.Context, req *Enable2FARequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetCurrentUser(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *User, err error)
 	GetInitialPassword(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *InitialPasswordReply, err error)
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
@@ -1025,12 +1141,14 @@ type TemperateServiceHTTPClient interface {
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	RegenerateServiceAccountToken(ctx context.Context, req *RegenerateServiceAccountTokenRequest, opts ...http.CallOption) (rsp *ServiceAccountTokenReply, err error)
 	SetRoleInheritances(ctx context.Context, req *SetRoleInheritancesRequest, opts ...http.CallOption) (rsp *Role, err error)
+	Setup2FA(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *Setup2FAReply, err error)
 	UpdatePermission(ctx context.Context, req *UpdatePermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
 	UpdateSSOProvider(ctx context.Context, req *UpdateSSOProviderRequest, opts ...http.CallOption) (rsp *SSOProvider, err error)
 	UpdateServiceAccount(ctx context.Context, req *UpdateServiceAccountRequest, opts ...http.CallOption) (rsp *ServiceAccount, err error)
 	UpdateSystemSettings(ctx context.Context, req *UpdateSystemSettingsRequest, opts ...http.CallOption) (rsp *SystemSettingsReply, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *User, err error)
+	VerifyTOTPLogin(ctx context.Context, req *VerifyTOTPLoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 }
 
 type TemperateServiceHTTPClientImpl struct {
@@ -1039,6 +1157,23 @@ type TemperateServiceHTTPClientImpl struct {
 
 func NewTemperateServiceHTTPClient(client *http.Client) TemperateServiceHTTPClient {
 	return &TemperateServiceHTTPClientImpl{client}
+}
+
+func (c *TemperateServiceHTTPClientImpl) AdminResetUser2FA(ctx context.Context, in *AdminResetUser2FARequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/users/{user_id}/reset-2fa"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceAdminResetUser2FA),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *TemperateServiceHTTPClientImpl) AssignRolePermissions(ctx context.Context, in *AssignRolePermissionsRequest, opts ...http.CallOption) (*Role, error) {
@@ -1251,6 +1386,40 @@ func (c *TemperateServiceHTTPClientImpl) DeleteUser(ctx context.Context, in *Del
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) Disable2FA(ctx context.Context, in *Disable2FARequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/auth/2fa/disable"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceDisable2FA),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) Enable2FA(ctx context.Context, in *Enable2FARequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/auth/2fa/enable"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceEnable2FA),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1615,6 +1784,23 @@ func (c *TemperateServiceHTTPClientImpl) SetRoleInheritances(ctx context.Context
 	return &out, nil
 }
 
+func (c *TemperateServiceHTTPClientImpl) Setup2FA(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*Setup2FAReply, error) {
+	var out Setup2FAReply
+	pattern := "/v1/auth/2fa/setup"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceSetup2FA),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *TemperateServiceHTTPClientImpl) UpdatePermission(ctx context.Context, in *UpdatePermissionRequest, opts ...http.CallOption) (*Permission, error) {
 	var out Permission
 	pattern := "/v1/permissions/{id}"
@@ -1711,6 +1897,23 @@ func (c *TemperateServiceHTTPClientImpl) UpdateUser(ctx context.Context, in *Upd
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TemperateServiceHTTPClientImpl) VerifyTOTPLogin(ctx context.Context, in *VerifyTOTPLoginRequest, opts ...http.CallOption) (*LoginReply, error) {
+	var out LoginReply
+	pattern := "/v1/auth/verify-totp"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTemperateServiceVerifyTOTPLogin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

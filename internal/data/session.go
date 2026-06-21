@@ -277,6 +277,8 @@ func (r *settingsRepo) GetSettings(ctx context.Context) (*biz.SystemSettings, er
 			if row.Value != "" {
 				settings.CornerIcon = row.Value
 			}
+		case "totp_enabled":
+			settings.TOTPEnabled = row.Value == "true"
 		}
 	}
 	_ = r.upsertSettings(ctx, defaultSettingPairs(settings, seen))
@@ -293,12 +295,17 @@ func (r *settingsRepo) UpdateSettings(ctx context.Context, settings *biz.SystemS
 	if settings.CornerIcon == "" {
 		settings.CornerIcon = biz.DefaultServiceName
 	}
+	totpVal := "false"
+	if settings.TOTPEnabled {
+		totpVal = "true"
+	}
 	return r.upsertSettings(ctx, map[string]string{
 		"audit_log_retention_days":   intToStr(settings.AuditLogRetentionDays),
 		"session_log_retention_days": intToStr(settings.SessionLogRetentionDays),
 		"service_name":               settings.ServiceName,
 		"site_icon":                  settings.SiteIcon,
 		"corner_icon":                settings.CornerIcon,
+		"totp_enabled":               totpVal,
 	})
 }
 

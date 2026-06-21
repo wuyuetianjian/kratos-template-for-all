@@ -61,6 +61,7 @@ type SystemSettings struct {
 	ServiceName             string
 	SiteIcon                string
 	CornerIcon              string
+	TOTPEnabled             bool
 }
 
 type SessionRepo interface {

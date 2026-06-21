@@ -40,6 +40,10 @@ type AuthRepo interface {
 	ChangePassword(context.Context, int64, string) error
 	EffectivePermissions(context.Context, int64) ([]Permission, []Role, error)
 
+	SetTOTPSecret(context.Context, int64, string) error
+	EnableTOTP(context.Context, int64) error
+	DisableTOTP(context.Context, int64) error
+
 	CreateUser(context.Context, *CreateUser) (*User, error)
 	ListUsers(context.Context, Page) ([]User, int, error)
 	UpdateUser(context.Context, *UpdateUser) (*User, error)
@@ -74,6 +78,8 @@ type User struct {
 	Disabled            bool
 	System              bool
 	InitialPasswordUsed bool
+	TOTPSecret          string
+	TOTPEnabled         bool
 	Roles               []Role
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
@@ -152,6 +158,8 @@ type LoginResult struct {
 	User               *User
 	MustChangePassword bool
 	InitialPassword    string
+	Requires2FA        bool
+	PreAuthToken       string
 }
 
 type InitialPasswordResult struct {
@@ -238,6 +246,16 @@ func (uc *UseCase) Login(ctx context.Context, username, password string) (*Login
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
 		return nil, errors.Unauthorized(reasonUnauthorized, "invalid username or password")
 	}
+
+	settings, _ := uc.settingsRepo.GetSettings(ctx)
+	if settings != nil && settings.TOTPEnabled && user.TOTPEnabled {
+		preAuthToken, err := uc.signPreAuthToken(user)
+		if err != nil {
+			return nil, err
+		}
+		return &LoginResult{Requires2FA: true, PreAuthToken: preAuthToken, User: user}, nil
+	}
+
 	_, roles, err := uc.authRepo.EffectivePermissions(ctx, user.ID)
 	if err != nil {
 		return nil, err
@@ -451,6 +469,58 @@ func (uc *UseCase) signToken(user *User) (string, error) {
 		"iat":      time.Now().Unix(),
 	})
 	return token.SignedString([]byte(key))
+}
+
+func (uc *UseCase) signPreAuthToken(user *User) (string, error) {
+	method, ok := jwtSigningMethod(uc.confData.GetApi().GetSigningMethod())
+	if !ok {
+		return "", errors.Unauthorized(reasonUnauthorized, "unsupported jwt signing method")
+	}
+	key := uc.confData.GetApi().GetJwtKey()
+	if key == "" {
+		return "", errors.Unauthorized(reasonUnauthorized, "jwt key is missing")
+	}
+	token := jwt.NewWithClaims(method, jwt.MapClaims{
+		"user_id":      user.ID,
+		"username":     user.Username,
+		"totp_pending": true,
+		"iat":          time.Now().Unix(),
+		"exp":          time.Now().Add(5 * time.Minute).Unix(),
+	})
+	return token.SignedString([]byte(key))
+}
+
+func (uc *UseCase) parsePreAuthToken(rawToken string) (int64, error) {
+	method, ok := jwtSigningMethod(uc.confData.GetApi().GetSigningMethod())
+	if !ok {
+		return 0, errors.Unauthorized(reasonUnauthorized, "unsupported jwt signing method")
+	}
+	key := uc.confData.GetApi().GetJwtKey()
+	token, err := jwt.Parse(rawToken, func(t *jwt.Token) (any, error) {
+		if t.Method != method {
+			return nil, errors.Unauthorized(reasonUnauthorized, "unexpected signing method")
+		}
+		return []byte(key), nil
+	})
+	if err != nil || !token.Valid {
+		return 0, errors.Unauthorized(reasonUnauthorized, "invalid pre-auth token")
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.Unauthorized(reasonUnauthorized, "invalid token claims")
+	}
+	pending, _ := claims["totp_pending"].(bool)
+	if !pending {
+		return 0, errors.Unauthorized(reasonUnauthorized, "not a pre-auth token")
+	}
+	switch v := claims["user_id"].(type) {
+	case float64:
+		return int64(v), nil
+	case int64:
+		return v, nil
+	default:
+		return 0, errors.Unauthorized(reasonUnauthorized, "invalid user_id in token")
+	}
 }
 
 func jwtSigningMethod(method string) (jwt.SigningMethod, bool) {

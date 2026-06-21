@@ -24,6 +24,8 @@ func (User) Fields() []ent.Field {
 		field.Bool("disabled").Default(false),
 		field.Bool("system").Default(false),
 		field.Bool("initial_password_used").Default(true),
+		field.String("totp_secret").Optional().Sensitive(),
+		field.Bool("totp_enabled").Default(false),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

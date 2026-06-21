@@ -146,6 +146,8 @@ var (
 		{Name: "disabled", Type: field.TypeBool, Default: false},
 		{Name: "system", Type: field.TypeBool, Default: false},
 		{Name: "initial_password_used", Type: field.TypeBool, Default: true},
+		{Name: "totp_secret", Type: field.TypeString, Nullable: true},
+		{Name: "totp_enabled", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

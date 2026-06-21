@@ -569,13 +569,20 @@ under resource type `service_account`.
 
 ## Audit Logs
 
-Every mutating operation (create, update, delete, login, kick) is recorded as
-an `AuditLog` entry with the acting user's identity, IP address, resource type,
+Every mutating operation (create, update, delete, login, logout, kick, 2FA
+setup/enable/disable/reset, and token regeneration) is recorded as an
+`AuditLog` entry with the acting user's identity, IP address, resource type,
 and resource name. Audit logs are append-only; only cleanup jobs remove them
 based on the configured retention period.
 
+Audit details use a structured JSON payload for new entries. Field details and
+before/after changes are rendered by the frontend audit page in a hover detail
+popover. TOTP secrets, QR URLs, and one-time codes are never written to audit
+logs.
+
 Query audit logs at `GET /v1/audit-logs`. An optional `action` query parameter
-filters by operation type (`login`, `create`, `update`, `delete`, `kick`).
+filters by operation type, such as `login`, `create`, `update`, `delete`,
+`kick`, `setup_2fa`, `enable_2fa`, `disable_2fa`, or `admin_reset_2fa`.
 
 ## System Settings
 
