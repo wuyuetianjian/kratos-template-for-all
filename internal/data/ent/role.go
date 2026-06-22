@@ -5,11 +5,11 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
 )
 
 // Role is the model entity for the Role schema.

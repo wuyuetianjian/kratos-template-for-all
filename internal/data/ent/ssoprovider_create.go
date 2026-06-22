@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/ssoprovider"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/ssoprovider"
 )
 
 // SSOProviderCreate is the builder for creating a SSOProvider entity.

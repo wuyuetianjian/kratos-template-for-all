@@ -6,14 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
 )
 
 // ServiceAccountUpdate is the builder for updating ServiceAccount entities.

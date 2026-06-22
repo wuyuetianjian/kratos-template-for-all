@@ -9,9 +9,8 @@ import (
 	// required by schema hooks.
 	_ "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/runtime"
 
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/migrate"
-
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/migrate"
 )
 
 type (

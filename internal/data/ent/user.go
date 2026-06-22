@@ -5,11 +5,11 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 )
 
 // User is the model entity for the User schema.
@@ -33,6 +33,8 @@ type User struct {
 	TotpSecret string `json:"-"`
 	// TotpEnabled holds the value of the "totp_enabled" field.
 	TotpEnabled bool `json:"totp_enabled,omitempty"`
+	// Source holds the value of the "source" field.
+	Source string `json:"source,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -81,7 +83,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPasswordHash, user.FieldDisplayName, user.FieldTotpSecret:
+		case user.FieldUsername, user.FieldPasswordHash, user.FieldDisplayName, user.FieldTotpSecret, user.FieldSource:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -153,6 +155,12 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field totp_enabled", values[i])
 			} else if value.Valid {
 				_m.TotpEnabled = value.Bool
+			}
+		case user.FieldSource:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field source", values[i])
+			} else if value.Valid {
+				_m.Source = value.String
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -233,6 +241,9 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("totp_enabled=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TotpEnabled))
+	builder.WriteString(", ")
+	builder.WriteString("source=")
+	builder.WriteString(_m.Source)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

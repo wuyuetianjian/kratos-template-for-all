@@ -7,14 +7,14 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 )
 
 // ModuleQuery is the builder for querying Module entities.

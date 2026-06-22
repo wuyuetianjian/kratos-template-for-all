@@ -5,12 +5,12 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 )
 
 // UserSession is the model entity for the UserSession schema.

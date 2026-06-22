@@ -5,6 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
+
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
 )
 

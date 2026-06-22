@@ -2,19 +2,19 @@ package biz
 
 import "sync"
 
-// SessionHub tracks live WebSocket connections per session and delivers kick signals.
+// SessionHub tracks live WebSocket connections per session and delivers kick/expire signals.
 type SessionHub struct {
 	mu  sync.RWMutex
-	chs map[int64]chan struct{}
+	chs map[int64]chan string
 }
 
 func newSessionHub() *SessionHub {
-	return &SessionHub{chs: make(map[int64]chan struct{})}
+	return &SessionHub{chs: make(map[int64]chan string)}
 }
 
-// Register returns a channel that receives a signal when the session is kicked.
-func (h *SessionHub) Register(sessionID int64) chan struct{} {
-	ch := make(chan struct{}, 1)
+// Register returns a channel that receives the event type when the session is terminated.
+func (h *SessionHub) Register(sessionID int64) chan string {
+	ch := make(chan string, 1)
 	h.mu.Lock()
 	h.chs[sessionID] = ch
 	h.mu.Unlock()
@@ -28,14 +28,23 @@ func (h *SessionHub) Unregister(sessionID int64) {
 	h.mu.Unlock()
 }
 
-// Notify delivers a kick signal to the WebSocket connection for the given session.
+// Notify delivers a "kicked" signal to the WebSocket for the given session.
 func (h *SessionHub) Notify(sessionID int64) {
+	h.notify(sessionID, "kicked")
+}
+
+// NotifyExpired delivers a "expired" signal to the WebSocket for the given session.
+func (h *SessionHub) NotifyExpired(sessionID int64) {
+	h.notify(sessionID, "expired")
+}
+
+func (h *SessionHub) notify(sessionID int64, event string) {
 	h.mu.RLock()
 	ch, ok := h.chs[sessionID]
 	h.mu.RUnlock()
 	if ok {
 		select {
-		case ch <- struct{}{}:
+		case ch <- event:
 		default:
 		}
 	}

@@ -6,15 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -150,6 +150,20 @@ func (_u *UserUpdate) SetTotpEnabled(v bool) *UserUpdate {
 func (_u *UserUpdate) SetNillableTotpEnabled(v *bool) *UserUpdate {
 	if v != nil {
 		_u.SetTotpEnabled(*v)
+	}
+	return _u
+}
+
+// SetSource sets the "source" field.
+func (_u *UserUpdate) SetSource(v string) *UserUpdate {
+	_u.mutation.SetSource(v)
+	return _u
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableSource(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetSource(*v)
 	}
 	return _u
 }
@@ -324,6 +338,9 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.TotpEnabled(); ok {
 		_spec.SetField(user.FieldTotpEnabled, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Source(); ok {
+		_spec.SetField(user.FieldSource, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
@@ -562,6 +579,20 @@ func (_u *UserUpdateOne) SetNillableTotpEnabled(v *bool) *UserUpdateOne {
 	return _u
 }
 
+// SetSource sets the "source" field.
+func (_u *UserUpdateOne) SetSource(v string) *UserUpdateOne {
+	_u.mutation.SetSource(v)
+	return _u
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableSource(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetSource(*v)
+	}
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *UserUpdateOne) SetUpdatedAt(v time.Time) *UserUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
@@ -762,6 +793,9 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if value, ok := _u.mutation.TotpEnabled(); ok {
 		_spec.SetField(user.FieldTotpEnabled, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Source(); ok {
+		_spec.SetField(user.FieldSource, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)

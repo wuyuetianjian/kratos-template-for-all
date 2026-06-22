@@ -42,7 +42,10 @@ require (
 )
 
 require (
+	github.com/Azure/go-ntlmssp v0.1.0 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
+	github.com/go-ldap/ldap/v3 v3.4.13 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/redis/go-redis/v9 v9.20.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

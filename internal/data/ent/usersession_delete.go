@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 )
 
 // UserSessionDelete is the builder for deleting a UserSession entity.

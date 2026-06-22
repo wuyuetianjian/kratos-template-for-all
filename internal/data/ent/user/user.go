@@ -30,6 +30,8 @@ const (
 	FieldTotpSecret = "totp_secret"
 	// FieldTotpEnabled holds the string denoting the totp_enabled field in the database.
 	FieldTotpEnabled = "totp_enabled"
+	// FieldSource holds the string denoting the source field in the database.
+	FieldSource = "source"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -65,6 +67,7 @@ var Columns = []string{
 	FieldInitialPasswordUsed,
 	FieldTotpSecret,
 	FieldTotpEnabled,
+	FieldSource,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -96,6 +99,8 @@ var (
 	DefaultInitialPasswordUsed bool
 	// DefaultTotpEnabled holds the default value on creation for the "totp_enabled" field.
 	DefaultTotpEnabled bool
+	// DefaultSource holds the default value on creation for the "source" field.
+	DefaultSource string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -150,6 +155,11 @@ func ByTotpSecret(opts ...sql.OrderTermOption) OrderOption {
 // ByTotpEnabled orders the results by the totp_enabled field.
 func ByTotpEnabled(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTotpEnabled, opts...).ToFunc()
+}
+
+// BySource orders the results by the source field.
+func BySource(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSource, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

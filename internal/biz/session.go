@@ -72,6 +72,7 @@ type SessionRepo interface {
 	ListSessions(ctx context.Context, page Page) ([]UserSession, int, error)
 	KickSession(ctx context.Context, sessionID int64, kickedBy string) error
 	ExpireSession(ctx context.Context, tokenHash string) error
+	ExpireInactiveSessions(ctx context.Context, idleSince time.Time) ([]int64, error)
 	DeleteSessionsBefore(ctx context.Context, before time.Time) error
 }
 
@@ -136,12 +137,19 @@ func (uc *UseCase) CreateSession(ctx context.Context, tokenHash, ip, browser, os
 	})
 }
 
+const sessionIdleTimeout = time.Hour
+
 func (uc *UseCase) CheckSession(ctx context.Context, tokenHash string) error {
 	session, err := uc.sessionRepo.FindSessionByTokenHash(ctx, tokenHash)
 	if err != nil {
 		return nil
 	}
 	if session.Status != SessionStatusActive {
+		return ErrUnauthorized()
+	}
+	if time.Since(session.LastAccessAt) > sessionIdleTimeout {
+		_ = uc.sessionRepo.ExpireSession(ctx, tokenHash)
+		uc.hub.NotifyExpired(session.ID)
 		return ErrUnauthorized()
 	}
 	_ = uc.sessionRepo.UpdateSessionLastAccess(ctx, tokenHash)
@@ -238,6 +246,17 @@ func (uc *UseCase) scheduleCleanup() {
 		}
 		if err := uc.sessionRepo.DeleteSessionsBefore(ctx, time.Now().AddDate(0, 0, -int(sessionDays))); err != nil {
 			uc.log.Warn("session cleanup failed", "error", err)
+		}
+	})
+	_, _ = uc.cron.AddFunc("*/5 * * * *", func() {
+		ctx := context.Background()
+		ids, err := uc.sessionRepo.ExpireInactiveSessions(ctx, time.Now().Add(-sessionIdleTimeout))
+		if err != nil {
+			uc.log.Warn("idle session cleanup failed", "error", err)
+			return
+		}
+		for _, id := range ids {
+			uc.hub.NotifyExpired(id)
 		}
 	})
 	uc.cron.Start()

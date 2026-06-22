@@ -193,6 +193,40 @@ func (r *authRepo) EffectivePermissions(ctx context.Context, userID int64) ([]bi
 	return permissions, resultRoles, nil
 }
 
+func (r *authRepo) UpsertLDAPUser(ctx context.Context, username, displayName string) (*biz.User, error) {
+	existing, err := r.data.ReadEnt.User.Query().
+		Where(entuser.Username(username)).
+		WithRoles(withRoleEdges).
+		Only(ctx)
+	if err == nil {
+		if existing.Source != "ldap" {
+			return nil, errors.Forbidden(bizReasonSystemProtected, "username conflicts with a local account")
+		}
+		update := r.data.WriteEnt.User.UpdateOneID(existing.ID)
+		if displayName != "" && displayName != existing.DisplayName {
+			update.SetDisplayName(displayName)
+		}
+		if err := update.Exec(ctx); err != nil {
+			return nil, err
+		}
+		return r.findUserByID(ctx, r.data.ReadEnt, int64(existing.ID))
+	}
+	if !ent.IsNotFound(err) {
+		return nil, err
+	}
+	u, err := r.data.WriteEnt.User.Create().
+		SetUsername(username).
+		SetPasswordHash("").
+		SetDisplayName(displayName).
+		SetSource("ldap").
+		SetInitialPasswordUsed(true).
+		Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.findUserByID(ctx, r.data.ReadEnt, int64(u.ID))
+}
+
 func (r *authRepo) CreateUser(ctx context.Context, in *biz.CreateUser) (*biz.User, error) {
 	u, err := r.data.WriteEnt.User.Create().
 		SetUsername(in.Username).
@@ -607,6 +641,7 @@ func toBizUser(user *ent.User) *biz.User {
 		DisplayName:         user.DisplayName,
 		Disabled:            user.Disabled,
 		System:              user.System,
+		Source:              user.Source,
 		InitialPasswordUsed: user.InitialPasswordUsed,
 		TOTPSecret:          user.TotpSecret,
 		TOTPEnabled:         user.TotpEnabled,

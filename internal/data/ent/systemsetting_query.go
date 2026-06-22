@@ -6,13 +6,13 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 )
 
 // SystemSettingQuery is the builder for querying SystemSetting entities.

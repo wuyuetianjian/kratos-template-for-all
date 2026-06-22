@@ -370,6 +370,7 @@ message User {
     google.protobuf.Timestamp created_at = 7;
     google.protobuf.Timestamp updated_at = 8;
     bool totp_enabled = 9;
+    string source = 10;
 }
 
 message Role {

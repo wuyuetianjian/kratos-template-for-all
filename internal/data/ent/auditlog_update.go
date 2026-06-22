@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 )
 
 // AuditLogUpdate is the builder for updating AuditLog entities.

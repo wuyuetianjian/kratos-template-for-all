@@ -3,11 +3,11 @@
 package user
 
 import (
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
@@ -93,6 +93,11 @@ func TotpSecret(v string) predicate.User {
 // TotpEnabled applies equality check predicate on the "totp_enabled" field. It's identical to TotpEnabledEQ.
 func TotpEnabled(v bool) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldTotpEnabled, v))
+}
+
+// Source applies equality check predicate on the "source" field. It's identical to SourceEQ.
+func Source(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldSource, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -423,6 +428,71 @@ func TotpEnabledEQ(v bool) predicate.User {
 // TotpEnabledNEQ applies the NEQ predicate on the "totp_enabled" field.
 func TotpEnabledNEQ(v bool) predicate.User {
 	return predicate.User(sql.FieldNEQ(FieldTotpEnabled, v))
+}
+
+// SourceEQ applies the EQ predicate on the "source" field.
+func SourceEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldSource, v))
+}
+
+// SourceNEQ applies the NEQ predicate on the "source" field.
+func SourceNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldSource, v))
+}
+
+// SourceIn applies the In predicate on the "source" field.
+func SourceIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldSource, vs...))
+}
+
+// SourceNotIn applies the NotIn predicate on the "source" field.
+func SourceNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldSource, vs...))
+}
+
+// SourceGT applies the GT predicate on the "source" field.
+func SourceGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldSource, v))
+}
+
+// SourceGTE applies the GTE predicate on the "source" field.
+func SourceGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldSource, v))
+}
+
+// SourceLT applies the LT predicate on the "source" field.
+func SourceLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldSource, v))
+}
+
+// SourceLTE applies the LTE predicate on the "source" field.
+func SourceLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldSource, v))
+}
+
+// SourceContains applies the Contains predicate on the "source" field.
+func SourceContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldSource, v))
+}
+
+// SourceHasPrefix applies the HasPrefix predicate on the "source" field.
+func SourceHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldSource, v))
+}
+
+// SourceHasSuffix applies the HasSuffix predicate on the "source" field.
+func SourceHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldSource, v))
+}
+
+// SourceEqualFold applies the EqualFold predicate on the "source" field.
+func SourceEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldSource, v))
+}
+
+// SourceContainsFold applies the ContainsFold predicate on the "source" field.
+func SourceContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldSource, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
@@ -13,7 +15,6 @@ import (
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -178,12 +179,16 @@ func init() {
 	userDescTotpEnabled := userFields[7].Descriptor()
 	// user.DefaultTotpEnabled holds the default value on creation for the totp_enabled field.
 	user.DefaultTotpEnabled = userDescTotpEnabled.Default.(bool)
+	// userDescSource is the schema descriptor for source field.
+	userDescSource := userFields[8].Descriptor()
+	// user.DefaultSource holds the default value on creation for the source field.
+	user.DefaultSource = userDescSource.Default.(string)
 	// userDescCreatedAt is the schema descriptor for created_at field.
-	userDescCreatedAt := userFields[8].Descriptor()
+	userDescCreatedAt := userFields[9].Descriptor()
 	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
 	// userDescUpdatedAt is the schema descriptor for updated_at field.
-	userDescUpdatedAt := userFields[9].Descriptor()
+	userDescUpdatedAt := userFields[10].Descriptor()
 	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

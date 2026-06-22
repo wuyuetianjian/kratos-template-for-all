@@ -4,12 +4,12 @@ package ent
 
 import (
 	"context"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 )
 
 // AuditLogDelete is the builder for deleting a AuditLog entity.

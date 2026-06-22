@@ -7,6 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
+
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
@@ -17,10 +21,6 @@ import (
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
-	"time"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -5227,6 +5227,7 @@ type UserMutation struct {
 	initial_password_used *bool
 	totp_secret           *string
 	totp_enabled          *bool
+	source                *string
 	created_at            *time.Time
 	updated_at            *time.Time
 	clearedFields         map[string]struct{}
@@ -5653,6 +5654,42 @@ func (m *UserMutation) ResetTotpEnabled() {
 	m.totp_enabled = nil
 }
 
+// SetSource sets the "source" field.
+func (m *UserMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *UserMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldSource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *UserMutation) ResetSource() {
+	m.source = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *UserMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -5867,7 +5904,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
@@ -5891,6 +5928,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.totp_enabled != nil {
 		fields = append(fields, user.FieldTotpEnabled)
+	}
+	if m.source != nil {
+		fields = append(fields, user.FieldSource)
 	}
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -5922,6 +5962,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.TotpSecret()
 	case user.FieldTotpEnabled:
 		return m.TotpEnabled()
+	case user.FieldSource:
+		return m.Source()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	case user.FieldUpdatedAt:
@@ -5951,6 +5993,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTotpSecret(ctx)
 	case user.FieldTotpEnabled:
 		return m.OldTotpEnabled(ctx)
+	case user.FieldSource:
+		return m.OldSource(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case user.FieldUpdatedAt:
@@ -6019,6 +6063,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotpEnabled(v)
+		return nil
+	case user.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
 		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -6121,6 +6172,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldTotpEnabled:
 		m.ResetTotpEnabled()
+		return nil
+	case user.FieldSource:
+		m.ResetSource()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()

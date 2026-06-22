@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -114,6 +114,20 @@ func (_c *UserCreate) SetTotpEnabled(v bool) *UserCreate {
 func (_c *UserCreate) SetNillableTotpEnabled(v *bool) *UserCreate {
 	if v != nil {
 		_c.SetTotpEnabled(*v)
+	}
+	return _c
+}
+
+// SetSource sets the "source" field.
+func (_c *UserCreate) SetSource(v string) *UserCreate {
+	_c.mutation.SetSource(v)
+	return _c
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_c *UserCreate) SetNillableSource(v *string) *UserCreate {
+	if v != nil {
+		_c.SetSource(*v)
 	}
 	return _c
 }
@@ -227,6 +241,10 @@ func (_c *UserCreate) defaults() {
 		v := user.DefaultTotpEnabled
 		_c.mutation.SetTotpEnabled(v)
 	}
+	if _, ok := _c.mutation.Source(); !ok {
+		v := user.DefaultSource
+		_c.mutation.SetSource(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -261,6 +279,9 @@ func (_c *UserCreate) check() error {
 	}
 	if _, ok := _c.mutation.TotpEnabled(); !ok {
 		return &ValidationError{Name: "totp_enabled", err: errors.New(`ent: missing required field "User.totp_enabled"`)}
+	}
+	if _, ok := _c.mutation.Source(); !ok {
+		return &ValidationError{Name: "source", err: errors.New(`ent: missing required field "User.source"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
@@ -325,6 +346,10 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.TotpEnabled(); ok {
 		_spec.SetField(user.FieldTotpEnabled, field.TypeBool, value)
 		_node.TotpEnabled = value
+	}
+	if value, ok := _c.mutation.Source(); ok {
+		_spec.SetField(user.FieldSource, field.TypeString, value)
+		_node.Source = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

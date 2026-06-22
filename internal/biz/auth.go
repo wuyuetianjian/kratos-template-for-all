@@ -44,6 +44,7 @@ type AuthRepo interface {
 	EnableTOTP(context.Context, int64) error
 	DisableTOTP(context.Context, int64) error
 
+	UpsertLDAPUser(ctx context.Context, username, displayName string) (*User, error)
 	CreateUser(context.Context, *CreateUser) (*User, error)
 	ListUsers(context.Context, Page) ([]User, int, error)
 	UpdateUser(context.Context, *UpdateUser) (*User, error)
@@ -77,6 +78,7 @@ type User struct {
 	DisplayName         string
 	Disabled            bool
 	System              bool
+	Source              string
 	InitialPasswordUsed bool
 	TOTPSecret          string
 	TOTPEnabled         bool
@@ -237,14 +239,15 @@ func (uc *UseCase) BootstrapAdmin(ctx context.Context) error {
 
 func (uc *UseCase) Login(ctx context.Context, username, password string) (*LoginResult, error) {
 	user, err := uc.authRepo.FindUserByUsername(ctx, username)
-	if err != nil {
-		return nil, err
+	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
+		ldapUser, ldapErr := uc.tryLDAPLogin(ctx, username, password)
+		if ldapErr != nil {
+			return nil, errors.Unauthorized(reasonUnauthorized, "invalid username or password")
+		}
+		user = ldapUser
 	}
 	if user.Disabled {
 		return nil, errors.Forbidden(reasonForbidden, "user is disabled")
-	}
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		return nil, errors.Unauthorized(reasonUnauthorized, "invalid username or password")
 	}
 
 	settings, _ := uc.settingsRepo.GetSettings(ctx)

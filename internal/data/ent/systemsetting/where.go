@@ -3,9 +3,8 @@
 package systemsetting
 
 import (
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-
 	"entgo.io/ent/dialect/sql"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

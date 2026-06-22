@@ -5,11 +5,11 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
 )
 
 // Module is the model entity for the Module schema.

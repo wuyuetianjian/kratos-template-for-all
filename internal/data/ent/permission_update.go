@@ -6,15 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
 )
 
 // PermissionUpdate is the builder for updating Permission entities.

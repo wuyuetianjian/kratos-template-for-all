@@ -372,6 +372,7 @@ type User struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	TotpEnabled   bool                   `protobuf:"varint,9,opt,name=totp_enabled,json=totpEnabled,proto3" json:"totp_enabled,omitempty"`
+	Source        string                 `protobuf:"bytes,10,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -467,6 +468,13 @@ func (x *User) GetTotpEnabled() bool {
 		return x.TotpEnabled
 	}
 	return false
+}
+
+func (x *User) GetSource() string {
+	if x != nil {
+		return x.Source
+	}
+	return ""
 }
 
 type Role struct {
@@ -3903,7 +3911,7 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"\x10initial_password\x18\x03 \x01(\tR\x0finitialPassword\"g\n" +
 	"\x15ChangePasswordRequest\x12&\n" +
 	"\fold_password\x18\x01 \x01(\tB\x03\xe0A\x02R\voldPassword\x12&\n" +
-	"\fnew_password\x18\x02 \x01(\tB\x03\xe0A\x02R\vnewPassword\"\xcc\x02\n" +
+	"\fnew_password\x18\x02 \x01(\tB\x03\xe0A\x02R\vnewPassword\"\xe4\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
@@ -3915,7 +3923,9 @@ const file_api_temperate_v1_temperate_proto_rawDesc = "" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12!\n" +
-	"\ftotp_enabled\x18\t \x01(\bR\vtotpEnabled\"\xd3\x02\n" +
+	"\ftotp_enabled\x18\t \x01(\bR\vtotpEnabled\x12\x16\n" +
+	"\x06source\x18\n" +
+	" \x01(\tR\x06source\"\xd3\x02\n" +
 	"\x04Role\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +

@@ -82,8 +82,8 @@ func newWSHandler(data *conf.Data, uc *biz.UseCase) http.HandlerFunc {
 
 		for {
 			select {
-			case <-kickCh:
-				_ = conn.WriteJSON(map[string]string{"type": "kicked"})
+			case event := <-kickCh:
+				_ = conn.WriteJSON(map[string]string{"type": event})
 				return
 			case <-ticker.C:
 				if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {

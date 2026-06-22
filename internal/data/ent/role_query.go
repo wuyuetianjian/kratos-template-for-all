@@ -7,16 +7,16 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
-	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 )
 
 // RoleQuery is the builder for querying Role entities.

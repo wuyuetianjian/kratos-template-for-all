@@ -8,6 +8,10 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
@@ -17,10 +21,6 @@ import (
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ent aliases to avoid import conflicts in user's code.

@@ -1071,6 +1071,7 @@ func convertUser(user *biz.User) *v1.User {
 		DisplayName: user.DisplayName,
 		Disabled:    user.Disabled,
 		System:      user.System,
+		Source:      user.Source,
 		TotpEnabled: user.TOTPEnabled,
 		Roles:       convertRoles(user.Roles),
 		CreatedAt:   timestamppb.New(user.CreatedAt),

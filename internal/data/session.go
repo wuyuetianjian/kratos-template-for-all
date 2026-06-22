@@ -127,6 +127,36 @@ func (r *sessionRepo) ExpireSession(ctx context.Context, tokenHash string) error
 		Exec(ctx)
 }
 
+func (r *sessionRepo) ExpireInactiveSessions(ctx context.Context, idleSince time.Time) ([]int64, error) {
+	sessions, err := r.data.WriteEnt.UserSession.Query().
+		Where(
+			entusersession.Status(biz.SessionStatusActive),
+			entusersession.LastAccessAtLT(idleSince),
+		).
+		Select(entusersession.FieldID).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(sessions) == 0 {
+		return nil, nil
+	}
+	ids := make([]int, 0, len(sessions))
+	result := make([]int64, 0, len(sessions))
+	for _, s := range sessions {
+		ids = append(ids, s.ID)
+		result = append(result, int64(s.ID))
+	}
+	_, err = r.data.WriteEnt.UserSession.Update().
+		Where(entusersession.IDIn(ids...)).
+		SetStatus(biz.SessionStatusExpired).
+		Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (r *sessionRepo) DeleteSessionsBefore(ctx context.Context, before time.Time) error {
 	_, err := r.data.WriteEnt.UserSession.Delete().
 		Where(entusersession.LoginAtLT(before)).

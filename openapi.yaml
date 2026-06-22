@@ -1429,6 +1429,8 @@ components:
                     format: date-time
                 totpEnabled:
                     type: boolean
+                source:
+                    type: string
         temperate.v1.UserSession:
             type: object
             properties:
