@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"temperate/internal/data/ent/auditlog"
-	"temperate/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

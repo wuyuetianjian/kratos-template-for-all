@@ -8,12 +8,12 @@ package main
 import (
 	"log/slog"
 
-	"temperate/internal/biz"
-	"temperate/internal/conf"
-	"temperate/internal/data"
-	registrar "temperate/internal/registry"
-	"temperate/internal/server"
-	"temperate/internal/service"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data"
+	registrar "github.com/wuyuetianjian/kratos-template-for-all/internal/registry"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/server"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/service"
 
 	"github.com/go-kratos/kratos/v3"
 	"github.com/google/wire"

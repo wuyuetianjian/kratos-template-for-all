@@ -8,7 +8,7 @@ import (
 	polaris "github.com/polarismesh/polaris-go"
 	polarisconfig "github.com/polarismesh/polaris-go/pkg/config"
 
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 )
 
 func newPolarisConfigSource(c *conf.Config_Remote) (kconfig.Source, error) {

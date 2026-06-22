@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"temperate/internal/data/ent/predicate"
-	"temperate/internal/data/ent/role"
-	"temperate/internal/data/ent/serviceaccount"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

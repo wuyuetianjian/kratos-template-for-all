@@ -7,9 +7,9 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"math"
-	"temperate/internal/data/ent/module"
-	"temperate/internal/data/ent/permission"
-	"temperate/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

@@ -3,7 +3,7 @@
 package module
 
 import (
-	"temperate/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

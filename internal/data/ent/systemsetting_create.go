@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"temperate/internal/data/ent/systemsetting"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"

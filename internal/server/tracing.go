@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"log/slog"
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 	"time"
 
 	"go.opentelemetry.io/otel"

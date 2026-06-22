@@ -716,6 +716,8 @@ type Data_Redis struct {
 	Addr          string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
 	ReadTimeout   *durationpb.Duration   `protobuf:"bytes,3,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
 	WriteTimeout  *durationpb.Duration   `protobuf:"bytes,4,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	Username      string                 `protobuf:"bytes,5,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -776,6 +778,20 @@ func (x *Data_Redis) GetWriteTimeout() *durationpb.Duration {
 		return x.WriteTimeout
 	}
 	return nil
+}
+
+func (x *Data_Redis) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *Data_Redis) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
 }
 
 type Data_API struct {
@@ -1207,7 +1223,7 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x04GRPC\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xf1\x06\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xa9\a\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x02 \x01(\v2\x19.kratos.api.Data.DatabaseR\bdatabase\x12,\n" +
 	"\x05redis\x18\x03 \x01(\v2\x16.kratos.api.Data.RedisR\x05redis\x12&\n" +
@@ -1220,12 +1236,14 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x0emax_open_conns\x18\x05 \x01(\x05R\fmaxOpenConns\x12E\n" +
 	"\x11conn_max_lifetime\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x12\x14\n" +
 	"\x05debug\x18\a \x01(\bR\x05debug\x12!\n" +
-	"\fauto_migrate\x18\b \x01(\bR\vautoMigrate\x1a\xb3\x01\n" +
+	"\fauto_migrate\x18\b \x01(\bR\vautoMigrate\x1a\xeb\x01\n" +
 	"\x05Redis\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x12<\n" +
 	"\fread_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vreadTimeout\x12>\n" +
-	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\x1a\xf9\x01\n" +
+	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\x12\x1a\n" +
+	"\busername\x18\x05 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x06 \x01(\tR\bpassword\x1a\xf9\x01\n" +
 	"\x03API\x12\x12\n" +
 	"\x04auth\x18\x01 \x01(\bR\x04auth\x12%\n" +
 	"\x0esigning_method\x18\x02 \x01(\tR\rsigningMethod\x12\x17\n" +

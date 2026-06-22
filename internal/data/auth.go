@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"slices"
 
-	"temperate/internal/biz"
-	"temperate/internal/data/ent"
-	entmodule "temperate/internal/data/ent/module"
-	entpermission "temperate/internal/data/ent/permission"
-	entrole "temperate/internal/data/ent/role"
-	entuser "temperate/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
+	entmodule "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/module"
+	entpermission "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/permission"
+	entrole "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/role"
+	entuser "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v3/errors"

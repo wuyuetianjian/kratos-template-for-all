@@ -1,4 +1,4 @@
-module temperate
+module github.com/wuyuetianjian/kratos-template-for-all
 
 go 1.26.0
 
@@ -44,6 +44,8 @@ require (
 require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
+	github.com/redis/go-redis/v9 v9.20.1 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 )
 
 require (

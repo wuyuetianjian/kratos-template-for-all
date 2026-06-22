@@ -5,11 +5,11 @@ package enttest
 import (
 	"context"
 
-	"temperate/internal/data/ent"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
 	// required by schema hooks.
-	_ "temperate/internal/data/ent/runtime"
+	_ "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/runtime"
 
-	"temperate/internal/data/ent/migrate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

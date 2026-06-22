@@ -23,8 +23,8 @@ import (
 	nacosvo "github.com/nacos-group/nacos-sdk-go/vo"
 	clientv3 "go.etcd.io/etcd/client/v3"
 
-	"temperate/internal/conf"
-	"temperate/internal/configsource"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/configsource"
 )
 
 func loadBootstrap(path string, logger *slog.Logger) (*conf.Bootstrap, kconfig.Config, error) {

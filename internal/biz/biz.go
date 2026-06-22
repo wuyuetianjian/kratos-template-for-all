@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 	"log/slog"
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 
 	"github.com/go-kratos/kratos/v3/log"
 

@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"temperate/internal/data/ent/user"
-	"temperate/internal/data/ent/usersession"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"temperate/internal/biz"
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"

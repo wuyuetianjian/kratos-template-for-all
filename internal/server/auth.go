@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	v1 "temperate/api/temperate/v1"
-	"temperate/internal/biz"
+	v1 "github.com/wuyuetianjian/kratos-template-for-all/api/temperate/v1"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
 
 	"github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/middleware"

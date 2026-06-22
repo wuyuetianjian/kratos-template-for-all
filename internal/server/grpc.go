@@ -2,10 +2,10 @@ package server
 
 import (
 	"log/slog"
-	v1 "temperate/api/temperate/v1"
-	"temperate/internal/biz"
-	"temperate/internal/conf"
-	"temperate/internal/service"
+	v1 "github.com/wuyuetianjian/kratos-template-for-all/api/temperate/v1"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/service"
 
 	oteltracing "github.com/go-kratos/kratos/contrib/otel/v3/tracing"
 	"github.com/go-kratos/kratos/v3/middleware"

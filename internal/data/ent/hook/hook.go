@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"temperate/internal/data/ent"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
 )
 
 // The AuditLogFunc type is an adapter to allow the use of ordinary

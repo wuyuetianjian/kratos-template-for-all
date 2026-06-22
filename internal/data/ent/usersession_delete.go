@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"temperate/internal/data/ent/predicate"
-	"temperate/internal/data/ent/usersession"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/predicate"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

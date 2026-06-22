@@ -3,7 +3,7 @@ package server
 import (
 	"log/slog"
 	"net/http"
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 
 	kratosmetrics "github.com/go-kratos/kratos/contrib/otel/v3/metrics"
 	"github.com/go-kratos/kratos/v3/middleware"

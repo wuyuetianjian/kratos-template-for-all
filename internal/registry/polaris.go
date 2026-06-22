@@ -8,7 +8,7 @@ import (
 	polarisapi "github.com/polarismesh/polaris-go/api"
 	polarisconfig "github.com/polarismesh/polaris-go/pkg/config"
 
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 )
 
 func newPolaris(c *conf.Registry) (registry.Registrar, func(), error) {

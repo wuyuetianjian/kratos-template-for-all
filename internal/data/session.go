@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"temperate/internal/biz"
-	"temperate/internal/data/ent"
-	entauditlog "temperate/internal/data/ent/auditlog"
-	entsystemsetting "temperate/internal/data/ent/systemsetting"
-	entusersession "temperate/internal/data/ent/usersession"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
+	entauditlog "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/auditlog"
+	entsystemsetting "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/systemsetting"
+	entusersession "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/usersession"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v3/errors"

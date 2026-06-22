@@ -2,9 +2,9 @@ package data
 
 import (
 	"context"
-	"temperate/internal/biz"
-	"temperate/internal/data/ent"
-	entsso "temperate/internal/data/ent/ssoprovider"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
+	entsso "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/ssoprovider"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v3/errors"

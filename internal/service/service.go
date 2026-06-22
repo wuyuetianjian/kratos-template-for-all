@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	v1 "temperate/api/temperate/v1"
-	"temperate/internal/biz"
-	"temperate/internal/conf"
+	v1 "github.com/wuyuetianjian/kratos-template-for-all/api/temperate/v1"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 
 	"github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/log"

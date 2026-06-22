@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"temperate/internal/conf"
-	"temperate/internal/data/ent"
+
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -14,6 +15,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/wire"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
 )
 
@@ -26,6 +28,7 @@ type Data struct {
 	cnf      *conf.Data
 	WriteEnt *ent.Client
 	ReadEnt  *ent.Client
+	Redis    *redis.Client
 }
 
 // NewData .
@@ -55,8 +58,22 @@ func NewData(c *conf.Data, logger *slog.Logger) (*Data, func(), error) {
 			return nil, nil, err
 		}
 	}
+	var redisClient *redis.Client
+	if rc := c.GetRedis(); rc != nil && rc.GetAddr() != "" {
+		redisClient = redis.NewClient(&redis.Options{
+			Network:      rc.GetNetwork(),
+			Addr:         rc.GetAddr(),
+			Username:     rc.GetUsername(),
+			Password:     rc.GetPassword(),
+			ReadTimeout:  rc.GetReadTimeout().AsDuration(),
+			WriteTimeout: rc.GetWriteTimeout().AsDuration(),
+		})
+	}
 	cleanup := func() {
 		logger.Info("closing the data resources")
+		if redisClient != nil {
+			_ = redisClient.Close()
+		}
 		if readEnt != writeEnt {
 			_ = readEnt.Close()
 		}
@@ -67,6 +84,7 @@ func NewData(c *conf.Data, logger *slog.Logger) (*Data, func(), error) {
 		cnf:      c,
 		WriteEnt: writeEnt,
 		ReadEnt:  readEnt,
+		Redis:    redisClient,
 	}, cleanup, nil
 }
 

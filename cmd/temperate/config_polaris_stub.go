@@ -7,7 +7,7 @@ import (
 
 	kconfig "github.com/go-kratos/kratos/v3/config"
 
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 )
 
 func newPolarisConfigSource(*conf.Config_Remote) (kconfig.Source, error) {

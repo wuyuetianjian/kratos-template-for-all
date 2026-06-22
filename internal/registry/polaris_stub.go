@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-kratos/kratos/v3/registry"
 
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 )
 
 func newPolaris(*conf.Registry) (registry.Registrar, func(), error) {

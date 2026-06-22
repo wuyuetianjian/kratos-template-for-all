@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"temperate/internal/biz"
-	"temperate/internal/data/ent"
-	entserviceaccount "temperate/internal/data/ent/serviceaccount"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/biz"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent"
+	entserviceaccount "github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/serviceaccount"
 
 	"github.com/go-kratos/kratos/v3/errors"
 )

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log/slog"
 	"os"
-	"temperate/internal/data"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data"
 
 	"github.com/go-kratos/kratos/contrib/otel/v3/tracing"
 	"github.com/go-kratos/kratos/v3"

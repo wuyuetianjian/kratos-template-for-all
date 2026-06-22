@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"temperate/internal/conf"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/conf"
 
 	consulreg "github.com/go-kratos/kratos/contrib/registry/consul/v3"
 	discoveryreg "github.com/go-kratos/kratos/contrib/registry/discovery/v3"

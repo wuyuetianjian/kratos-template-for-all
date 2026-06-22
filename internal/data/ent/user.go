@@ -5,7 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"temperate/internal/data/ent/user"
+	"github.com/wuyuetianjian/kratos-template-for-all/internal/data/ent/user"
 	"time"
 
 	"entgo.io/ent"
